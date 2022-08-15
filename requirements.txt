@@ -1,0 +1,8 @@
+bokeh==2.4.3
+jupyterlab==3.4.5
+matplotlib==3.5.3
+nptyping==2.2.0
+pip-chill==1.0.1
+ptvsd==4.3.2
+statsmodels==0.13.2
+strenum==0.4.8
