@@ -76,14 +76,12 @@ class KDECDF_integrate(DensityFunc):
 
 
 class KDECDF_approx(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=20_000) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000) -> None:
         self._kde = gaussian_kde(dataset=data)
-        self._ecdf = SMEcdf(x=self._kde.resample(size=resample_samples, seed=1).reshape((resample_samples,)))
+        data = self._kde.resample(size=resample_samples, seed=1).reshape((resample_samples,))
+        self._ecdf = SMEcdf(x=data)
 
-        def cdf(x):
-            return self._ecdf(x)
-
-        super().__init__(range=(np.min(data), np.max(data)), cdf=cdf)
+        super().__init__(range=(np.min(data), np.max(data)), cdf=self._ecdf)
 
 
 
