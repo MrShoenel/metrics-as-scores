@@ -110,10 +110,10 @@ class Distribution:
         return self.df['project'].unique()
 
 
-    def get_cdf_data(self, metric_id: MetricID, system: str=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
+    def get_cdf_data(self, metric_id: MetricID, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
         new_df = self.df[self.df['metric'] == metric_id.name]
-        if system is not None:
-            new_df = new_df[new_df['system'] == system]
+        if systems is not None:
+            new_df = new_df[new_df['system'].isin(systems)]
         
         vals = new_df['value']
         if unique_vals:
