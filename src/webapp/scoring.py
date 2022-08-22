@@ -12,12 +12,15 @@ in your browser.
 
 '''
 import os
-import ptvsd
 from sys import path
+
+path.append(os.getcwd())
+
+import ptvsd
 from src.data.metrics import MetricID
 
 
-path.append(os.getcwd())
+
 
 if os.environ['BOKEH_VS_DEBUG'] == 'true':
     # 5678 is the default attach port in the VS Code debug configurations
@@ -36,7 +39,6 @@ from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Dropdown
-from bokeh.models.ranges import Range1d
 from bokeh.plotting import figure
 
 
