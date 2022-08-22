@@ -1,8 +1,9 @@
-from typing import Any, Callable
+from typing import Any, Callable, Union
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.stats import kstest
+from scipy.optimize import direct
 import pandas as pd
 import numpy as np
 import scipy.stats
@@ -12,12 +13,37 @@ import pickle
 
 
 class DensityFunc:
-    def __init__(self, range: tuple[float, float], func: Callable[[float], float]) -> None:
+    def __init__(self, range: tuple[float, float], cdf: Callable[[float], float]) -> None:
         self.range = range
-        self.func = np.vectorize(func)
+        self._practical_range: tuple[float, float] = None
+        
+        def func1(x):
+            if x < self.range[0]:
+                return 0.0
+            elif x > self.range[1]:
+                return 1.0
+            return cdf(x)
+
+        self.func = np.vectorize(func1)
     
-    def __call__(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
-        x = np.max(self.range[0], np.min(self.range[1], x))
+    def compute_practical_range(self, cutoff: float=0.985) -> tuple[float, float]:
+        def obj(x):
+            return np.square(self.func(x) - cutoff)
+
+        r = self.range
+        m = direct(func=obj, bounds=(r,), f_min=0.)
+        return (r[0], m.x[0])
+
+    
+    @property
+    def practical_range(self) -> tuple[float, float]:
+        if self._practical_range is None:
+            self._practical_range = self.compute_practical_range()
+        return self._practical_range
+    
+    def __call__(self, x: Union[float, NDArray[Shape["*"], Float]]) -> NDArray[Shape["*"], Float]:
+        if np.isscalar(x):
+            x = np.asarray(x)
         return self.func(x)
     
     def save_to_file(self, file: str) -> None:
