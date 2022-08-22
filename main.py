@@ -8,12 +8,20 @@ import numpy as np
 
 
 from src.data.metrics import MetricID
-from src.distribution.distribution import Distribution
+from src.distribution.distribution import Distribution, ECDF, KDECDF_approx
 
 
 d = Distribution(df=pd.read_csv('csv/metrics.csv'))
-data = d.get_cdf_data(metric_id=MetricID.RMA, unique_vals=False)
-cdf = Distribution.fit_parametric(data=data)
+data = d.get_cdf_data(metric_id=MetricID.VG, unique_vals=True)
+
+ecdf = ECDF(data=data)
+print(ecdf([-1.0, 0.8, 1.0, 20.34]))
+
+kde = KDECDF_approx(data=d.get_cdf_data(metric_id=MetricID.VG, unique_vals=False))
+print(kde.practical_range)
+print(kde([-1.0, 0.8, 1.0, 1.5, 2.0, 20.34]))
+
+cdf = Distribution.fit_parametric(data=data, max_samples=1_000)
 cdf.save_to_file(file='./results/cdf_VG.pickle')
 
 
