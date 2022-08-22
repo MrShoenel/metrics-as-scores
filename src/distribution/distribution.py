@@ -1,4 +1,4 @@
-from typing import Any, Callable, Union
+from typing import Any, Callable, Iterable, Union
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
@@ -41,8 +41,8 @@ class DensityFunc:
             self._practical_range = self.compute_practical_range()
         return self._practical_range
     
-    def __call__(self, x: Union[float, NDArray[Shape["*"], Float]]) -> NDArray[Shape["*"], Float]:
-        if np.isscalar(x):
+    def __call__(self, x: Union[float, list[float], NDArray[Shape["*"], Float]]) -> NDArray[Shape["*"], Float]:
+        if np.isscalar(x) or isinstance(x, list):
             x = np.asarray(x)
         return self.func(x)
     
