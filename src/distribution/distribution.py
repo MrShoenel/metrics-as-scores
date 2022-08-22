@@ -57,9 +57,39 @@ class DensityFunc:
 
 
 
+from sklearn.neighbors import KernelDensity
+from scipy.integrate import quad
+from scipy.stats import gaussian_kde
+
+class KDECDF_integrate(DensityFunc):
+    def __init__(self, data: NDArray[Shape["*"], Float]) -> None:
+        self._kde = KernelDensity().fit(X=np.asarray(data).reshape((-1, 1)))
+
+        def pdf(x):
+            return np.exp(self._kde.score_samples(X=np.asarray(x).reshape((-1, 1))))
+        
+        def cdf(x):
+            y, _ = quad(func=pdf, a=np.min(data), b=x)
+            return y
+
+        super().__init__(range=(np.min(data), np.max(data)), cdf=cdf)
+
+
+class KDECDF_approx(DensityFunc):
+    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=20_000) -> None:
+        self._kde = gaussian_kde(dataset=data)
+        self._ecdf = SMEcdf(x=self._kde.resample(size=resample_samples, seed=1).reshape((resample_samples,)))
+
+        def cdf(x):
+            return self._ecdf(x)
+
+        super().__init__(range=(np.min(data), np.max(data)), cdf=cdf)
+
+
+
 class ECDF(DensityFunc):
     def __init__(self, data: NDArray[Shape["*"], Float]) -> None:
-        super().__init__(range=(np.min(data), np.max(data)), func=SMEcdf(data))
+        super().__init__(range=(np.min(data), np.max(data)), cdf=SMEcdf(data))
 
 
 
