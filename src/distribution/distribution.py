@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, Union
+from typing import Callable, Iterable, Union
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
@@ -13,26 +13,35 @@ import pickle
 
 
 class DensityFunc:
-    def __init__(self, range: tuple[float, float], cdf: Callable[[float], float]) -> None:
+    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], **kwargs) -> None:
         self.range = range
+        self._pdf = pdf
+        self._cdf = cdf
         self._practical_range: tuple[float, float] = None
-        
-        def func1(x):
-            if x < self.range[0]:
-                return 0.0
-            elif x > self.range[1]:
-                return 1.0
-            return cdf(x)
+        self._practical_range_pdf: tuple[float, float] = None
 
-        self.func = np.vectorize(func1)
+        self.pdf = np.vectorize(self._pdf)
+        self.cdf = np.vectorize(self._min_max)
+
+
+    def _min_max(self, x: float) -> float:
+        if x < self.range[0]:
+            return 0.0
+        elif x > self.range[1]:
+            return 1.0
+        return self._cdf(x)
     
-    def compute_practical_range(self, cutoff: float=0.985) -> tuple[float, float]:
-        def obj(x):
-            return np.square(self.func(x) - cutoff)
+
+    def compute_practical_range(self, cutoff: float=0.995) -> tuple[float, float]:
+        def obj_lb(x):
+            return np.square(self.cdf(x) - (1. - cutoff))
+        def obj_ub(x):
+            return np.square(self.cdf(x) - cutoff)
 
         r = self.range
-        m = direct(func=obj, bounds=(r,), f_min=0.)
-        return (r[0], m.x[0])
+        m_lb = direct(func=obj_lb, bounds=(r,), f_min=0.)
+        m_ub = direct(func=obj_ub, bounds=(r,), f_min=0.)
+        return (m_lb.x[0], m_ub.x[0])
 
     
     @property
@@ -41,10 +50,26 @@ class DensityFunc:
             self._practical_range = self.compute_practical_range()
         return self._practical_range
     
+
+    def compute_practical_range_pdf(self) -> tuple[float, float]:
+        def obj(x):
+            return -1. * np.log(1. + self.pdf(x))
+
+        m = direct(func=obj, bounds=(self.range,))#, locally_biased=False, maxiter=15)
+        return (0., 1.01 * self.pdf(m.x[0])[0])
+    
+
+    @property
+    def practical_range_pdf(self) -> tuple[float, float]:
+        if self._practical_range_pdf is None:
+            self._practical_range_pdf = self.compute_practical_range_pdf()
+        return self._practical_range_pdf
+
+    
     def __call__(self, x: Union[float, list[float], NDArray[Shape["*"], Float]]) -> NDArray[Shape["*"], Float]:
         if np.isscalar(x) or isinstance(x, list):
             x = np.asarray(x)
-        return self.func(x)
+        return self.cdf(x)
     
     def save_to_file(self, file: str) -> None:
         with open(file=file, mode='wb') as f:
@@ -57,43 +82,66 @@ class DensityFunc:
 
 
 
-from sklearn.neighbors import KernelDensity
 from scipy.integrate import quad
 from scipy.stats import gaussian_kde
 
 class KDECDF_integrate(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float]) -> None:
-        self._kde = KernelDensity().fit(X=np.asarray(data).reshape((-1, 1)))
+    def __init__(self, data: NDArray[Shape["*"], Float], **kwargs) -> None:
+        self._kde = gaussian_kde(dataset=np.asarray(data))
+        lb, ub = np.min(data), np.max(data)
+        ext = np.max(data) - lb
 
         def pdf(x):
-            return np.exp(self._kde.score_samples(X=np.asarray(x).reshape((-1, 1))))
+            return self._kde.evaluate(points=np.asarray(x))
         
         def cdf(x):
-            y, _ = quad(func=pdf, a=np.min(data), b=x)
+            y, _ = quad(func=pdf, a=self.range[0], b=x)
             return y
+        
+        m_lb = direct(func=pdf, bounds=((lb - ext, lb),), f_min=1e-6)
+        m_ub = direct(func=pdf, bounds=((ub, ub + ext),), f_min=1e-6)
 
-        super().__init__(range=(np.min(data), np.max(data)), cdf=cdf)
+        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, kwargs=kwargs)
 
 
 class KDECDF_approx(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000) -> None:
-        self._kde = gaussian_kde(dataset=data)
-        data = self._kde.resample(size=resample_samples, seed=1).reshape((resample_samples,))
+    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, **kwargs) -> None:
+        # First, we'll fit an extra KDE for an approximate PDF.
+        # It is used to also roughly estimate its mode.
+        np.random.seed(1)
+        data_pdf = data if data.shape[0] <= 10_000 else np.random.choice(a=data, size=10_000, replace=False)
+        self._kde_for_pdf = gaussian_kde(dataset=data_pdf)
+
+        self._range_data = (np.min(data), np.max(data))   
+        self._kde = gaussian_kde(dataset=np.asarray(data))
+        data = self._kde.resample(size=resample_samples, seed=1).reshape((-1,))
         self._ecdf = SMEcdf(x=data)
 
-        super().__init__(range=(np.min(data), np.max(data)), cdf=self._ecdf)
+        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, kwargs=kwargs)
+
+        if compute_ranges:
+            self.practical_range
+            self.practical_range_pdf
+    
+    def _pdf_from_kde(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        return self._kde_for_pdf.evaluate(points=np.asarray(x))
 
 
 
 class ECDF(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float]) -> None:
-        super().__init__(range=(np.min(data), np.max(data)), cdf=SMEcdf(data))
+    def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, **kwargs) -> None:
+        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=SMEcdf(data), kwargs=kwargs)
 
+        if compute_ranges:
+            self.practical_range
 
 
 class CDF(DensityFunc):
-    def __init__(self, name: str, range: tuple[float, float], func: Callable[[float], float], pval: float, dstat: float) -> None:
-        super().__init__(range, func)
+    def __init__(self, name: str, range: tuple[float, float], func: Callable[[float], float], pval: float, dstat: float, **kwargs) -> None:
+        def ex(*args):
+            raise Exception('PDF not supported')
+
+        super().__init__(range=range, cdf=func, pdf=lambda _: ex, kwargs=kwargs)
         self.name = name
         self.pval = pval
         self.dstat = dstat
@@ -133,6 +181,7 @@ class Distribution:
         
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
+            np.random.seed(1)
             data = np.random.choice(data, size=max_samples, replace=False)
         
         best_kst = None
