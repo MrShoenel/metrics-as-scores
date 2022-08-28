@@ -12,18 +12,17 @@ in your browser.
 
 '''
 import os
-import ptvsd
 from sys import path
+
 
 path.append(os.getcwd())
 
-if os.environ['BOKEH_VS_DEBUG'] == 'true':
+if 'BOKEH_VS_DEBUG' in os.environ and os.environ['BOKEH_VS_DEBUG'] == 'true':
+    import ptvsd
     # 5678 is the default attach port in the VS Code debug configurations
     print('Waiting for debugger attach')
     ptvsd.enable_attach(address=('localhost', 5678), redirect_output=True)
     ptvsd.wait_for_attach()
-
-
 
 
 
@@ -36,11 +35,14 @@ from pickle import load
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, Dropdown, CheckboxGroup, Button
+from bokeh.models import ColumnDataSource, Dropdown, CheckboxGroup, Button, DataTable, TableColumn
+from bokeh.models.widgets.inputs import Spinner
 from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
-from src.distribution.distribution import ECDF, KDECDF_approx
+from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx
+from src.tools.lazy import Lazy
+from numbers import Integral
 
 
 def cap(s: str) -> str:
@@ -66,10 +68,19 @@ selected_score = dd_scores_items[13] # LCOM
 dd_scores = Dropdown(label=selected_score[0], menu=dd_scores_items)
 
 
+dd_transf_items = list([(item.value, item.name) for item in list(DistTransform)])
+selected_transf = dd_transf_items[0]
+dd_transf = Dropdown(label=selected_transf[0], menu=dd_transf_items)
+
+
 # Data and UI for cutting off distributions
-cbg_cutoff_items = ['Cut off smoothed distributions beyond actual values']
+cbg_cutoff_items = ['Cut off smoothed distributions beyond observed values']
 selected_cutoff = False
 cbg_cutoff = CheckboxGroup(labels=cbg_cutoff_items, active=[])
+
+
+# Input for own metric's value
+input_own = Spinner(mode='float', placeholder='Check Own Metric Value')
 
 
 
@@ -86,10 +97,9 @@ btn_contain = Button(label='Contain plot')
 
 
 # Set up data
-#source = ColumnDataSource(data=dict(x=[0], y=[0]))
 source = ColumnDataSource(data=pd.DataFrame(columns=list([f'x_{domain}' for domain in domains.keys()]) + list(domains.keys())))
 # Set up plot
-plot = figure(sizing_mode = 'stretch_width', height=850, title="Metrics as Scores",
+plot = figure(sizing_mode = 'stretch_width', height=640, title="Metrics as Scores",
               x_axis_label='Metric Value', y_axis_label='Corresponding Score',
               tools="crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset", x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom')
 #plot.toolbar.active_scroll = plot.select_one('wheel_zoom') #'wheel_zoom'
@@ -98,8 +108,31 @@ plot = figure(sizing_mode = 'stretch_width', height=850, title="Metrics as Score
 for idx, domain in enumerate(domains.keys()):
     plot.line(f'x_{domain}', domain, source=source, line_width=2, line_alpha=1., color=Category20_12[idx], legend_label=domains_labels[domain])
 
+# Also add a vertical line for own metric
+line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
+line_own = plot.line('x', 'y', source=line_own_source, line_alpha=1., color='black', line_width=1.5)
+def update_own_line():
+    val = input_own.value
+    if isinstance(val, int) or isinstance(val, float) or isinstance(val, Integral):
+        line_own_source.data = dict(x=[val, val], y=[plot.y_range.start, plot.y_range.end])
+    else:
+        line_own_source.data = dict(x=[], y=[])
+
+
+
+plot.legend.title = 'Domain'
 plot.legend.location = 'top_right'
 plot.legend.click_policy = 'hide'
+
+
+# Table for transformation values
+tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=['domain', 'transf_value', 'own_value']))
+tbl_transf_cols = [
+    TableColumn(field='domain', title='Domain'),
+    TableColumn(field='transf_value', title='Used Transformation Value'),
+    TableColumn(field='own_value', title='Own Metric Value')]
+tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_both')
+
 
 
 
@@ -108,17 +141,26 @@ plot.legend.click_policy = 'hide'
 cdfs_ECDF: dict[str, ECDF] = None
 cdfs_KDECDF_approx: dict[str, KDECDF_approx] = None
 
-try:
-    with open('./results/cdfs_ECDF.pickle', 'rb') as f:
-        cdfs_ECDF = load(f)
-    with open('./results/cdfs_KDECDF_approx.pickle', 'rb') as f:
-        cdfs_KDECDF_approx = load(f)
-except Exception as e:
-    raise Exception('This webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
 
+cdfs: dict[str, Lazy[dict[str, Union[ECDF, KDECDF_approx]]]] = {}
+clazzes = [ECDF, KDECDF_approx]
+transfs = list(DistTransform)
+
+def unpickle(file: str):
+    try:
+        with open(file=file, mode='rb') as f:
+            return load(f)
+    except Exception as e:
+        raise Exception('This webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
+
+for clazz in clazzes:
+    for transf in transfs:
+        cdfs[f'{clazz.__name__}_{transf.name}'] = Lazy(
+            fnCreateVal=lambda clazz=clazz, transf=transf: unpickle(f'./results/cdfs_{clazz.__name__}_{transf.name}.pickle'))
 
 
 def update_plot(contain_plot: bool=False):
+    global selected_cutoff
     sd = selected_denstype[1]
     is_ecdf = 'ECDF' in sd or 'ECCDF' in sd
     is_ccdf = 'CCDF' in sd
@@ -126,32 +168,34 @@ def update_plot(contain_plot: bool=False):
 
     # The E(C)CDF is always cut off.
     cbg_cutoff.disabled = is_ecdf
+    if cbg_cutoff.disabled:
+        # We also should uncheck it, since it's not possible.
+        cbg_cutoff.active = []
+        selected_cutoff = False
 
-    densities = {}
-    df_cols = { }
+    densities: dict[str, Union[ECDF, KDECDF_approx]] = {}
+    df_cols = {}
     lb, ub = 0, 0
     
-    use_densities = cdfs_ECDF if is_ecdf else cdfs_KDECDF_approx
+    clazz = ECDF if is_ecdf else KDECDF_approx
+    use_densities = cdfs[f'{clazz.__name__}_{selected_transf[1]}'].value
 
     for domain in domains.keys():
         density: Union[ECDF, KDECDF_approx] = use_densities[f'{domain}_{selected_score[1]}']
         densities[domain] = density
 
-        pr = density.practical_range
+        pd = density.practical_domain
 
-        pr = densities[domain].practical_range
-        if pr[0] < lb:
-            lb = pr[0]
-        if pr[1] > ub:
-            ub = pr[1]
+        pd = densities[domain].practical_domain
+        if pd[0] < lb:
+            lb = pd[0]
+        if pd[1] > ub:
+            ub = pd[1]
 
     if not is_ecdf and selected_cutoff:
         # This will cut off values falsely indicated by the smoothness.
-        lb = min(map(lambda _dens: _dens._range_data[0], densities.values()))
-        #if is_pdf:
-        #    lb = min(map(lambda _dens: _dens._range_data[0], densities.values()))
-        #else:
-        #    lb = min(map(lambda _dens: _dens.range[0], densities.values()))
+        lb = max(lb, min(map(lambda _dens: _dens._range_data[0], densities.values())))
+        ub = min(ub, max(map(lambda _dens: _dens._range_data[1], densities.values())))
 
     if contain_plot:
         ext = ub - lb
@@ -161,29 +205,66 @@ def update_plot(contain_plot: bool=False):
         if is_pdf:
             plot.y_range.end = max(map(lambda _dens: _dens.practical_range_pdf[1], densities.values()))
             plot.y_range.start = 0. - .02 * plot.y_range.end
+            plot.y_range.end += .02 * plot.y_range.end
         else:
             plot.y_range.start = 0. - .02
             plot.y_range.end = 1. + .02
         return
 
 
+    v = input_own.value
+    has_own = isinstance(v, int) or isinstance(v, float) or isinstance(v, Integral)
+    own_values = []
+    input_own.low = lb
+    input_own.high = ub
+    input_own.step = (ub - lb) / 25.
+
     for domain in domains.keys():
         density = densities[domain]
-        #ext_domain = density.practical_range[1] - density.practical_range[0]
-        #lb_domain = density.practical_range[0]# - ext_domain * 0.03
-        lb_domain = density._range_data[0] if not is_ecdf and selected_cutoff else density.practical_range[0]
-        #ub_domain = density.practical_range[1]# + ext_domain * 0.03
-        ub_domain = density._range_data[1] if not is_ecdf and selected_cutoff else density.practical_range[1]
-        domain_x = np.linspace(lb_domain, ub_domain, 250 if is_pdf else 500) # PDF is slower
+        lb_domain = max(density._range_data[0], density.practical_domain[0]) if not is_ecdf and selected_cutoff else density.practical_domain[0]
+        ub_domain = min(density._range_data[1], density.practical_domain[1]) if not is_ecdf and selected_cutoff else density.practical_domain[1]
+        domain_x = np.linspace(lb_domain, ub_domain, 300 if is_pdf else 600) # PDF is slower
         df_cols[f'x_{domain}'] = domain_x
         if is_pdf:
             df_cols[domain] = densities[domain].pdf(domain_x)
+            if has_own:
+                own_values.append(densities[domain].pdf(v))
         else:
             df_cols[domain] = densities[domain].cdf(domain_x)
             if is_ccdf:
                 df_cols[domain] = 1. - df_cols[domain]
+            if has_own:
+                if is_ccdf:
+                    own_values.append(1. - densities[domain].cdf(v))
+                else:
+                    own_values.append(densities[domain].cdf(v))
 
     source.data = pd.DataFrame(df_cols)
+
+
+    def tbl_format(v: float=None):
+        if v is None:
+            return '<none>'
+        
+        if v >= 0. and v <= 1e-300:
+            return 0.
+        exp = np.floor(np.log10(np.abs(v)))
+        if exp < 0.:
+            if exp >= -4.0:
+                return np.round(v, 4)
+            return np.round(v, int(np.ceil(2. + np.abs(exp))))
+        if exp > 4.0:
+            return np.round(v)
+        return np.round(v, 4)
+        
+    
+    tbl_transf_src.data = {
+        'domain': list(map(lambda domain: domains_labels[domain], domains.keys())),
+        'transf_value': list(map(lambda domain: tbl_format(densities[domain].transform_value), domains.keys())),
+        'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(domains.keys()))])
+    }
+
+    update_own_line()
 
 
 
@@ -212,6 +293,29 @@ def dd_denstype_click(evt: MenuItemClick):
     update_plot()
     if type_before != type_after:
         update_plot(contain_plot=True)
+    
+    if 'PDF' in selected_denstype[1]:
+        plot.yaxis.axis_label = 'Relative Likelihood'
+    elif 'CCDF' in selected_denstype[1]:
+        plot.yaxis.axis_label = 'Corresponding Score'
+    else:
+        plot.yaxis.axis_label = 'Cumulative Probability'
+
+
+def dd_transf_click(evt: MenuItemClick):
+    global selected_transf
+    transf_before = selected_transf[1]
+    transf_after = evt.item
+    temp = { key: val for (val, key) in dd_transf_items }
+    dd_transf.label = temp[evt.item]
+    selected_transf = (temp[evt.item], evt.item)
+    update_plot()
+    if transf_before != transf_after:
+        update_plot(contain_plot=True)
+    if selected_transf[1] == DistTransform.NONE.name:
+        plot.xaxis.axis_label = 'Metric Value'
+    else:
+        plot.xaxis.axis_label = 'Metric Distance from Ideal'
 
 
 def dd_scores_click(evt: MenuItemClick):
@@ -230,24 +334,31 @@ def btn_contain_click(*args):
     update_plot(contain_plot=True)
 
 
+def input_own_change(attr, old, new):
+    update_plot()
+
+
 def read_text(file: str) -> str:
     with open(file=file, mode='r') as f:
         return f.read().strip()
 
 cbg_cutoff.on_click(cbg_cutoff_click)
 dd_scores.on_click(dd_scores_click)
+dd_transf.on_click(dd_transf_click)
 dd_denstype.on_click(dd_denstype_click)
 btn_contain.on_click(btn_contain_click)
+input_own.on_change('value', input_own_change)
 
 
 header = Div(text=read_text('./src/webapp/header.html'))
 footer = Div(text=read_text('./src/webapp/footer.html'))
 
 
-input_row = row([dd_scores, dd_denstype])
-input_row2 = row([btn_contain, cbg_cutoff])
-plot_row = row([plot], sizing_mode='stretch_both')
-root_col = column(header, input_row, input_row2, plot_row, footer, sizing_mode='stretch_both')
+input_row1 = row([dd_scores, dd_transf, input_own])
+input_row2 = row([btn_contain, dd_denstype, cbg_cutoff])
+#input_row3 = row([])
+plot_row = row([column(tbl_transf, plot)], sizing_mode='stretch_both')
+root_col = column(header, input_row1, input_row2, plot_row, footer, sizing_mode='stretch_both')
 
 curdoc().add_root(root_col)
 curdoc().title = "Metrics as Scores"
