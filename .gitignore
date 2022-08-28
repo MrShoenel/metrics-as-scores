@@ -130,3 +130,6 @@ dmypy.json
 
 # Unpacked CSVs:
 csv/metrics.csv
+
+# Pre-computed and pickled results:
+results/*.pickle
