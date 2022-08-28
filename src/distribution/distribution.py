@@ -4,11 +4,22 @@ from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.stats import kstest
 from scipy.optimize import direct
+from strenum import StrEnum
 import pandas as pd
 import numpy as np
 import scipy.stats
 import pickle
 
+
+
+
+class DistTransform(StrEnum):
+    NONE = '<none>'
+    EXPECTATION = 'E[X] (expectation)'
+    MEDIAN = 'Median (50th percentile)'
+    MODE = 'Mode (most likely value)'
+    INFIMUM = 'Infimum (min. observed value)'
+    SUPREMUM = 'Supremum (max. observed value)'
 
 
 
