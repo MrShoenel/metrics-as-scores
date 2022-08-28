@@ -1,0 +1,16 @@
+html, body {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+html {
+	overflow-y: scroll;
+}
+
+a#authors {
+	font-size: 50% !important;
+}
+
+ul#elements {
+	list-style-type: '–  ';
+	padding-left: 2em;
+}

@@ -184,13 +184,13 @@ def update_plot(contain_plot: bool=False):
         density: Union[ECDF, KDECDF_approx] = use_densities[f'{domain}_{selected_score[1]}']
         densities[domain] = density
 
-        pd = density.practical_domain
+        prd = density.practical_domain
 
-        pd = densities[domain].practical_domain
-        if pd[0] < lb:
-            lb = pd[0]
-        if pd[1] > ub:
-            ub = pd[1]
+        prd = densities[domain].practical_domain
+        if prd[0] < lb:
+            lb = prd[0]
+        if prd[1] > ub:
+            ub = prd[1]
 
     if not is_ecdf and selected_cutoff:
         # This will cut off values falsely indicated by the smoothness.

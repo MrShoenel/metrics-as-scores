@@ -1,5 +1,21 @@
 <hr/>
 
+<h3>Help</h3>
+
+<div>
+	<p>This application allows to inspect the distributions (probability densities) of a large corpus of metrics. It was conceived to demonstrate the significant differencs in these densities when they become conditional on the context. For example, the distribution of the TLOC metric differs vastly among the contexts "Programming language" and "Middleware".</p>
+
+	<p>In order to <i>operationalize</i> a metric in a given context, it is transformed into a <i>score</i> using some ideal value. Some metrics have an implicit ideal value. For example, the McCabe Cyclomatic Complexity has a lowest-possible ideal value of <code>1</code>. This application allows to transform any metric into a distance metric using a user-chosen explicit ideal value. After transforming a metric into a distance metric, its distributions reflects the observed distances from the chosen ideal value. When we then proceed to obtaining the <i>complementary cumulative</i> distribution function, the CCDF, those distances can be translated into scores. The application also allows checking metrics values from own application in specific contexts.</p>
+
+	<h4>Elements</h4>
+
+	<ul id="elements">
+		<li><b>Plotting area:</b> Asd</li>
+	</ul>
+</div>
+
+<hr/>
+
 <h3>References</h3>
 
 <p>[1] Terra, R., Miranda, L.F., Valente, M.T. and Bigonha, R.S., 2013. Qualitas.class Corpus: A compiled version of the Qualitas Corpus. ACM SIGSOFT Software Engineering Notes, 38(5), pp.1-4. <a target="_blank" href="https://dx.doi.org/10.1145/2507288.2507314">https://dx.doi.org/10.1145/2507288.2507314</a>.</p>
