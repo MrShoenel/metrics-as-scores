@@ -6,11 +6,15 @@ html {
 	overflow-y: scroll;
 }
 
-a#authors {
-	font-size: 50% !important;
+small {
+	font-size: 70% !important;
 }
 
 ul#elements {
 	list-style-type: '–  ';
 	padding-left: 2em;
+}
+
+h3#help {
+	cursor: pointer;
 }
