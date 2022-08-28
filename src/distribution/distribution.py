@@ -1,4 +1,5 @@
 from typing import Callable, Iterable, Union
+from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
@@ -24,15 +25,52 @@ class DistTransform(StrEnum):
 
 
 class DensityFunc:
-    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], **kwargs) -> None:
+    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self.range = range
         self._pdf = pdf
         self._cdf = cdf
-        self._practical_range: tuple[float, float] = None
+        self._ideal_value = ideal_value
+        self._dist_transform = dist_transform
+        self._transform_value: float = None
+        self._metric_id = metric_id
+        self._domain = domain
+        self._practical_domain: tuple[float, float] = None
         self._practical_range_pdf: tuple[float, float] = None
+
+        self.transform_value = transform_value
 
         self.pdf = np.vectorize(self._pdf)
         self.cdf = np.vectorize(self._min_max)
+    
+
+    @property
+    def metric_id(self) -> Union[MetricID, None]:
+        return self._metric_id
+    
+    @property
+    def domain(self) -> Union[str, None]:
+        return self._domain
+
+    @property
+    def ideal_value(self) -> Union[float, None]:
+        return self._ideal_value
+    
+    @property
+    def is_quality_score(self) -> bool:
+        return self.ideal_value is not None
+
+    @property
+    def dist_transform(self) -> DistTransform:
+        return self._dist_transform
+
+    @property
+    def transform_value(self) -> Union[float, None]:
+        return self._transform_value
+    
+    @transform_value.setter
+    def transform_value(self, value: Union[float, None]) -> Self:
+        self._transform_value = value
+        return self
 
 
     def _min_max(self, x: float) -> float:
@@ -56,18 +94,18 @@ class DensityFunc:
 
     
     @property
-    def practical_range(self) -> tuple[float, float]:
-        if self._practical_range is None:
-            self._practical_range = self.compute_practical_range()
-        return self._practical_range
+    def practical_domain(self) -> tuple[float, float]:
+        if self._practical_domain is None:
+            self._practical_domain = self.compute_practical_range()
+        return self._practical_domain
     
 
     def compute_practical_range_pdf(self) -> tuple[float, float]:
         def obj(x):
             return -1. * np.log(1. + self.pdf(x))
 
-        m = direct(func=obj, bounds=(self.range,))#, locally_biased=False, maxiter=15)
-        return (0., 1.01 * self.pdf(m.x[0])[0])
+        m = direct(func=obj, bounds=(self.range,), locally_biased=False)#, maxiter=15)
+        return (0., self.pdf(m.x[0])[0])
     
 
     @property
@@ -97,7 +135,7 @@ from scipy.integrate import quad
 from scipy.stats import gaussian_kde
 
 class KDECDF_integrate(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float], **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self._kde = gaussian_kde(dataset=np.asarray(data))
         lb, ub = np.min(data), np.max(data)
         ext = np.max(data) - lb
@@ -112,11 +150,11 @@ class KDECDF_integrate(DensityFunc):
         m_lb = direct(func=pdf, bounds=((lb - ext, lb),), f_min=1e-6)
         m_ub = direct(func=pdf, bounds=((ub, ub + ext),), f_min=1e-6)
 
-        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, kwargs=kwargs)
+        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
 
 class KDECDF_approx(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         # First, we'll fit an extra KDE for an approximate PDF.
         # It is used to also roughly estimate its mode.
         np.random.seed(1)
@@ -128,10 +166,10 @@ class KDECDF_approx(DensityFunc):
         data = self._kde.resample(size=resample_samples, seed=1).reshape((-1,))
         self._ecdf = SMEcdf(x=data)
 
-        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, kwargs=kwargs)
+        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
         if compute_ranges:
-            self.practical_range
+            self.practical_domain
             self.practical_range_pdf
     
     def _pdf_from_kde(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
@@ -140,29 +178,30 @@ class KDECDF_approx(DensityFunc):
 
 
 class ECDF(DensityFunc):
-    def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, **kwargs) -> None:
-        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=SMEcdf(data), kwargs=kwargs)
+    def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=SMEcdf(data), ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
         if compute_ranges:
-            self.practical_range
+            self.practical_domain
 
 
 class CDF(DensityFunc):
-    def __init__(self, name: str, range: tuple[float, float], func: Callable[[float], float], pval: float, dstat: float, **kwargs) -> None:
+    def __init__(self, name: str, range: tuple[float, float], func: Callable[[float], float], pval: float, dstat: float, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         def ex(*args):
             raise Exception('PDF not supported')
 
-        super().__init__(range=range, cdf=func, pdf=lambda _: ex, kwargs=kwargs)
+        super().__init__(range=range, cdf=func, pdf=lambda _: ex, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
         self.name = name
         self.pval = pval
         self.dstat = dstat
 
 
 
+
+
 class Distribution:
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
-    
 
     @property
     def available_systems(self) -> NDArray[Shape["*"], String]:
