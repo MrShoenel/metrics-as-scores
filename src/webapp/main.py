@@ -69,6 +69,7 @@ dd_scores = Dropdown(label=selected_score[0], menu=dd_scores_items)
 
 
 dd_transf_items = list([(item.value, item.name) for item in list(DistTransform)])
+dd_transf_items[0] = ('<No Transformation>', DistTransform.NONE.name)
 selected_transf = dd_transf_items[0]
 dd_transf = Dropdown(label=selected_transf[0], menu=dd_transf_items)
 
@@ -82,6 +83,11 @@ cbg_cutoff = CheckboxGroup(labels=cbg_cutoff_items, active=[])
 # Input for own metric's value
 input_own = Spinner(mode='float', placeholder='Check Own Metric Value')
 
+# Checkbox for automatic transform
+cbg_autotrans_items = ['Apply transform using ideal value']
+selected_autotransf = True
+cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
+
 
 
 # Data and UI for selected CDF type
@@ -91,15 +97,14 @@ dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items)
 
 
 # Contain button
-btn_contain = Button(label='Contain plot')
-
+btn_contain = Button(label='Contain Plot')
 
 
 
 # Set up data
 source = ColumnDataSource(data=pd.DataFrame(columns=list([f'x_{domain}' for domain in domains.keys()]) + list(domains.keys())))
 # Set up plot
-plot = figure(sizing_mode = 'stretch_width', height=640, title="Metrics as Scores",
+plot = figure(sizing_mode='stretch_width', height=640,# title="Metrics as Scores",
               x_axis_label='Metric Value', y_axis_label='Corresponding Score',
               tools="crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset", x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom')
 #plot.toolbar.active_scroll = plot.select_one('wheel_zoom') #'wheel_zoom'
@@ -113,7 +118,7 @@ line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
 line_own = plot.line('x', 'y', source=line_own_source, line_alpha=1., color='black', line_width=1.5)
 def update_own_line():
     val = input_own.value
-    if isinstance(val, int) or isinstance(val, float) or isinstance(val, Integral):
+    if (selected_transf[1] == 'NONE' or (selected_transf[1] != 'NONE' and not selected_autotransf)) and (isinstance(val, int) or isinstance(val, float) or isinstance(val, Integral)):
         line_own_source.data = dict(x=[val, val], y=[plot.y_range.start, plot.y_range.end])
     else:
         line_own_source.data = dict(x=[], y=[])
@@ -126,13 +131,23 @@ plot.legend.click_policy = 'hide'
 
 
 # Table for transformation values
-tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=['domain', 'transf_value', 'own_value']))
+tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=['domain', 'transf_value', 'metric_value', 'own_value']))
 tbl_transf_cols = [
     TableColumn(field='domain', title='Domain'),
     TableColumn(field='transf_value', title='Used Transformation Value'),
-    TableColumn(field='own_value', title='Own Metric Value')]
+    TableColumn(field='metric_value', title='Metric Value (not transformed)'),
+    TableColumn(field='own_value', title='Corresponding Score')]
 tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_both')
 
+
+def update_transf():
+    if selected_autotransf:
+        if selected_transf[1] == 'NONE':
+            tbl_transf_cols[2].title = 'Metric Value (no transformation chosen)'
+        else:
+            tbl_transf_cols[2].title = 'Metric Distance (transformed using ideal)'
+    else:
+        tbl_transf_cols[2].title = 'Metric Value'
 
 
 
@@ -221,23 +236,26 @@ def update_plot(contain_plot: bool=False):
 
     for domain in domains.keys():
         density = densities[domain]
+        use_v = v
+        if has_own and selected_autotransf and density.transform_value is not None:
+            use_v = np.abs(density.transform_value - v)
         lb_domain = max(density._range_data[0], density.practical_domain[0]) if not is_ecdf and selected_cutoff else density.practical_domain[0]
         ub_domain = min(density._range_data[1], density.practical_domain[1]) if not is_ecdf and selected_cutoff else density.practical_domain[1]
         domain_x = np.linspace(lb_domain, ub_domain, 300 if is_pdf else 600) # PDF is slower
         df_cols[f'x_{domain}'] = domain_x
         if is_pdf:
-            df_cols[domain] = densities[domain].pdf(domain_x)
+            df_cols[domain] = density.pdf(domain_x)
             if has_own:
-                own_values.append(densities[domain].pdf(v))
+                own_values.append(density.pdf(use_v))
         else:
-            df_cols[domain] = densities[domain].cdf(domain_x)
+            df_cols[domain] = density.cdf(domain_x)
             if is_ccdf:
                 df_cols[domain] = 1. - df_cols[domain]
             if has_own:
                 if is_ccdf:
-                    own_values.append(1. - densities[domain].cdf(v))
+                    own_values.append(1. - density.cdf(use_v))
                 else:
-                    own_values.append(densities[domain].cdf(v))
+                    own_values.append(density.cdf(use_v))
 
     source.data = pd.DataFrame(df_cols)
 
@@ -261,10 +279,12 @@ def update_plot(contain_plot: bool=False):
     tbl_transf_src.data = {
         'domain': list(map(lambda domain: domains_labels[domain], domains.keys())),
         'transf_value': list(map(lambda domain: tbl_format(densities[domain].transform_value), domains.keys())),
+        'metric_value': list(map(lambda domain: tbl_format(np.abs(densities[domain].transform_value - v) if has_own and selected_autotransf and densities[domain].transform_value is not None else v), domains.keys())),
         'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(domains.keys()))])
     }
 
     update_own_line()
+    update_transf()
 
 
 
@@ -283,6 +303,12 @@ def cbg_cutoff_click(active: list[int]):
     update_plot()
 
 
+def cbg_autotrans_click(active: list[int]):
+    global selected_autotransf
+    selected_autotransf = len(active) > 0
+    update_plot()
+
+
 def dd_denstype_click(evt: MenuItemClick):
     global selected_denstype
     type_before = get_score_type(selected_denstype[1])
@@ -295,11 +321,11 @@ def dd_denstype_click(evt: MenuItemClick):
         update_plot(contain_plot=True)
     
     if 'PDF' in selected_denstype[1]:
-        plot.yaxis.axis_label = 'Relative Likelihood'
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Relative Likelihood'
     elif 'CCDF' in selected_denstype[1]:
-        plot.yaxis.axis_label = 'Corresponding Score'
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Corresponding Score'
     else:
-        plot.yaxis.axis_label = 'Cumulative Probability'
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Cumulative Probability'
 
 
 def dd_transf_click(evt: MenuItemClick):
@@ -343,6 +369,7 @@ def read_text(file: str) -> str:
         return f.read().strip()
 
 cbg_cutoff.on_click(cbg_cutoff_click)
+cbg_autotrans.on_click(cbg_autotrans_click)
 dd_scores.on_click(dd_scores_click)
 dd_transf.on_click(dd_transf_click)
 dd_denstype.on_click(dd_denstype_click)
@@ -354,14 +381,28 @@ header = Div(text=read_text('./src/webapp/header.html'))
 footer = Div(text=read_text('./src/webapp/footer.html'))
 
 
-input_row1 = row([dd_scores, dd_transf, input_own])
-input_row2 = row([btn_contain, dd_denstype, cbg_cutoff])
-#input_row3 = row([])
+
+input_row1 = row([
+    dd_scores, dd_denstype
+    #column(Div(text='Metric:'), dd_scores),
+    #column(Div(text='Transformation:'), dd_transf)
+])
+input_row2 = row([
+    dd_transf, input_own, cbg_autotrans
+    #column(Div(text='Distribution Type:'), dd_denstype),
+    #column(Div(text='Check Own Value (press Enter):'), input_own, cbg_autotrans)
+])
+input_row3 = row([
+    btn_contain, cbg_cutoff
+    #column(Div(text='Plot Controls:'), btn_contain),
+    #column(Div(text=''), cbg_cutoff)
+])
+
 plot_row = row([column(tbl_transf, plot)], sizing_mode='stretch_both')
-root_col = column(header, input_row1, input_row2, plot_row, footer, sizing_mode='stretch_both')
+root_col = column(header, input_row1, input_row2, input_row3, plot_row, footer, sizing_mode='stretch_both')
 
 curdoc().add_root(root_col)
-curdoc().title = "Metrics as Scores"
+curdoc().title = "Metrics As Scores"
 
 update_plot()
 update_plot(contain_plot=True)
