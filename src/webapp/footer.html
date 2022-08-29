@@ -1,16 +1,35 @@
 <hr/>
 
-<h3 id="help">Help <small>(click to show)</small></h3>
+<h2 id="help">Help</h2>
 
-<div style="display: none;">
+<div>
 	<p>This application allows to inspect the distributions (probability densities) of a large corpus of metrics. It was conceived to demonstrate the significant differencs in these densities when they become conditional on the context. For example, the distribution of the TLOC metric differs vastly among the contexts "Programming language" and "Middleware".</p>
 
-	<p>In order to <i>operationalize</i> a metric in a given context, it is transformed into a <i>score</i> using some ideal value. Some metrics have an implicit ideal value. For example, the McCabe Cyclomatic Complexity has a lowest-possible ideal value of <code>1</code>. This application allows to transform any metric into a distance metric using a user-chosen explicit ideal value. After transforming a metric into a distance metric, its distributions reflects the observed distances from the chosen ideal value. When we then proceed to obtaining the <i>complementary cumulative</i> distribution function, the CCDF, those distances can be translated into scores. The application also allows checking metrics values from own application in specific contexts.</p>
+	<p>In order to <i>operationalize</i> a metric in a given context, it is transformed into a <i>score</i> using some ideal value. Some metrics have an implicit ideal value. For example, the McCabe Cyclomatic Complexity has a lowest-possible (and desirable) ideal value of <code>1</code>. This application allows to transform any metric into a distance using a user-chosen explicit ideal value. After transforming a metric into a distance, its distribution reflects the observed distances from the chosen ideal value. When we then proceed to obtaining the <i>complementary cumulative</i> distribution function, the CCDF, those distances can be translated into scores. The application also allows checking metrics values from own applications in specific contexts.</p>
 
-	<h4>Elements</h4>
+	<h3>Elements</h3>
 
-	<ul id="elements">
-		<li><b>Plotting area:</b> Asd</li>
+	<ul>
+		<li><b>Controls:</b>
+			<ul>
+				<li><b>Metric Selector:</b> Used to select a single metric for operationalization across the entire corpus and all the various domains.</li>
+				<li><b>Distribution Type Selector:</b> Used to select the type of distribution. The three principal types are PDF (probability density function), CDF (cumulative density function), and CCDF (<i>complementary</i> cumulative distribution function; sometimes also called survival function). The latter two functions always have a range of <code>[0,1]</code> and the last type can be interpreted as a score (where higher is better). The smoothed versions were obtained by inversely drawing large samples from the empirical distributions and then fitting a Gaussian Kernel. The smoothed versions are useful for cases when the actual data is scarce and the ECDFs have large jumps. However, for obtaining exact scores, the E(C)CDFs should be used.</li>
+				<li><b>Transformation Type Selector:</b> Used to select an explicit value to transform the selected metric into a distance from that value, which is context-specific. While the infimum and supremum were taken directly from the data, the expectation (E[X), median, and mode were taken from PDFs that were obtained by fitting a Gaussian Kernel on a large individual inverse sample from the original data. This was done to obtain more real-valued data as transformation values are otherwise very similar and repetitive.</li>
+				<li><b>Own Metric Value Input:</b> A numeric input field that enables the user to check their own metric value against the currently selected distribution- and transformation type. If no transformation is chosen or transformation using the context's ideal value is disabled, the own metric's value is shown as a vertical line on the plot.</li>
+				<li><b>Apply transform using ideal value:</b> If selected, the own metric's value will be transformed into a distance (has no effect if no transformation was chosen). The transformation is calculated as <code>abs(ideal - [own metric value])</code>. Note that when a transformation is chosen and this box is checked, the vertical line in the plot indicating the own metric's value will disappear, as the distance is dependent on the context and this would otherwise require drawing a line for each transformed value / distance.</li>
+				<li><b>Contain Plot Button:</b> When this button is clicked, the plot will be panned and zoomed to exactly contain the shown distributions. Note that the plot itself also has a reset button.</li>
+				<li><b>Cutting off smoothed distributions:</b> This checkbox is only enabled if the chosen distribution is not of type E(C)CDF. Since smoothed distributions were obtained using Kernel density estimation, the bandwidth of Gaussian Kernels will indicate non-zero probability beyond actual observed values. Checking this box will allow to obtain a value from a smoothed distribution while simultaneously ascertaining that it will not be out of range.</li>
+			</ul>
+		</li>
+		<li><b>Data Table:</b> A table that shows context-specific values (according to each domain).
+			<ul>
+				<li>Domain: The domain/context.</li>
+				<li>Used Transformation Value: If a transformation other than <i>&lt;none&gt;</i> was chosen, this column shows the context-dependent value for the conditional distribution. This value is used to transform the own metric's value into a distance from the transformation value.</li>
+				<li>Metric Value / Metric Distance: If an own metric value is checked against the corpus, the value is shown here. If a transformation other than <i>&lt;none&gt;</i> is chosen and the checkbox for applying transformations is selected, then the own metric's value is transformed into a distance using each domain's ideal value as <code>abs(ideal - value)</code>. The title of this column will change accordingly.</li>
+				<li>Relative Likelihood / Cumulative Probability / Corresponding Score: Shows the (transformed) own metric's value for each domain. For probability densities (PDF), the column name will be "Relative Likelihood". For ECDFs the title will be "Cumulative Probability", and for ECCDFs / Scores the title will be "Corresponding Score".</li>
+			</ul>
+		</li>
+		<li><b>Plotting Area:</b> The plot is the main interactive user element of the "Metrics As Scores" web application. It is best utilized using a mouse. Panning the plot can be achieved by using the left mouse button, zooming by using the mouse wheel. By default, x- and y-axis are zoomed simultaneously. The plot features additional controls located on top of the right edge for zooming along the x- or y-axis separately. Each domain in the legend on the right can be (de-)selected. By hovering the plot, a crosshair is shown. It allows to obtain values for relative likelihood, cumulative probability, and scores. The labels for both axes will change accordingly, based on the distribution type and whether a transformation is selected.</li>
 	</ul>
 </div>
 
