@@ -6,15 +6,16 @@ html {
 	overflow-y: scroll;
 }
 
-small {
-	font-size: 70% !important;
+a {
+	color: blue !important;
+	text-decoration: underline !important;
 }
 
-ul#elements {
+small {
+	font-size: 60% !important;
+}
+
+ul {
 	list-style-type: '–  ';
 	padding-left: 2em;
-}
-
-h3#help {
-	cursor: pointer;
 }
