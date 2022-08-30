@@ -185,17 +185,18 @@ class ECDF(DensityFunc):
             self.practical_domain
 
 
-class CDF(DensityFunc):
-    def __init__(self, name: str, range: tuple[float, float], func: Callable[[float], float], pval: float, dstat: float, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
-        def ex(*args):
-            raise Exception('PDF not supported')
-
-        super().__init__(range=range, cdf=func, pdf=lambda _: ex, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+class ParametricCDF(DensityFunc):
+    def __init__(self, name: str, pval: float, dstat: float, dist_params: tuple, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
         self.name = name
         self.pval = pval
         self.dstat = dstat
+        self.dist_params = dist_params
 
+        super().__init__(range=range, pdf=pdf, cdf=cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
 
+        if compute_ranges:
+            self.practical_domain
+            self.practical_range_pdf
 
 
 
@@ -224,10 +225,41 @@ class Distribution:
         return vals.to_numpy()
     
     @staticmethod
-    def fit_parametric(data: NDArray[Shape["*"], Float], alpha: float=0.05, max_samples: int=10_000) -> CDF:
+    def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE) -> tuple[float, NDArray[Shape["*"], Float]]:
+        if dist_transform == DistTransform.NONE:
+            return (None, data)
+
+        # Do optional transformation
+        transform_value: float=None
+        if dist_transform == DistTransform.EXPECTATION:
+            temp = KDECDF_approx(data=data, compute_ranges=True)
+            ext = temp.practical_domain[1] - temp.practical_domain[0]
+            transform_value, _ = quad(func=lambda x: x * temp._pdf_from_kde(x), a=temp.practical_domain[0] - ext, b=temp.practical_domain[1] + ext, limit=250)
+        elif dist_transform == DistTransform.MODE:
+            temp = KDECDF_approx(data=data, compute_ranges=True)
+            m = direct(func=lambda x: -1. * np.log(1. + temp._pdf_from_kde(x)), bounds=(temp.range,), locally_biased=False)
+            transform_value = m.x[0] # x of where the mode is (i.e., not f(x))!
+        elif dist_transform == DistTransform.MEDIAN:
+            # We'll get the median from the smoothed PDF in order to also get a more smooth value
+            temp = KDECDF_approx(data=data, compute_ranges=True)
+            transform_value = np.median(temp._kde.resample(size=50_000, seed=2))
+        elif dist_transform == DistTransform.INFIMUM:
+            transform_value = np.min(data)
+        elif dist_transform == DistTransform.SUPREMUM:
+            transform_value = np.max(data)
+        
+        # Now do the convex transform: Compute the distance to the transform value!
+        if transform_value is not None:
+            data = np.abs(data - transform_value)
+        
+        return (transform_value, data)
+    
+    @staticmethod
+    def fit_parametric(data: NDArray[Shape["*"], Float], alpha: float=0.05, max_samples: int=5_000, metric_id: MetricID=None, domain: str=None, dist_transform: DistTransform=DistTransform.NONE) -> ParametricCDF:
         distNames = ['gamma', 'gennorm', 'genexpon', 'expon', 'exponnorm',
-            'exponweib', 'exponpow', 'genextreme', 'gausshyper', 'dweibull', 'invgamma', 'gilbrat','genhalflogistic', 'ncf', 'nct', 'ncx2', 'pareto', 'uniform', 'pearson3', 'mielke', 'moyal', 'nakagami', 'laplace', 'laplace_asymmetric', 'rice', 'rayleigh', 'trapezoid', 'vonmises','kappa4', 'lomax', 'loguniform', 'loglaplace', 'foldnorm', 'kstwobign', 'erlang', 'ksone','chi2', 'logistic', 'johnsonsb', 'gumbel_l', 'gumbel_r', 'genpareto', 'powerlognorm', 'bradford', 'alpha', 'tukeylambda', 'wald', 'maxwell', 'loggamma', 'fisk', 'cosine', 'burr',
-            'beta', 'betaprime', 'crystalball', 'burr12', 'anglit', 'arcsine', 'gompertz', 'geninvgauss']
+            'exponweib', 'exponpow', 'genextreme', 'gausshyper', 'dweibull', 'invgamma', 'gilbrat','genhalflogistic', 'ncf', 'nct', 'ncx2', 'pareto', 'uniform', 'pearson3', 'mielke', 'moyal', 'nakagami', 'laplace', 'laplace_asymmetric', 'rice', 'rayleigh', 'trapezoid', 'vonmises','kappa4', 'lomax', 'loguniform', 'loglaplace', 'foldnorm', 'kstwobign', 'erlang', 'ksone','chi2', 'logistic', 'johnsonsb', 'gumbel_l', 'gumbel_r', 'genpareto', 'powerlognorm', 'bradford', 'alpha', 'tukeylambda', 'wald', 'maxwell', 'loggamma', 'fisk', 'cosine', 'burr', 'beta', 'betaprime', 'crystalball', 'burr12', 'anglit', 'arcsine', 'gompertz', 'geninvgauss']
+        
+        transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform)
         
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
@@ -236,27 +268,34 @@ class Distribution:
         
         best_kst = None
         use_dist: tuple = None
-        for distName in distNames:
-            res = float('inf')
-
+        res = float('inf')
+        for dist_name in distNames:
+            print(f'Trying distribution: {dist_name}')
             try:
-                dist = getattr(scipy.stats, distName)
-                distParams = dist.fit(data)
-                kst = kstest(data, cdf=dist.cdf, args=distParams)
+                dist = getattr(scipy.stats, dist_name)
+                dist_params = dist.fit(data)
+                kst = kstest(data, cdf=dist.cdf, args=dist_params)
 
                 if kst.pvalue >= alpha and kst.statistic < res:
                     res = kst.statistic
                     best_kst = kst
-                    use_dist = (distName, dist.cdf, distParams)
+                    use_dist = (dist, dist_params, dist_name)
             except Exception as ex:
                 print(ex)
-                pass
         
         if use_dist is None:
             raise Exception('Cannot fit parametric distribution for given data.')
+
+        
+        metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
+        metrics_ideal_df.replace({ np.nan: None }, inplace=True)
+        metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
         
 
+        def pdf(x):
+            return use_dist[0].pdf(*(x, *use_dist[1])).reshape((1,))
+
         def cdf(x):
-            return use_dist[1](*(x, *use_dist[2]))
+            return use_dist[0].cdf(*(x, *use_dist[1])).reshape((1,))
         
-        return CDF(name=use_dist[0], range=(np.min(data), np.max(data)), func=cdf, pval=best_kst.pvalue, dstat=best_kst.statistic)
+        return ParametricCDF(name=use_dist[2], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), pdf=pdf, cdf=cdf, compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)

@@ -46,28 +46,6 @@ def generate_densities(distr: Distribution, CDF: type[DensityFunc]=ECDF, unique_
         uvals = True if unique_vals else (CDF == ECDF)
         data = distr.get_cdf_data(metric_id=metric_id, unique_vals=uvals, systems=systems)
 
-        # Do optional transformation
-        transform_value: float=None
-        if dist_transform == DistTransform.EXPECTATION:
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            ext = temp.practical_domain[1] - temp.practical_domain[0]
-            transform_value, _ = quad(func=lambda x: x * temp._pdf_from_kde(x), a=temp.practical_domain[0] - ext, b=temp.practical_domain[1] + ext, limit=250)
-        elif dist_transform == DistTransform.MODE:
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            m = direct(func=lambda x: -1. * np.log(1. + temp._pdf_from_kde(x)), bounds=(temp.range,), locally_biased=False)
-            transform_value = m.x[0] # x of where the mode is (i.e., not f(x))!
-        elif dist_transform == DistTransform.MEDIAN:
-            # We'll get the median from the smoothed PDF in order to also get a more smooth value
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            transform_value = np.median(temp._kde.resample(size=50_000, seed=2))
-        elif dist_transform == DistTransform.INFIMUM:
-            transform_value = np.min(data)
-        elif dist_transform == DistTransform.SUPREMUM:
-            transform_value = np.max(data)
-        
-        # Now do the convex transform: Compute the distance to the transform value!
-        if transform_value is not None:
-            data = np.abs(data - transform_value)
 
         return (f'{domain}_{row.metric}', CDF(data=data, resample_samples=resample_samples, compute_ranges=True, ideal_value=metrics_ideal[metric_id], dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain))
 
