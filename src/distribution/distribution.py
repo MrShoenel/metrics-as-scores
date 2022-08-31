@@ -1,10 +1,11 @@
-from typing import Callable, Iterable, Union
+from typing import Any, Callable, Iterable, Union
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.stats import kstest
 from scipy.optimize import direct
+from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from strenum import StrEnum
 import pandas as pd
 import numpy as np
@@ -186,17 +187,49 @@ class ECDF(DensityFunc):
 
 
 class ParametricCDF(DensityFunc):
-    def __init__(self, name: str, pval: float, dstat: float, dist_params: tuple, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
-        self.name = name
+    def __init__(self, dist: rv_generic, pval: float, dstat: float, dist_params: tuple, range: tuple[float, float], compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
+        self.dist: Union[rv_generic, rv_continuous] = dist
         self.pval = pval
         self.dstat = dstat
         self.dist_params = dist_params
 
-        super().__init__(range=range, pdf=pdf, cdf=cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
+        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
 
         if compute_ranges:
             self.practical_domain
             self.practical_range_pdf
+    
+    @property
+    def is_fit(self) -> bool:
+        return not self.dist_params is None
+    
+    @property
+    def practical_domain(self) -> tuple[float, float]:
+        if not self.is_fit:
+            return (0., 0.)
+        return super().practical_domain
+    
+    @property
+    def practical_range_pdf(self) -> tuple[float, float]:
+        if not self.is_fit:
+            return (0., 0.)
+        return super().practical_range_pdf
+    
+    @property
+    def dist_name(self) -> str:
+        return self.dist.__class__.__name__
+    
+    def pdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        x = np.asarray(x)
+        if not self.is_fit:
+            return np.zeros((x.size,))
+        return self.dist.pdf(*(x, *self.dist_params)).reshape((x.size,))
+    
+    def cdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        x = np.asarray(x)
+        if not self.is_fit:
+            return np.zeros((x.size,))
+        return self.dist.cdf(*(x, *self.dist_params)).reshape((x.size,))
 
 
 
@@ -267,7 +300,7 @@ class Distribution:
             data = np.random.choice(data, size=max_samples, replace=False)
         
         best_kst = None
-        use_dist: tuple = None
+        use_dist: tuple[Union[rv_generic, rv_continuous], tuple[Any]] = None
         res = float('inf')
         for dist_name in distNames:
             print(f'Trying distribution: {dist_name}')
@@ -279,7 +312,8 @@ class Distribution:
                 if kst.pvalue >= alpha and kst.statistic < res:
                     res = kst.statistic
                     best_kst = kst
-                    use_dist = (dist, dist_params, dist_name)
+                    use_dist = (dist, dist_params)
+                    break
             except Exception as ex:
                 print(ex)
         
@@ -291,11 +325,4 @@ class Distribution:
         metrics_ideal_df.replace({ np.nan: None }, inplace=True)
         metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
         
-
-        def pdf(x):
-            return use_dist[0].pdf(*(x, *use_dist[1])).reshape((1,))
-
-        def cdf(x):
-            return use_dist[0].cdf(*(x, *use_dist[1])).reshape((1,))
-        
-        return ParametricCDF(name=use_dist[2], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), pdf=pdf, cdf=cdf, compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
+        return ParametricCDF(dist=use_dist[0], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
