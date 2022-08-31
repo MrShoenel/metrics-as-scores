@@ -8,6 +8,7 @@ from pickle import dump
 from joblib import Parallel, delayed
 from scipy.integrate import quad, quadrature
 from scipy.optimize import direct
+from scipy.stats import norm
 from src.data.metrics import MetricID
 from src.distribution.distribution import DensityFunc, DistTransform, Distribution, ECDF, KDECDF_approx, ParametricCDF
 from sklearn.model_selection import ParameterGrid
@@ -47,12 +48,12 @@ def generate_densities(distr: Distribution, dens_fun: type[DensityFunc]=ECDF, un
         data = distr.get_cdf_data(metric_id=metric_id, unique_vals=uvals, systems=systems)
 
         if dens_fun == ParametricCDF:
+            df = None
             try:
-                df = Distribution.fit_parametric(data=data, max_samples=20_000, metric_id=metric_id, domain=domain, dist_transform=dist_transform)
-                return (f'{domain}_{row.metric}', df)
+                df = Distribution.fit_parametric(data=data, alpha=0.001, max_samples=30_000, metric_id=metric_id, domain=domain, dist_transform=dist_transform)
             except Exception as e:
-                print(f'Cannot fit parametric distribution for domain={domain}, metric={metric_id.value}')
-                return (f'{domain}_{row.metric}', None)
+                df = ParametricCDF(dist=norm, pval=np.nan, dstat=np.nan, dist_params=None, range=(np.min(data), np.max(data)), compute_ranges=False, ideal_value=np.nan, dist_transform=dist_transform, transform_value=np.nan, metric_id=metric_id, domain=domain)
+            return (f'{domain}_{row.metric}', df)
 
         # Do transformation manually for other types of DensityFunc
         transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform)
@@ -64,7 +65,7 @@ def generate_densities(distr: Distribution, dens_fun: type[DensityFunc]=ECDF, un
 
 
 if __name__ == '__main__':
-    clazzes = [ParametricCDF] # [ECDF, KDECDF_approx, ParametricCDF]
+    clazzes = [ECDF, KDECDF_approx, ParametricCDF]
     transfs = list(DistTransform)
 
     d = Distribution(df=pd.read_csv('csv/metrics.csv'))    
