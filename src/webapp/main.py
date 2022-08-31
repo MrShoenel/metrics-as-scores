@@ -40,7 +40,7 @@ from bokeh.models.widgets.inputs import Spinner
 from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
-from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx
+from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx, ParametricCDF
 from src.tools.lazy import SelfResetLazy
 from numbers import Integral
 from gc import collect
@@ -92,8 +92,8 @@ cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
 
 
 # Data and UI for selected CDF type
-dd_denstype_items = [('PDF from KDE', 'PDF'), ('ECDF', 'ECDF'), ('Smoothed approx. ECDF from KDE', 'KDE_CDF_approx'), ('[Score] ECCDF', 'ECCDF'), ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF_approx')]
-selected_denstype = dd_denstype_items[4]
+dd_denstype_items = [('PDF from Parametric', 'Param_PDF'), ('PDF from KDE', 'PDF'), ('CDF from Parametric', 'Param_CDF'), ('CDF from Empirical (ECDF)', 'ECDF'), ('Smoothed approx. ECDF from KDE', 'KDE_CDF_approx'), ('[Score] CCDF from Parametric', 'Param_CCDF'), ('[Score] CCDF from Empirical (ECCDF)', 'ECCDF'), ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF_approx')]
+selected_denstype = dd_denstype_items[7]
 dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items)
 
 
@@ -132,12 +132,14 @@ plot.legend.click_policy = 'hide'
 
 
 # Table for transformation values
-tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=['domain', 'transf_value', 'metric_value', 'own_value']))
 tbl_transf_cols = [
     TableColumn(field='domain', title='Domain'),
     TableColumn(field='transf_value', title='Used Transformation Value'),
     TableColumn(field='metric_value', title='Metric Value (not transformed)'),
-    TableColumn(field='own_value', title='Corresponding Score')]
+    TableColumn(field='own_value', title='Corresponding Score'),
+    TableColumn(field='pdist', title='Parametric Distrib.'),
+    TableColumn(field='pdist_dval', title='D-Statistic')]
+tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=list([tc.field for tc in tbl_transf_cols])))
 tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_both')
 
 
@@ -159,7 +161,7 @@ cdfs_KDECDF_approx: dict[str, KDECDF_approx] = None
 
 
 cdfs: dict[str, SelfResetLazy[dict[str, Union[ECDF, KDECDF_approx]]]] = {}
-clazzes = [ECDF, KDECDF_approx]
+clazzes = [ECDF, KDECDF_approx, ParametricCDF]
 transfs = list(DistTransform)
 
 def unpickle(file: str):
@@ -181,6 +183,7 @@ def update_plot(contain_plot: bool=False):
     is_ecdf = 'ECDF' in sd or 'ECCDF' in sd
     is_ccdf = 'CCDF' in sd
     is_pdf = 'PDF' in sd
+    is_parametric = 'Param' in sd
 
     # The E(C)CDF is always cut off.
     cbg_cutoff.disabled = is_ecdf
@@ -189,20 +192,31 @@ def update_plot(contain_plot: bool=False):
         cbg_cutoff.active = []
         selected_cutoff = False
 
-    densities: dict[str, Union[ECDF, KDECDF_approx]] = {}
+    densities: dict[str, Union[ECDF, KDECDF_approx, ParametricCDF]] = {}
     df_cols = {}
-    lb, ub = 0, 0
+    lb, ub = 0.0, 0.1
     
-    clazz = ECDF if is_ecdf else KDECDF_approx
+    clazz = None
+    if is_ecdf:
+        clazz = ECDF
+    elif is_parametric:
+        clazz = ParametricCDF
+    else:
+        clazz = KDECDF_approx
     use_densities = cdfs[f'{clazz.__name__}_{selected_transf[1]}'].value
 
+    def range_data(d: Union[KDECDF_approx, ParametricCDF]) -> tuple[float, float]:
+        if is_parametric:
+            return d.range
+        return d._range_data
+
     for domain in domains.keys():
-        density: Union[ECDF, KDECDF_approx] = use_densities[f'{domain}_{selected_score[1]}']
+        density: Union[ECDF, KDECDF_approx, ParametricCDF] = use_densities[f'{domain}_{selected_score[1]}']
         densities[domain] = density
+        if is_parametric and not density.is_fit:
+            continue
 
         prd = density.practical_domain
-
-        prd = densities[domain].practical_domain
         if prd[0] < lb:
             lb = prd[0]
         if prd[1] > ub:
@@ -210,8 +224,8 @@ def update_plot(contain_plot: bool=False):
 
     if not is_ecdf and selected_cutoff:
         # This will cut off values falsely indicated by the smoothness.
-        lb = max(lb, min(map(lambda _dens: _dens._range_data[0], densities.values())))
-        ub = min(ub, max(map(lambda _dens: _dens._range_data[1], densities.values())))
+        lb = max(lb, min(map(lambda _dens: range_data(_dens)[0], densities.values())))
+        ub = min(ub, max(map(lambda _dens: range_data(_dens)[1], densities.values())))
 
     if contain_plot:
         ext = ub - lb
@@ -240,10 +254,16 @@ def update_plot(contain_plot: bool=False):
         use_v = v
         if has_own and selected_autotransf and density.transform_value is not None:
             use_v = np.abs(density.transform_value - v)
-        lb_domain = max(density._range_data[0], density.practical_domain[0]) if not is_ecdf and selected_cutoff else density.practical_domain[0]
-        ub_domain = min(density._range_data[1], density.practical_domain[1]) if not is_ecdf and selected_cutoff else density.practical_domain[1]
+        lb_domain = max(range_data(density)[0], density.practical_domain[0]) if not is_ecdf and selected_cutoff else density.practical_domain[0]
+        ub_domain = min(range_data(density)[1], density.practical_domain[1]) if not is_ecdf and selected_cutoff else density.practical_domain[1]
         domain_x = np.linspace(lb_domain, ub_domain, 300 if is_pdf else 600) # PDF is slower
         df_cols[f'x_{domain}'] = domain_x
+        if is_parametric and not density.is_fit:
+            df_cols[domain] = np.asarray([0.] * domain_x.size) # np.zeros((domain_x.size,)) # [np.nan] * domain_x.size
+            if has_own:
+                own_values.append(0.)#np.nan)
+            continue
+
         if is_pdf:
             df_cols[domain] = density.pdf(domain_x)
             if has_own:
@@ -264,7 +284,9 @@ def update_plot(contain_plot: bool=False):
     def tbl_format(v: float=None):
         if v is None:
             return '<none>'
-        
+        elif np.isnan(v):
+            return '<nan>'
+
         if v >= 0. and v <= 1e-300:
             return 0.
         exp = np.floor(np.log10(np.abs(v)))
@@ -275,13 +297,27 @@ def update_plot(contain_plot: bool=False):
         if exp > 4.0:
             return np.round(v)
         return np.round(v, 4)
-        
-    
+
+    def pdist_format(d: ParametricCDF):
+        if d.is_fit:
+            return d.dist_name
+        return '<not possible>'
+
+    pdist: list[str] = None
+    pdist_dval: list[str] = None
+    if is_parametric:
+        pdist = list([pdist_format(densities[domain]) for domain in domains.keys()])
+        pdist_dval = list([tbl_format(None if np.isnan(densities[domain].dstat) else densities[domain].dstat) for domain in domains.keys()])
+    else:
+        pdist = ['<not parametric>'] * len(domains.keys())
+        pdist_dval = list([tbl_format(None) for _ in range(len(domains.keys()))])
     tbl_transf_src.data = {
         'domain': list(map(lambda domain: domains_labels[domain], domains.keys())),
-        'transf_value': list(map(lambda domain: tbl_format(densities[domain].transform_value), domains.keys())),
+        'transf_value': list(map(lambda domain: tbl_format(None if not densities[domain].transform_value is None and np.isnan(densities[domain].transform_value) else densities[domain].transform_value), domains.keys())),
         'metric_value': list(map(lambda domain: tbl_format(np.abs(densities[domain].transform_value - v) if has_own and selected_autotransf and densities[domain].transform_value is not None else v), domains.keys())),
-        'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(domains.keys()))])
+        'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(domains.keys()))]),
+        'pdist': pdist,
+        'pdist_dval': pdist_dval
     }
 
     update_own_line()
@@ -317,9 +353,6 @@ def dd_denstype_click(evt: MenuItemClick):
     temp = { key: val for (val, key) in dd_denstype_items }
     dd_denstype.label = temp[evt.item]
     selected_denstype = (temp[evt.item], evt.item)
-    update_plot()
-    if type_before != type_after:
-        update_plot(contain_plot=True)
     
     if 'PDF' in selected_denstype[1]:
         plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Relative Likelihood'
@@ -327,6 +360,10 @@ def dd_denstype_click(evt: MenuItemClick):
         plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Corresponding Score'
     else:
         plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Cumulative Probability'
+
+    update_plot()
+    if type_before != type_after:
+        update_plot(contain_plot=True)
 
 
 def dd_transf_click(evt: MenuItemClick):
