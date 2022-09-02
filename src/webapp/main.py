@@ -154,27 +154,10 @@ def update_transf():
 
 
 
+# Import the data; Note this is process-static!
+from . import data
+cdfs = data.cdfs
 
-
-cdfs_ECDF: dict[str, ECDF] = None
-cdfs_KDECDF_approx: dict[str, KDECDF_approx] = None
-
-
-cdfs: dict[str, SelfResetLazy[dict[str, Union[ECDF, KDECDF_approx]]]] = {}
-clazzes = [ECDF, KDECDF_approx, ParametricCDF]
-transfs = list(DistTransform)
-
-def unpickle(file: str):
-    try:
-        with open(file=file, mode='rb') as f:
-            return load(f)
-    except Exception as e:
-        raise Exception('This webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
-
-for clazz in clazzes:
-    for transf in transfs:
-        cdfs[f'{clazz.__name__}_{transf.name}'] = SelfResetLazy(reset_after=3600.0,
-            fn_create_val=lambda clazz=clazz, transf=transf: unpickle(f'./results/cdfs_{clazz.__name__}_{transf.name}.pickle'))
 
 
 def update_plot(contain_plot: bool=False):
