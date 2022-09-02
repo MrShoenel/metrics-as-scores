@@ -4,7 +4,9 @@ After=syslog.target network.target remote-fs.target nss-lookup.target
 
 [Service]
 WorkingDirectory=/var/www/metrics-as-scores
-ExecStart=/var/www/metrics-as-scores/venv/bin/bokeh serve --allow-websocket-origin "*" --address 127.0.0.1 --port 5678 --prefix=/ src/webapp
+ExecStart=/var/www/metrics-as-scores/venv/bin/bokeh serve --allow-websocket-origin="*" --address=127.0.0.1 --port=5678 --prefix=/ --args=preload src/webapp
+KillMode=mixed
+TimeoutStopSec=2
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
