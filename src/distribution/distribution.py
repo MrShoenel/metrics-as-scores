@@ -82,7 +82,7 @@ class DensityFunc:
         return self._cdf(x)
     
 
-    def compute_practical_range(self, cutoff: float=0.995) -> tuple[float, float]:
+    def compute_practical_domain(self, cutoff: float=0.995) -> tuple[float, float]:
         def obj_lb(x):
             return np.square(self.cdf(x) - (1. - cutoff))
         def obj_ub(x):
@@ -97,7 +97,7 @@ class DensityFunc:
     @property
     def practical_domain(self) -> tuple[float, float]:
         if self._practical_domain is None:
-            self._practical_domain = self.compute_practical_range()
+            self._practical_domain = self.compute_practical_domain()
         return self._practical_domain
     
 
