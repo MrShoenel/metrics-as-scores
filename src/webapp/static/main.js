@@ -10,6 +10,6 @@
 	}, authors = await asyncElem('authors');
 
 	authors.addEventListener('click', (elem, ev) => {
-		window.alert('This application belongs to a paper currently under double-blind review. The authors cannot be revealed until after this process.')
+		window.alert('This application belongs to a paper currently under double-blind review. The authors cannot be revealed until after this process. You can contact us anonymously until then using the email address metrics-as-scores@gmx.com.')
 	});
 })();
