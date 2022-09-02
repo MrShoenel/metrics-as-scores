@@ -6,14 +6,13 @@ Use the ``bokeh serve`` command to run the example by executing:
 
 at your command prompt. Then navigate to the URL
 
-    http://localhost:5678/scoring
+    http://localhost:5678/webapp
 
 in your browser.
 
 '''
 import os
 from sys import path
-
 
 path.append(os.getcwd())
 
@@ -25,13 +24,12 @@ if 'BOKEH_VS_DEBUG' in os.environ and os.environ['BOKEH_VS_DEBUG'] == 'true':
     ptvsd.wait_for_attach()
 
 
-
 import pandas as pd
 import numpy as np
 from typing import Union
 from src.data.metrics import MetricID
+from src.tools.funcs import nonlinspace
 from collections import OrderedDict
-from pickle import load
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -41,9 +39,7 @@ from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
 from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx, ParametricCDF
-from src.tools.lazy import SelfResetLazy
 from numbers import Integral
-from gc import collect
 
 
 def cap(s: str) -> str:
@@ -177,8 +173,8 @@ def update_plot(contain_plot: bool=False):
 
     densities: dict[str, Union[ECDF, KDECDF_approx, ParametricCDF]] = {}
     df_cols = {}
-    lb, ub = 0.0, 0.1
-    
+    lb, ub = 0.0, 1e-10
+
     clazz = None
     if is_ecdf:
         clazz = ECDF
@@ -216,7 +212,7 @@ def update_plot(contain_plot: bool=False):
         plot.x_range.end = ub + ext * 1e-2
 
         if is_pdf:
-            plot.y_range.end = max(map(lambda _dens: _dens.practical_range_pdf[1], densities.values()))
+            plot.y_range.end = max([1e-10] + list(map(lambda _dens: _dens.practical_range_pdf[1], densities.values())))
             plot.y_range.start = 0. - .02 * plot.y_range.end
             plot.y_range.end += .02 * plot.y_range.end
         else:
@@ -237,14 +233,25 @@ def update_plot(contain_plot: bool=False):
         use_v = v
         if has_own and selected_autotransf and density.transform_value is not None:
             use_v = np.abs(density.transform_value - v)
-        lb_domain = max(range_data(density)[0], density.practical_domain[0]) if not is_ecdf and selected_cutoff else density.practical_domain[0]
+        lb_domain: float = None
+        if is_ecdf:
+            lb_domain = density.range[0]
+        else:
+            lb_domain = max(range_data(density)[0], density.practical_domain[0]) if selected_cutoff else density.practical_domain[0]
         ub_domain = min(range_data(density)[1], density.practical_domain[1]) if not is_ecdf and selected_cutoff else density.practical_domain[1]
-        domain_x = np.linspace(lb_domain, ub_domain, 300 if is_pdf else 600) # PDF is slower
+        if lb_domain == ub_domain:
+            ub_domain = lb + 1e-10
+        npoints = 350
+        if not is_pdf:
+            npoints *= 2
+        if is_ecdf:
+            npoints *= 2
+        domain_x = nonlinspace(lb_domain, ub_domain, npoints)
         df_cols[f'x_{domain}'] = domain_x
         if is_parametric and not density.is_fit:
-            df_cols[domain] = np.asarray([0.] * domain_x.size) # np.zeros((domain_x.size,)) # [np.nan] * domain_x.size
+            df_cols[domain] = np.zeros((domain_x.size,))
             if has_own:
-                own_values.append(0.)#np.nan)
+                own_values.append(0.)
             continue
 
         if is_pdf:
@@ -311,6 +318,8 @@ def update_plot(contain_plot: bool=False):
 
 def get_score_type(val: str) -> str:
     if 'PDF' in val:
+        if 'Param' in val:
+            return 'PDF_Param'
         return 'PDF'
     if 'CCDF' in val:
         return 'CCDF'
