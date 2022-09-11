@@ -21,31 +21,19 @@ def generate_densities(distr: Distribution, dens_fun: type[DensityFunc]=ECDF, un
     metrics_ideal_df.replace({ np.nan: None }, inplace=True)
     metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
 
-    systems_domains_df = pd.read_csv('./files/systems-domains.csv')
-    systems_domains = dict(zip(systems_domains_df.System, systems_domains_df.Domain))
-    systems_qc_names = dict(zip(systems_domains_df.System, systems_domains_df.System_QC_name))
-    domains = systems_domains_df.Domain.unique().tolist()
-    domains.append('__ALL__')
-
+    domains = Distribution.domains()
     param_grid = { 'domain': domains, 'metric': list(map(lambda m: m.name, MetricID)) }
     expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
 
     def get_cdf(grid_idx: int) -> tuple[str, DensityFunc]:
         row = expanded_grid.iloc[grid_idx,]
         domain = row.domain
+        systems = Distribution.systems_for_domain(domain=domain)
         metric_id = MetricID[row.metric]
-
-        if domain == '__ALL__':
-            systems = list(systems_qc_names.values())
-        else:
-            # Gather all systems with the selected domain.
-            temp = filter(lambda di: di[1] == domain, systems_domains.items())
-            # Map the names to the Qualitas compiled corpus:
-            systems = list(map(lambda di: systems_qc_names[di[0]], temp))
         
         # Only use unique values if explicitly requested or CDF-type is ECDF!
         uvals = True if unique_vals else (dens_fun == ECDF)
-        data = distr.get_cdf_data(metric_id=metric_id, unique_vals=uvals, systems=systems)
+        data = distr.data(metric_id=metric_id, unique_vals=uvals, systems=systems)
 
         if dens_fun == ParametricCDF:
             df = None

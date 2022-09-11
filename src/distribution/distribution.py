@@ -1,11 +1,16 @@
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+from itertools import combinations
 from typing import Any, Callable, Iterable, Union
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
-from scipy.stats import kstest
+from scipy.interpolate import interp1d
+from scipy.stats import kstest, ks_2samp, f_oneway, spearmanr, ttest_ind
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from strenum import StrEnum
 import pandas as pd
 import numpy as np
@@ -234,15 +239,19 @@ class ParametricCDF(DensityFunc):
 
 
 class Distribution:
-    def __init__(self, df: pd.DataFrame) -> None:
+    def __init__(self, df: pd.DataFrame, attach_domain: bool=False, attach_system: bool=False) -> None:
         self.df = df
+        if attach_domain:
+            df['domain'] = [Distribution.domain_for_system(system=system, is_qc_name=True) for system in df.system]
+        if attach_system:
+            df['system_org'] = [Distribution.system_qc_to_system(system_qc=system_qc) for system_qc in df.system]
 
     @property
     def available_systems(self) -> NDArray[Shape["*"], String]:
         return self.df['project'].unique()
 
 
-    def get_cdf_data(self, metric_id: MetricID, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
+    def data(self, metric_id: MetricID, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
         new_df = self.df[self.df['metric'] == metric_id.name]
         if systems is not None:
             new_df = new_df[new_df['system'].isin(systems)]
@@ -326,3 +335,46 @@ class Distribution:
         metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
         
         return ParametricCDF(dist=use_dist[0], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
+
+
+    @lru_cache(maxsize=None)
+    @staticmethod
+    def domains(include_all_domain: bool=True) -> list[str]:
+        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
+        domains: list[str] = systems_domains_df.Domain.unique().tolist()
+        if include_all_domain:
+            domains.append('__ALL__')
+        return domains
+
+
+    @lru_cache(maxsize=None)
+    @staticmethod
+    def systems_for_domain(domain: str) -> list[str]:
+        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
+        systems_domains = dict(zip(systems_domains_df.System, systems_domains_df.Domain))
+        systems_qc_names = dict(zip(systems_domains_df.System, systems_domains_df.System_QC_name))
+
+        if domain == '__ALL__':
+            return list(systems_qc_names.values())
+        
+        # Gather all systems with the selected domain.
+        temp = filter(lambda di: di[1] == domain, systems_domains.items())
+        # Map the names to the Qualitas compiled corpus:
+        return list(map(lambda di: systems_qc_names[di[0]], temp))
+    
+
+    @lru_cache(maxsize=None)
+    @staticmethod
+    def domain_for_system(system: str, is_qc_name: bool=False) -> str:
+        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
+        domain_dict = dict(zip(systems_domains_df[('System_QC_name' if is_qc_name else 'System')], systems_domains_df.Domain))
+        return domain_dict[system]
+    
+
+    @lru_cache(maxsize=None)
+    @staticmethod
+    def system_qc_to_system(system_qc: str) -> str:
+        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
+        domain_dict = dict(zip(systems_domains_df.System_QC_name, systems_domains_df.System))
+        return domain_dict[system_qc]
+
