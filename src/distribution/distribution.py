@@ -378,3 +378,102 @@ class Distribution:
         domain_dict = dict(zip(systems_domains_df.System_QC_name, systems_domains_df.System))
         return domain_dict[system_qc]
 
+
+    def analyze_ANOVA(self, metric_ids: Iterable[MetricID], domains: Iterable[str], unique_vals: bool=True) -> pd.DataFrame:
+        # We first have to build the data; f_oneway requires *args, where each
+        # arg is a data series.
+        if len(list(metric_ids)) < 1 or len(list(domains)) < 2:
+            raise Exception('Requires one or metrics and two or more domains.')
+
+        def anova_for_metric(metric_id: MetricID) -> dict[str, Union[MetricID, str, float]]:
+            data_tuple = ()
+            for domain in domains:
+                data_tuple += (self.data(metric_id=metric_id, systems=Distribution.systems_for_domain(domain=domain), unique_vals=unique_vals),)
+            
+            stat, pval = f_oneway(*data_tuple)
+            return { 'metric': metric_id.name, 'stat': stat, 'pval': pval, 'across_domains': ';'.join(domains) }
+
+        from joblib import Parallel, delayed
+        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_metric)(metric_id) for metric_id in metric_ids)
+
+        return pd.DataFrame(res_dicts)
+    
+
+    def analyze_TukeyHSD(self, metric_ids: Iterable[MetricID]) -> pd.DataFrame:
+        if len(list(metric_ids)) < 1:
+            raise Exception('Requires one or metrics.')
+        
+        temp = self.df.copy()
+        temp.domain = '__ALL__' # Erase domain
+        all_data = pd.concat([temp, self.df])
+        
+        def tukeyHSD_for_metric(metric_id: MetricID) -> pd.DataFrame:
+            data = all_data[all_data.metric == metric_id.name]
+            tukey = pairwise_tukeyhsd(endog=data.value, groups=data.domain)
+            temp = tukey.summary().data
+            return pd.DataFrame(data=temp[1:], columns=temp[0])
+
+        from joblib import Parallel, delayed
+        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(metric_id) for metric_id in metric_ids)
+
+        return pd.concat(res_dfs)
+    
+
+    def analyze_distr(self, metric_ids: Iterable[MetricID], use_ks_2samp: bool=True) -> pd.DataFrame:
+        if len(list(metric_ids)) < 1:
+            raise Exception('Requires one or metrics.')
+        
+        temp = self.df.copy()
+        temp.domain = '__ALL__'
+        all_data = pd.concat([temp, self.df])
+        unique_domain_pairs: list[tuple[str, str]] = list(combinations(iterable=all_data.domain.unique(), r=2))
+
+        # def pairwise_rank_corr(metric_id: MetricID) -> pd.DataFrame:
+        #     dict_list: list[dict[str, Union[str, float]]] = [ ]
+
+        #     for udp in unique_domain_pairs:
+        #         data1 = all_data[(all_data.domain == udp[0]) & (all_data.metric == metric_id.name)].value.to_numpy()
+        #         data2 = all_data[(all_data.domain == udp[1]) & (all_data.metric == metric_id.name)].value.to_numpy()
+
+        #         l1, l2 = len(data1), len(data2)
+        #         ll, ls = max(l1, l2), min(l1, l2)
+        #         if ll != ls:
+        #             # We need to resample the data if length not equal
+        #             x_long = np.linspace(start=0., stop=1., num=ll)
+        #             x_short = np.linspace(start=0., stop=1., num=ls)
+
+        #             if l1 < l2:
+        #                 data1 = interp1d(x=x_short, y=data1, kind='nearest')(x_long)
+        #             else:
+        #                 data2 = interp1d(x=x_short, y=data2, kind='nearest')(x_long)
+
+        #         corr, pval = spearmanr(a=np.sort(data1), b=np.sort(data2), alternative='greater', nan_policy='raise')
+        #         dict_list.append({
+        #             'metric': metric_id.name, 'stat': corr, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
+        #         })
+            
+        #     return pd.DataFrame(dict_list)
+        
+        def compare(metric_id: MetricID) -> pd.DataFrame:
+            dict_list: list[dict[str, Union[str, float]]] = [ ]
+
+            for udp in unique_domain_pairs:
+                data1 = all_data[(all_data.domain == udp[0]) & (all_data.metric == metric_id.name)].value.to_numpy()
+                data2 = all_data[(all_data.domain == udp[1]) & (all_data.metric == metric_id.name)].value.to_numpy()
+
+                stat = pval = None
+                if use_ks_2samp:
+                    stat, pval = ks_2samp(data1=data1, data2=data2, alternative='two-sided', method='exact')
+                else:
+                    stat, pval = ttest_ind(a=data1, b=data2, equal_var=False, alternative='two-sided')
+
+                dict_list.append({
+                    'metric': metric_id.name, 'stat': stat, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
+                })
+            
+            return pd.DataFrame(dict_list)
+
+        from joblib import Parallel, delayed
+        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(metric_id) for metric_id in metric_ids)
+
+        return pd.concat(res_dfs)
