@@ -103,7 +103,7 @@ source = ColumnDataSource(data=pd.DataFrame(columns=list([f'x_{domain}' for doma
 # Set up plot
 plot = figure(sizing_mode='stretch_width', height=640,# title="Metrics as Scores",
               x_axis_label='Metric Value', y_axis_label='Corresponding Score',
-              tools="crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset", x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom')
+              tools="box_zoom,crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset", x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom')
 #plot.toolbar.active_scroll = plot.select_one('wheel_zoom') #'wheel_zoom'
 
 
@@ -224,8 +224,9 @@ def update_plot(contain_plot: bool=False):
     v = input_own.value
     has_own = isinstance(v, int) or isinstance(v, float) or isinstance(v, Integral)
     own_values = []
-    input_own.low = lb
-    input_own.high = ub
+    # We should not limit what the user can input
+    #input_own.low = lb
+    #input_own.high = ub
     input_own.step = (ub - lb) / 25.
 
     for domain in domains.keys():
