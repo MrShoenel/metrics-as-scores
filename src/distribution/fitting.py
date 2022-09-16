@@ -1,14 +1,15 @@
-
+import numpy as np
+from numpy.random import normal, default_rng
+from math import pow
+from multiprocessing.pool import ThreadPool
 from typing import Any, Callable, Sequence, Union
 from nptyping import Float, NDArray, Shape
 from scipy.stats import _continuous_distns, _discrete_distns, _fit
 from inspect import getmembers, isclass
-from scipy.stats._distn_infrastructure import rv_generic, rv_continuous, rv_discrete
-
+from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 
 Continuous_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_continuous), getmembers(_continuous_distns))))
 Discrete_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_discrete), getmembers(_discrete_distns))))
-
 
 from src.distribution import fitting_problems
 temp = list(filter(lambda rv: hasattr(fitting_problems, f'Fit_{type(rv).__name__}'), Discrete_RVs))
@@ -17,104 +18,46 @@ Discrete_Problems = { x: y for (x, y) in zip(
     map(lambda rv: getattr(fitting_problems, f'Fit_{type(rv).__name__}'), temp))}
 del temp
 
-
-    
-import numpy as np
-from numpy.random import normal
-from multiprocessing.pool import ThreadPool, Pool
-
-
-
-
-
 from pymoo.termination.default import DefaultTermination
 from pymoo.indicators.igd import IGD
 from pymoo.termination.cv import ConstraintViolationTermination
-from pymoo.util.normalization import normalize
 from pymoo.termination.default import DefaultTermination
 from pymoo.indicators.igd import IGD
 from pymoo.termination.robust import RobustTermination
 from pymoo.termination.default import SingleObjectiveSpaceTermination
 from pymoo.termination.xtol import DesignSpaceTermination
 from pymoo.termination.cv import ConstraintViolationTermination
-from pymoo.util.normalization import normalize
-from pymoo.core.problem import ElementwiseProblem
-from pymoo.core.variable import Real, Integer
-from scipy.stats._discrete_distns import nchypergeom_fisher_gen, nchypergeom_wallenius_gen
+from pymoo.termination.max_time import TimeBasedTermination
+from scipy.optimize import differential_evolution
 from pymoo.core.result import Result
 from pymoo.core.mixed import MixedVariableGA
 from pymoo.optimize import minimize
-from pymoo.core.problem import StarmapParallelization
+from scipy.stats import cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp
 
 
+
+# We override this class because of a bug in pymoo.
 class DesignSpaceTerminationFixed(DesignSpaceTermination):
     def _delta(self, prev, current):
         if prev.dtype == float and current.dtype == float:
             return IGD(current).do(prev)
         else:
+            # The error was here: it uses axis=1, but it appears this does not work
+            # when using with explicitly defined/types variables as we do.
             return np.mean([np.sum(e != prev).max() / len(e) for e in current])
 
+
 class SingleObjectiveTermination(DefaultTermination):
-    def __init__(self, xtol=1e-8, cvtol=1e-8, ftol=1e-6, period=75, **kwargs) -> None:
+    def __init__(self, xtol=1e-8, cvtol=1e-8, ftol=1e-6, period=75, max_time: int=600, **kwargs) -> None:
         x = RobustTermination(DesignSpaceTerminationFixed(xtol), period=period)
         cv = RobustTermination(ConstraintViolationTermination(cvtol, terminate_when_feasible=False), period=period)
         f = RobustTermination(SingleObjectiveSpaceTermination(ftol, only_feas=True), period=period)
         super().__init__(x, cv, f, **kwargs)
+        if max_time is not None:
+            self.mt = TimeBasedTermination(max_time=max_time)
+            self.criteria.append(self.mt)
 
 
-
-
-
-
-class MixedVariableProblem(ElementwiseProblem):
-
-    def __init__(self, data, **kwargs):
-        ext = int(np.max(data) - np.min(data))
-        vars = {
-            #"M": Integer(bounds=(0, 25_000)),
-            #"M": Integer(bounds=(0, int(1e5))),
-            "M": Integer(bounds=(1, data.size)),
-            #"n": Integer(bounds=(int(np.max(data)), 25_000)),
-            #"n": Integer(bounds=(0, int(1e5))),
-            "n": Integer(bounds=(1, 2*data.size)),
-            #"N": Integer(bounds=(int(np.max(data)), 25_000)),
-            #"N": Integer(bounds=(0, int(1e5))),
-            "N": Integer(bounds=(1, 2*data.size)),
-            "odds": Real(bounds=(5e-324, 1e4)),
-            #"loc": Integer(bounds=(-1_000, 1_000))
-            "loc": Integer(bounds=(int(np.floor(np.min(data))) - (int(10 * ext)), int(np.ceil(np.max(data))) + int(10 * ext)))
-            #"loc": Integer(bounds=(int(-1e7), int(1e7)))
-        }
-        self.dist = nchypergeom_wallenius_gen() # nchypergeom_fisher_gen()
-        super().__init__(vars=vars, n_obj=1, n_ieq_constr=4, **kwargs)
-        self.data = data
-
-    def _evaluate(self, X, out, *args, **kwargs):
-        M, n, N, odds, loc = X["M"], X["n"], X["N"], X["odds"], X["loc"]
-        a, b = np.min(self.data), np.max(self.data)
-        out["F"] = self.dist.nnlf(theta=(M, n, N, odds, loc), x=self.data)
-        out["G"] = np.asarray([
-            N - M,
-            n - M,
-            #M - N - n + a,
-            b - N,
-            b - n])
-        #if not np.isinf(out["F"]):
-        #    self.dist.nnlf(theta=(M, n, N, odds, loc), x=self.data)
-        #    out["G"] = np.full((5,), -1)
-        return out
-        #out["G"] = np.asarray(N) - np.asarray(M)
-        #out["H"] = np.asarray(n) - np.asarray(M)
-        # cond5 = N <= M
-        # cond6 = n <= M
-
-
-
-
-
-from scipy.optimize import differential_evolution #, shgo, basinhopping, direct
-def optimizer(fun, bounds, integrality):
-    return differential_evolution(func=fun, bounds=bounds, integrality=integrality, maxiter=10_00)
 
 class Fitter:
     # All have 'loc' which is an integer, and we will derive it from the data (i.e., use int([min/max](data)))
@@ -209,6 +152,10 @@ class Fitter:
 
         if self.is_discrete and not dist.__name__ in Fitter.Practical_Ranges.keys():
             raise Exception(f'Cannot fit discrete distribution "{dist.__name__}" because no practical ranges exist.')
+    
+    @staticmethod
+    def _optimizer_de(fun, bounds, integrality):
+        return differential_evolution(func=fun, bounds=bounds, integrality=integrality, maxiter=10_00)
 
     @property
     def is_discrete(self) -> bool:
@@ -228,7 +175,7 @@ class Fitter:
             dist: type[rv_discrete] = self.dist
             bounds = list(Fitter.Practical_Ranges[dist.__name__].values())
             bounds.append([int(np.floor(np.min(data))), int(np.ceil(np.max(data)))]) # for 'loc'
-            result: _fit.FitResult = _fit.fit(dist=dist(), data=data, bounds=bounds, optimizer=optimizer)
+            result: _fit.FitResult = _fit.fit(dist=dist(), data=data, bounds=bounds, optimizer=Fitter._optimizer_de)
             params = result.params
         
         return params
@@ -247,7 +194,7 @@ class FitterPymoo(Fitter):
 
         super().__init__(dist=dist)
 
-    def fit(self, data: NDArray[Shape["*"], Float], max_samples = 10_000, minimize_seeds = [1_337, 0xdeadbeef, 45640321], verbose: bool=True) -> dict[str, Union[float, int]]:
+    def fit(self, data: NDArray[Shape["*"], Float], max_samples = 10_000, minimize_seeds = [1_337, 0xdeadbeef, 45640321], verbose: bool=True, stop_after_first_res: bool=True) -> dict[str, Union[float, int]]:
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
             rng = default_rng(seed=1)
@@ -265,13 +212,15 @@ class FitterPymoo(Fitter):
                     xtol=1e-8,
                     cvtol=1e-8,
                     ftol=1e-6,
-                    period=300,
+                    period=500,
+                    max_time=300,
                     n_max_gen=10_000,
                     n_max_evals=20_000),
                 seed=seed, verbose=verbose, save_history=False)
             if res.feas and res.F[0] < float('inf'):
                 results.append(res)
-                break # 1 is enough
+                if stop_after_first_res:
+                    break # 1 result is enough
 
         if len(results) > 0:
             results.sort(key=lambda r: r.F[0])
@@ -280,9 +229,6 @@ class FitterPymoo(Fitter):
         raise Exception('Optimization did not find a maximum likelihood estimate.')
 
 
-
-from math import pow
-from scipy.stats import cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp
 
 
 class StatisticalTest:
@@ -352,58 +298,7 @@ class StatisticalTest:
                 self.tests[f'{test.__name__}_{tt}'] = dict(pval = pval, stat = stat)
     
     def __iter__(self) -> Sequence[tuple[str, Any]]:
+        # We can call dict(obj) to get this class as a dictionary
         yield ('tests', self.tests)
         yield ('discrete_data1', self.discrete_data1)
         yield ('discrete_data2', self.discrete_data2)
-
-
-import numpy as np
-from numpy.random import default_rng
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    # st = StatisticalTest(data1=data, cdf=temp_cdf, ppf_or_data2=temp_ppf, data2_num_samples=2_250)
-
-
-    np.random.seed(1)
-    data = np.rint(normal(loc=1.1, scale=8.7, size=1_000))
-    from scipy.stats._continuous_distns import norm_gen
-    fitter = FitterPymoo(norm_gen)
-    params = fitter.fit(data=data)
-    print(params)
-
-    #data = np.random.binomial(n=4532, p=.7777, size=1_000)
-    fitter = FitterPymoo(dist=nchypergeom_wallenius_gen)
-    bla = fitter.fit(data=data)
-
-    X = {'M': 954, 'n': 529, 'N': 507, 'loc': -301, 'odds': 1.2956040934963131}
-    temp = nchypergeom_wallenius_gen()
-    temp_ppf = lambda x: temp.ppf(x, M = X["M"], n = X["n"], N = X["N"], odds = X["odds"], loc = X["loc"])
-    temp_cdf = lambda x: temp.cdf(x, M = X["M"], n = X["n"], N = X["N"], odds = X["odds"], loc = X["loc"])
-    algorithm = MixedVariableGA(pop=100, n_offsprings=2)
-
-
-    pool = ThreadPool(200)
-    runner = StarmapParallelization(pool.starmap)
-    #problem = MixedVariableProblem(data=data, elementwise_runner=runner)
-    from fitting_problems import Fit_bernoulli_gen, Fit_nbinom_gen
-    problem = Fit_bernoulli_gen(data=data)
-
-    res = minimize(problem,
-                algorithm,
-                termination=SingleObjectiveTermination(period=100),
-                seed=1,
-                verbose=True)
-
-    print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
-
-    f = Fitter(dist=nchypergeom_fisher_gen)
-    parama = f.fit(data=data)
-    print(f.is_continuous)
-    print(f.is_discrete)
