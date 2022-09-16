@@ -15,7 +15,7 @@ venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
-Here is a Linux example that assumes you have Python `3.10` installed:
+Here is a Linux example that assumes you have Python `3.10` installed (this may also require installing `python3.10-venv` and/or `python3.10-dev`):
 
 ```shell
 python3.10 -m venv venv
