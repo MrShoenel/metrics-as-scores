@@ -163,8 +163,8 @@ class KDECDF_approx(DensityFunc):
     def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         # First, we'll fit an extra KDE for an approximate PDF.
         # It is used to also roughly estimate its mode.
-        np.random.seed(1)
-        data_pdf = data if data.shape[0] <= 10_000 else np.random.choice(a=data, size=10_000, replace=False)
+        rng = np.random.default_rng(seed=1)
+        data_pdf = data if data.shape[0] <= 10_000 else rng.choice(a=data, size=10_000, replace=False)
         self._kde_for_pdf = gaussian_kde(dataset=data_pdf)
 
         self._range_data = (np.min(data), np.max(data))   
@@ -251,7 +251,7 @@ class Distribution:
         return self.df['project'].unique()
 
 
-    def data(self, metric_id: MetricID, domain: str=None, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
+    def data(self, metric_id: MetricID, domain: str=None, systems: Iterable[str]=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
         new_df = self.df[self.df['metric'] == metric_id.name]
         if domain is not None:
             new_df = new_df[new_df['domain'] == domain]
@@ -261,12 +261,18 @@ class Distribution:
         vals = new_df['value']
         if unique_vals:
             rng = np.random.default_rng(seed=1_337)
-            r = rng.choice(np.linspace(1e-8, 1e-6, vals.size), vals.size, replace=False)
+            r = rng.choice(a=np.linspace(1e-8, 1e-6, vals.size), size=vals.size, replace=False)
             # Add small but insignificant perturbations to the data to produce unique
             # values that would otherwise be eliminated by certain methods.
             vals += r
         
-        return vals.to_numpy()
+        vals = vals.to_numpy()
+        
+        if sub_sample is not None and sub_sample < vals.size:
+            rng = np.random.default_rng(seed=1_338)
+            vals = rng.choice(a=vals, size=sub_sample, replace=False)
+        
+        return vals
     
     @staticmethod
     def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE) -> tuple[float, NDArray[Shape["*"], Float]]:
