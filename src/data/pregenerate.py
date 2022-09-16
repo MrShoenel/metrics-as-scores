@@ -56,7 +56,7 @@ if __name__ == '__main__':
     clazzes = [ECDF, KDECDF_approx, ParametricCDF]
     transfs = list(DistTransform)
 
-    d = Distribution(df=pd.read_csv('csv/metrics.csv'))    
+    d = Distribution(df=pd.read_csv('csv/metrics.csv'))
     for transf in transfs:
         for clazz in clazzes:
             temp = generate_densities(distr=d, dens_fun=clazz, unique_vals=True, resample_samples=75_000, dist_transform=transf)

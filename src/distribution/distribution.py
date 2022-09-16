@@ -251,15 +251,17 @@ class Distribution:
         return self.df['project'].unique()
 
 
-    def data(self, metric_id: MetricID, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
+    def data(self, metric_id: MetricID, domain: str=None, systems: Iterable[str]=None, unique_vals: bool=True) -> NDArray[Shape["*"], Float]:
         new_df = self.df[self.df['metric'] == metric_id.name]
+        if domain is not None:
+            new_df = new_df[new_df['domain'] == domain]
         if systems is not None:
             new_df = new_df[new_df['system'].isin(systems)]
         
         vals = new_df['value']
         if unique_vals:
-            rng = np.random.default_rng(seed=1337)
-            r = rng.choice(np.linspace(0, 1e-6, vals.size), vals.size, replace=False)
+            rng = np.random.default_rng(seed=1_337)
+            r = rng.choice(np.linspace(1e-8, 1e-6, vals.size), vals.size, replace=False)
             # Add small but insignificant perturbations to the data to produce unique
             # values that would otherwise be eliminated by certain methods.
             vals += r
@@ -305,8 +307,8 @@ class Distribution:
         
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
-            np.random.seed(1)
-            data = np.random.choice(data, size=max_samples, replace=False)
+            rng = np.random.default_rng(seed=1)
+            data = rng.choice(data, size=max_samples, replace=False)
         
         best_kst = None
         use_dist: tuple[Union[rv_generic, rv_continuous], tuple[Any]] = None
