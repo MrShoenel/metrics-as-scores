@@ -1,3 +1,4 @@
+from abc import ABC
 from functools import lru_cache
 from itertools import combinations
 from typing import Any, Callable, Iterable, Union
@@ -30,8 +31,8 @@ class DistTransform(StrEnum):
 
 
 
-class Density:
-    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+class Density(ABC):
+    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ppf: Callable[[float], float]=None, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self.range = range
         self._pdf = pdf
         self._cdf = cdf
