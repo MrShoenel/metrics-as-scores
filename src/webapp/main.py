@@ -38,7 +38,7 @@ from bokeh.models.widgets.inputs import Spinner
 from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
-from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx, ParametricCDF
+from src.distribution.distribution import Empirical, DistTransform, KDE_approx, Parametric
 from numbers import Integral
 
 
@@ -84,13 +84,6 @@ input_own = Spinner(mode='float', placeholder='Check Own Metric Value')
 cbg_autotrans_items = ['Apply transform using ideal value']
 selected_autotransf = True
 cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
-
-
-
-# Data and UI for selected CDF type
-dd_denstype_items = [('PDF from Parametric', 'Param_PDF'), ('PDF from KDE', 'PDF'), ('CDF from Parametric', 'Param_CDF'), ('CDF from Empirical (ECDF)', 'ECDF'), ('Smoothed approx. ECDF from KDE', 'KDE_CDF_approx'), ('[Score] CCDF from Parametric', 'Param_CCDF'), ('[Score] CCDF from Empirical (ECCDF)', 'ECCDF'), ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF_approx')]
-selected_denstype = dd_denstype_items[7]
-dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items)
 
 
 # Contain button
@@ -156,6 +149,21 @@ cdfs = data.cdfs
 
 
 
+# Data and UI for selected CDF type
+dd_denstype_items = [
+    ('PDF from Parametric', 'Param_PDF'),
+    ('PDF from KDE', 'PDF'),
+    ('CDF from Parametric', 'Param_CDF'),
+    ('CDF from Empirical (ECDF)', 'ECDF'),
+    ('Smoothed approx. ECDF from KDE', 'KDE_CDF_approx'),
+    ('[Score] CCDF from Parametric', 'Param_CCDF'),
+    ('[Score] CCDF from Empirical (ECCDF)', 'ECCDF'),
+    ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF_approx')
+]
+selected_denstype = dd_denstype_items[7]
+dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items)
+
+
 def update_plot(contain_plot: bool=False):
     global selected_cutoff
     sd = selected_denstype[1]
@@ -171,26 +179,26 @@ def update_plot(contain_plot: bool=False):
         cbg_cutoff.active = []
         selected_cutoff = False
 
-    densities: dict[str, Union[ECDF, KDECDF_approx, ParametricCDF]] = {}
+    densities: dict[str, Union[Empirical, KDE_approx, Parametric]] = {}
     df_cols = {}
     lb, ub = 0.0, 1e-10
 
     clazz = None
     if is_ecdf:
-        clazz = ECDF
+        clazz = Empirical
     elif is_parametric:
-        clazz = ParametricCDF
+        clazz = Parametric
     else:
-        clazz = KDECDF_approx
+        clazz = KDE_approx
     use_densities = cdfs[f'{clazz.__name__}_{selected_transf[1]}'].value
 
-    def range_data(d: Union[KDECDF_approx, ParametricCDF]) -> tuple[float, float]:
+    def range_data(d: Union[KDE_approx, Parametric]) -> tuple[float, float]:
         if is_parametric:
             return d.range
         return d._range_data
 
     for domain in domains.keys():
-        density: Union[ECDF, KDECDF_approx, ParametricCDF] = use_densities[f'{domain}_{selected_score[1]}']
+        density: Union[Empirical, KDE_approx, Parametric] = use_densities[f'{domain}_{selected_score[1]}']
         densities[domain] = density
         if is_parametric and not density.is_fit:
             continue
@@ -289,7 +297,7 @@ def update_plot(contain_plot: bool=False):
             return np.round(v)
         return np.round(v, 4)
 
-    def pdist_format(d: ParametricCDF):
+    def pdist_format(d: Parametric):
         if d.is_fit:
             return d.dist_name
         return '<not possible>'
