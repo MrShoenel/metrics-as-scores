@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from itertools import combinations
 from typing import Any, Callable, Iterable, Union
@@ -7,7 +6,8 @@ from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.interpolate import interp1d
-from scipy.stats import kstest, ks_2samp, f_oneway, mode, ttest_ind
+from scipy.stats import gaussian_kde, kstest, ks_2samp, f_oneway, mode, ttest_ind
+from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -30,7 +30,7 @@ class DistTransform(StrEnum):
 
 
 
-class DensityFunc:
+class Density:
     def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self.range = range
         self._pdf = pdf
@@ -131,16 +131,14 @@ class DensityFunc:
             pickle.dump(obj=self, file=f)
     
     @staticmethod
-    def load_from_file(file: str) -> 'DensityFunc':
+    def load_from_file(file: str) -> 'Density':
         with open(file=file, mode='rb') as f:
             return pickle.load(file=f)
 
 
 
-from scipy.integrate import quad
-from scipy.stats import gaussian_kde
 
-class KDECDF_integrate(DensityFunc):
+class KDE_integrate(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self._kde = gaussian_kde(dataset=np.asarray(data))
         lb, ub = np.min(data), np.max(data)
@@ -159,7 +157,7 @@ class KDECDF_integrate(DensityFunc):
         super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
 
-class KDECDF_approx(DensityFunc):
+class KDE_approx(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         # First, we'll fit an extra KDE for an approximate PDF.
         # It is used to also roughly estimate its mode.
@@ -183,7 +181,7 @@ class KDECDF_approx(DensityFunc):
 
 
 
-class ECDF(DensityFunc):
+class Empirical(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=SMEcdf(data), ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
@@ -191,7 +189,7 @@ class ECDF(DensityFunc):
             self.practical_domain
 
 
-class ParametricCDF(DensityFunc):
+class Parametric(Density):
     def __init__(self, dist: rv_generic, pval: float, dstat: float, dist_params: tuple, range: tuple[float, float], compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.pval = pval
@@ -205,9 +203,9 @@ class ParametricCDF(DensityFunc):
             self.practical_range_pdf
     
     @staticmethod
-    def unfitted(dist_transform: DistTransform) -> 'ParametricCDF':
+    def unfitted(dist_transform: DistTransform) -> 'Parametric':
         from scipy.stats._continuous_distns import norm_gen
-        return ParametricCDF(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
+        return Parametric(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
     
     @property
     def is_fit(self) -> bool:
@@ -242,7 +240,7 @@ class ParametricCDF(DensityFunc):
         return self.dist.cdf(*(x, *self.dist_params)).reshape((x.size,))
 
 
-class ParametricCDF_discrete(ParametricCDF):
+class Parametric_discrete(Parametric):
     def pmf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
         x = np.asarray(x)
         if not self.is_fit:
@@ -253,19 +251,19 @@ class ParametricCDF_discrete(ParametricCDF):
         return self.pmf(x=x)
     
     @staticmethod
-    def unfitted(dist_transform: DistTransform) -> 'ParametricCDF_discrete':
+    def unfitted(dist_transform: DistTransform) -> 'Parametric_discrete':
         from scipy.stats._continuous_distns import norm_gen
-        return ParametricCDF_discrete(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
+        return Parametric_discrete(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
 
 
 
-class Distribution:
+class Dataset:
     def __init__(self, df: pd.DataFrame, attach_domain: bool=False, attach_system: bool=False) -> None:
         self.df = df
         if attach_domain:
-            df['domain'] = [Distribution.domain_for_system(system=system, is_qc_name=True) for system in df.system]
+            df['domain'] = [Dataset.domain_for_system(system=system, is_qc_name=True) for system in df.system]
         if attach_system:
-            df['system_org'] = [Distribution.system_qc_to_system(system_qc=system_qc) for system_qc in df.system]
+            df['system_org'] = [Dataset.system_qc_to_system(system_qc=system_qc) for system_qc in df.system]
 
     @property
     def available_systems(self) -> NDArray[Shape["*"], String]:
@@ -304,7 +302,7 @@ class Distribution:
         transform_value: float=None
         if dist_transform == DistTransform.EXPECTATION:
             if continuous_value:
-                temp = KDECDF_approx(data=data, compute_ranges=True)
+                temp = KDE_approx(data=data, compute_ranges=True)
                 ext = temp.practical_domain[1] - temp.practical_domain[0]
                 transform_value, _ = quad(func=lambda x: x * temp._pdf_from_kde(x), a=temp.practical_domain[0] - ext, b=temp.practical_domain[1] + ext, limit=250)
             else:
@@ -314,7 +312,7 @@ class Distribution:
                 transform_value = np.mean(np.rint(data))
         elif dist_transform == DistTransform.MODE:
             if continuous_value:
-                temp = KDECDF_approx(data=data, compute_ranges=True)
+                temp = KDE_approx(data=data, compute_ranges=True)
                 m = direct(func=lambda x: -1. * np.log(1. + temp._pdf_from_kde(x)), bounds=(temp.range,), locally_biased=False)
                 transform_value = m.x[0] # x of where the mode is (i.e., not f(x))!
             else:
@@ -322,7 +320,7 @@ class Distribution:
         elif dist_transform == DistTransform.MEDIAN:
             if continuous_value:
                 # We'll get the median from the smoothed PDF in order to also get a more smooth value
-                temp = KDECDF_approx(data=data, compute_ranges=True)
+                temp = KDE_approx(data=data, compute_ranges=True)
                 transform_value = np.median(temp._kde.resample(size=50_000, seed=2))
             else:
                 transform_value = np.median(a=np.rint(data))
@@ -346,11 +344,11 @@ class Distribution:
         return (transform_value, data)
     
     @staticmethod
-    def fit_parametric(data: NDArray[Shape["*"], Float], alpha: float=0.05, max_samples: int=5_000, metric_id: MetricID=None, domain: str=None, dist_transform: DistTransform=DistTransform.NONE) -> ParametricCDF:
+    def fit_parametric(data: NDArray[Shape["*"], Float], alpha: float=0.05, max_samples: int=5_000, metric_id: MetricID=None, domain: str=None, dist_transform: DistTransform=DistTransform.NONE) -> Parametric:
         distNames = ['gamma', 'gennorm', 'genexpon', 'expon', 'exponnorm',
             'exponweib', 'exponpow', 'genextreme', 'gausshyper', 'dweibull', 'invgamma', 'gilbrat','genhalflogistic', 'ncf', 'nct', 'ncx2', 'pareto', 'uniform', 'pearson3', 'mielke', 'moyal', 'nakagami', 'laplace', 'laplace_asymmetric', 'rice', 'rayleigh', 'trapezoid', 'vonmises','kappa4', 'lomax', 'loguniform', 'loglaplace', 'foldnorm', 'kstwobign', 'erlang', 'ksone','chi2', 'logistic', 'johnsonsb', 'gumbel_l', 'gumbel_r', 'genpareto', 'powerlognorm', 'bradford', 'alpha', 'tukeylambda', 'wald', 'maxwell', 'loggamma', 'fisk', 'cosine', 'burr', 'beta', 'betaprime', 'crystalball', 'burr12', 'anglit', 'arcsine', 'gompertz', 'geninvgauss']
         
-        transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform)
+        transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform)
         
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
@@ -383,7 +381,7 @@ class Distribution:
         metrics_ideal_df.replace({ np.nan: None }, inplace=True)
         metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
         
-        return ParametricCDF(dist=use_dist[0], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
+        return Parametric(dist=use_dist[0], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
 
 
     @lru_cache(maxsize=None)
@@ -437,7 +435,7 @@ class Distribution:
         def anova_for_metric(metric_id: MetricID) -> dict[str, Union[MetricID, str, float]]:
             data_tuple = ()
             for domain in domains:
-                data_tuple += (self.data(metric_id=metric_id, systems=Distribution.systems_for_domain(domain=domain), unique_vals=unique_vals),)
+                data_tuple += (self.data(metric_id=metric_id, systems=Dataset.systems_for_domain(domain=domain), unique_vals=unique_vals),)
             
             stat, pval = f_oneway(*data_tuple)
             return { 'metric': metric_id.name, 'stat': stat, 'pval': pval, 'across_domains': ';'.join(domains) }

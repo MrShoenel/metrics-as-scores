@@ -14,7 +14,7 @@ from numpy.random import default_rng
 from pickle import dump
 from joblib import Parallel, delayed
 from src.data.metrics import MetricID
-from src.distribution.distribution import DistTransform, Distribution, ParametricCDF, ParametricCDF_discrete
+from src.distribution.distribution import DistTransform, Dataset, Parametric, Parametric_discrete
 from src.data.pregenerate_fit import fit, get_data_tuple, Continuous_RVs_dict, Discrete_RVs_dict
 from sklearn.model_selection import ParameterGrid
 
@@ -35,7 +35,7 @@ def generate_parametric_fits(dist_transform: DistTransform, data_dict: dict[str,
     # That means that for discrete data, we will have to kinds of fitted RVs.
     # Also, when fitting a continuous RV to discrete data, we will add jitter to the data.
 
-    domains = Distribution.domains(include_all_domain=True)
+    domains = Dataset.domains(include_all_domain=True)
 
     from scipy.stats._continuous_distns import norminvgauss_gen, gausshyper_gen, genhyperbolic_gen, geninvgauss_gen, invgauss_gen, studentized_range_gen
     from scipy.stats._discrete_distns import nhypergeom_gen, hypergeom_gen
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     #    print(bla)
 
     print('Reading data file...')
-    dist = Distribution(df=pd.read_csv('csv/metrics.csv'))
+    dist = Dataset(df=pd.read_csv('csv/metrics.csv'))
 
     for dist_transform in list(DistTransform):
         print(f'Parallel pre-processing of datasets for transform {dist_transform.name} ({dist_transform.value})...')

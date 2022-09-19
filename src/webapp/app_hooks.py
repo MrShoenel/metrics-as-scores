@@ -3,7 +3,7 @@ from sys import path, argv
 path.append(os.getcwd())
 from pickle import load
 from src.tools.lazy import SelfResetLazy
-from src.distribution.distribution import ECDF, DistTransform, KDECDF_approx, ParametricCDF
+from src.distribution.distribution import Empirical, DistTransform, KDE_approx, Parametric, Parametric_discrete
 
 from . import data
 
@@ -13,19 +13,19 @@ def unpickle(file: str):
         with open(file=file, mode='rb') as f:
             return load(f)
     except Exception as e:
-        raise Exception('This webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
+        raise Exception('The webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
 
 
 def load_data(preload: bool=False):
     print('Loading data')
-    clazzes = [ECDF, KDECDF_approx, ParametricCDF]
+    clazzes = [Empirical, KDE_approx, Parametric, Parametric_discrete]
     transfs = list(DistTransform)
 
     data.cdfs = {}
     for clazz in clazzes:
         for transf in transfs:
             data.cdfs[f'{clazz.__name__}_{transf.name}'] = SelfResetLazy(reset_after=3600.0 * (4. if preload else 1.),
-                fn_create_val=lambda clazz=clazz, transf=transf: unpickle(f'./results/cdfs_{clazz.__name__}_{transf.name}.pickle'))
+                fn_create_val=lambda clazz=clazz, transf=transf: unpickle(f'./results/densities_{clazz.__name__}_{transf.name}.pickle'))
             if preload:
                 print(f'Pre-loading data for {clazz.__name__}_{transf.name}')
                 data.cdfs[f'{clazz.__name__}_{transf.name}'].value

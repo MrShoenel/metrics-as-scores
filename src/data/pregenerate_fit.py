@@ -3,7 +3,7 @@ import numpy as np
 from typing import Any, Union
 from nptyping import Float, NDArray, Shape
 from src.data.metrics import MetricID
-from src.distribution.distribution import DistTransform, Distribution
+from src.distribution.distribution import DistTransform, Dataset
 from src.distribution.fitting import Continuous_RVs, Discrete_RVs, StatisticalTest
 from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 from src.distribution.fitting import FitterPymoo
@@ -16,12 +16,12 @@ Discrete_RVs_dict: dict[str, type[rv_discrete]] = { x: y for (x, y) in zip(map(l
 
 
 
-def get_data_tuple(dist: Distribution, metric_id: MetricID, dist_transform: DistTransform, continuous_transform: bool=True) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
+def get_data_tuple(dist: Dataset, metric_id: MetricID, dist_transform: DistTransform, continuous_transform: bool=True) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
     l = []
-    for dom in Distribution.domains(include_all_domain=True):
+    for dom in Dataset.domains(include_all_domain=True):
         for unique_vals in [True, False]:
             data = dist.data(metric_id=metric_id, domain=(None if dom == '__ALL__' else dom), unique_vals=unique_vals, sub_sample=25_000)
-            transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform, continuous_value=continuous_transform)
+            transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform, continuous_value=continuous_transform)
             key = f"{dom}_{metric_id.name}{('_u' if unique_vals else '')}"
             l.append((key, data, transform_value))
     return l
