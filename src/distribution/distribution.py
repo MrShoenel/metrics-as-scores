@@ -7,7 +7,7 @@ from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.interpolate import interp1d
-from scipy.stats import kstest, ks_2samp, f_oneway, spearmanr, ttest_ind
+from scipy.stats import kstest, ks_2samp, f_oneway, mode, ttest_ind
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -296,33 +296,53 @@ class Distribution:
         return vals
     
     @staticmethod
-    def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE) -> tuple[float, NDArray[Shape["*"], Float]]:
+    def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE, continuous_value: bool=True) -> tuple[float, NDArray[Shape["*"], Float]]:
         if dist_transform == DistTransform.NONE:
             return (None, data)
 
         # Do optional transformation
         transform_value: float=None
         if dist_transform == DistTransform.EXPECTATION:
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            ext = temp.practical_domain[1] - temp.practical_domain[0]
-            transform_value, _ = quad(func=lambda x: x * temp._pdf_from_kde(x), a=temp.practical_domain[0] - ext, b=temp.practical_domain[1] + ext, limit=250)
+            if continuous_value:
+                temp = KDECDF_approx(data=data, compute_ranges=True)
+                ext = temp.practical_domain[1] - temp.practical_domain[0]
+                transform_value, _ = quad(func=lambda x: x * temp._pdf_from_kde(x), a=temp.practical_domain[0] - ext, b=temp.practical_domain[1] + ext, limit=250)
+            else:
+                # For non-continuous transforms, we should first round the data,
+                # because it may contain a jitter (i.e., we expect the data to
+                # be integral, but it may has a jitter applied).
+                transform_value = np.mean(np.rint(data))
         elif dist_transform == DistTransform.MODE:
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            m = direct(func=lambda x: -1. * np.log(1. + temp._pdf_from_kde(x)), bounds=(temp.range,), locally_biased=False)
-            transform_value = m.x[0] # x of where the mode is (i.e., not f(x))!
+            if continuous_value:
+                temp = KDECDF_approx(data=data, compute_ranges=True)
+                m = direct(func=lambda x: -1. * np.log(1. + temp._pdf_from_kde(x)), bounds=(temp.range,), locally_biased=False)
+                transform_value = m.x[0] # x of where the mode is (i.e., not f(x))!
+            else:
+                transform_value = mode(a=np.rint(data), keepdims=False).mode
         elif dist_transform == DistTransform.MEDIAN:
-            # We'll get the median from the smoothed PDF in order to also get a more smooth value
-            temp = KDECDF_approx(data=data, compute_ranges=True)
-            transform_value = np.median(temp._kde.resample(size=50_000, seed=2))
+            if continuous_value:
+                # We'll get the median from the smoothed PDF in order to also get a more smooth value
+                temp = KDECDF_approx(data=data, compute_ranges=True)
+                transform_value = np.median(temp._kde.resample(size=50_000, seed=2))
+            else:
+                transform_value = np.median(a=np.rint(data))
         elif dist_transform == DistTransform.INFIMUM:
-            transform_value = np.min(data)
+            if continuous_value:
+                transform_value = np.min(data)
+            else:
+                transform_value = np.min(np.rint(data))
         elif dist_transform == DistTransform.SUPREMUM:
-            transform_value = np.max(data)
+            if continuous_value:
+                transform_value = np.max(data)
+            else:
+                transform_value = np.max(np.rint(data))
         
         # Now do the convex transform: Compute the distance to the transform value!
         if transform_value is not None:
+            if not continuous_value:
+                transform_value = np.rint(transform_value)
             data = np.abs(data - transform_value)
-        
+
         return (transform_value, data)
     
     @staticmethod
