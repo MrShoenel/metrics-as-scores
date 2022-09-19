@@ -16,12 +16,12 @@ Discrete_RVs_dict: dict[str, type[rv_discrete]] = { x: y for (x, y) in zip(map(l
 
 
 
-def get_data_tuple(dist: Distribution, metric_id: MetricID, dist_transform: DistTransform) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
+def get_data_tuple(dist: Distribution, metric_id: MetricID, dist_transform: DistTransform, continuous_transform: bool=True) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
     l = []
     for dom in Distribution.domains(include_all_domain=True):
         for unique_vals in [True, False]:
             data = dist.data(metric_id=metric_id, domain=(None if dom == '__ALL__' else dom), unique_vals=unique_vals, sub_sample=25_000)
-            transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform)
+            transform_value, data = Distribution.transform(data=data, dist_transform=dist_transform, continuous_value=continuous_transform)
             key = f"{dom}_{metric_id.name}{('_u' if unique_vals else '')}"
             l.append((key, data, transform_value))
     return l
