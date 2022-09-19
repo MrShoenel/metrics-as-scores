@@ -1,7 +1,6 @@
 import numpy as np
-from numpy.random import normal, default_rng
+from numpy.random import default_rng
 from math import pow
-from multiprocessing.pool import ThreadPool
 from typing import Any, Callable, Sequence, Union
 from nptyping import Float, NDArray, Shape
 from scipy.stats import _continuous_distns, _discrete_distns, _fit
@@ -177,7 +176,7 @@ class Fitter:
             bounds.append([int(np.floor(np.min(data))), int(np.ceil(np.max(data)))]) # for 'loc'
             result: _fit.FitResult = _fit.fit(dist=dist(), data=data, bounds=bounds, optimizer=Fitter._optimizer_de)
             params = result.params
-        
+
         return params
 
 
@@ -213,7 +212,7 @@ class FitterPymoo(Fitter):
                     cvtol=1e-8,
                     ftol=1e-6,
                     period=500,
-                    max_time=300,
+                    max_time=600,
                     n_max_gen=10_000,
                     n_max_evals=20_000),
                 seed=seed, verbose=verbose, save_history=False)
