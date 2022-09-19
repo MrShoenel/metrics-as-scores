@@ -204,6 +204,11 @@ class ParametricCDF(DensityFunc):
             self.practical_domain
             self.practical_range_pdf
     
+    @staticmethod
+    def unfitted(dist_transform: DistTransform) -> 'ParametricCDF':
+        from scipy.stats._continuous_distns import norm_gen
+        return ParametricCDF(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
+    
     @property
     def is_fit(self) -> bool:
         return not self.dist_params is None
@@ -235,6 +240,22 @@ class ParametricCDF(DensityFunc):
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.cdf(*(x, *self.dist_params)).reshape((x.size,))
+
+
+class ParametricCDF_discrete(ParametricCDF):
+    def pmf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        x = np.asarray(x)
+        if not self.is_fit:
+            return np.zeros((x.size,))
+        return self.dist.pmf(*(x, *self.dist_params)).reshape((x.size,))
+        
+    def pdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        return self.pmf(x=x)
+    
+    @staticmethod
+    def unfitted(dist_transform: DistTransform) -> 'ParametricCDF_discrete':
+        from scipy.stats._continuous_distns import norm_gen
+        return ParametricCDF_discrete(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
 
 
 
