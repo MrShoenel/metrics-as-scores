@@ -52,6 +52,50 @@ def generate_densities(distr: Distribution, dens_fun: type[DensityFunc]=ECDF, un
     return dict(cdfs)
 
 
+def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_continuous: bool) -> dict[str, Union[Parametric, Parametric_discrete]]:
+    data_df = pd.read_csv('./csv/metrics.csv')
+
+    metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
+    metrics_ideal_df.replace({ np.nan: None }, inplace=True)
+    metrics_ideal = { x: y for (x, y) in zip(metrics_ideal_df.Metric, metrics_ideal_df.Ideal) }
+
+    domains = Dataset.domains(include_all_domain=True)
+    metrics = list(MetricID)
+    the_type = 'continuous' if use_continuous else 'discrete'
+    use_stat = 'stat_tests_tests_ks_2samp_ordinary_stat' if use_continuous else 'stat_tests_tests_epps_singleton_2samp_jittered_stat'
+    use_pval = 'stat_tests_tests_ks_2samp_ordinary_pval' if use_continuous else 'stat_tests_tests_epps_singleton_2samp_jittered_pval'
+    use_vars = Continuous_RVs_dict if use_continuous else Discrete_RVs_dict
+    Use_class = Parametric if use_continuous else Parametric_discrete
+
+    the_dict: dict[str, Parametric] = {}
+    for domain in domains:
+        for metric in metrics:
+            key = f'{domain}_{metric.name}'
+            candidates = df[(df.domain == domain) & (df.metric == metric.name) & (df.type == the_type) & (df.dist_transform == dist_transform.value)]
+            if len(candidates.index) == 0:
+                # No fit at all :(
+                the_dict[key] = Use_class.unfitted(dist_transform=dist_transform)
+            else:
+                candidates.sort_values(by=[use_stat], ascending=True, inplace=True) # Lowest D-stat first
+                best = candidates.head(1).iloc[0,]
+                dist_type = use_vars[best.rv]
+                dist = dist_type()
+                params = ()
+                for pi in dist._param_info():
+                    params += (best[f'params_{pi.name}'],)
+                
+                data = data_df[(data_df.metric == metric.name)]
+                if domain != '__ALL__':
+                    data = data[(data.domain == domain)]
+                data = data.value.to_numpy()
+                
+                the_dict[key] = Use_class(dist=dist, pval=best[use_pval], dstat=best[use_stat], dist_params=params, range=(data.min(), data.max()),
+                    compute_ranges=True, ideal_value=metrics_ideal[best.metric], dist_transform=dist_transform,
+                    transform_value=best.transform_value, metric_id=metric, domain=domain)
+    
+    return the_dict
+
+
 if __name__ == '__main__':
     clazzes = [ECDF, KDECDF_approx, ParametricCDF]
     transfs = list(DistTransform)
