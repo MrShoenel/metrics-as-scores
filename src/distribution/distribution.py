@@ -12,6 +12,7 @@ from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from statsmodels.distributions.empirical_distribution import monotone_fn_inverter
 from strenum import StrEnum
 import pandas as pd
 import numpy as np
@@ -36,6 +37,7 @@ class Density(ABC):
         self.range = range
         self._pdf = pdf
         self._cdf = cdf
+        self._ppf = ppf
         self._ideal_value = ideal_value
         self._dist_transform = dist_transform
         self._transform_value: float = None
@@ -48,6 +50,10 @@ class Density(ABC):
 
         self.pdf = np.vectorize(self._pdf)
         self.cdf = np.vectorize(self._min_max)
+        if ppf is None:
+            self.ppf = lambda *args: exec('raise(NotImplementedError())')
+        else:
+            self.ppf = np.vectorize(self._ppf)
     
 
     @property
@@ -154,8 +160,10 @@ class KDE_integrate(Density):
         
         m_lb = direct(func=pdf, bounds=((lb - ext, lb),), f_min=1e-6)
         m_ub = direct(func=pdf, bounds=((ub, ub + ext),), f_min=1e-6)
+        
+        ppf = monotone_fn_inverter(fn=np.vectorize(cdf), x=data, vectorized=True)
 
-        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
 
 class KDE_approx(Density):
@@ -170,8 +178,9 @@ class KDE_approx(Density):
         self._kde = gaussian_kde(dataset=np.asarray(data))
         data = self._kde.resample(size=resample_samples, seed=1).reshape((-1,))
         self._ecdf = SMEcdf(x=data)
+        self._ppf_interp = monotone_fn_inverter(fn=np.vectorize(self._ecdf), x=data, vectorized=True)
 
-        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
         if compute_ranges:
             self.practical_domain
@@ -179,15 +188,24 @@ class KDE_approx(Density):
     
     def _pdf_from_kde(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
         return self._kde_for_pdf.evaluate(points=np.asarray(x))
+    
+    def _ppf_from_ecdf(self, q: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        return self._ppf_interp(q)
 
 
 
 class Empirical(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
-        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=SMEcdf(data), ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        self._ecdf = SMEcdf(data)
+        self._ppf_interp = monotone_fn_inverter(fn=np.vectorize(self._ecdf), x=data, vectorized=True)
+
+        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
         if compute_ranges:
             self.practical_domain
+    
+    def _ppf_from_ecdf(self, q: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        return self._ppf_interp(q)
 
 
 class Parametric(Density):
@@ -197,7 +215,7 @@ class Parametric(Density):
         self.dstat = dstat
         self.dist_params = dist_params
 
-        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
+        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
 
         if compute_ranges:
             self.practical_domain
@@ -239,6 +257,12 @@ class Parametric(Density):
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.cdf(*(x, *self.dist_params)).reshape((x.size,))
+    
+    def ppf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        x = np.asarray(x)
+        if not self.is_fit:
+            return np.zeros((x.size,))
+        return self.dist.ppf(*(x, *self.dist_params)).reshape((x.size,))
 
 
 class Parametric_discrete(Parametric):
