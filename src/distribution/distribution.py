@@ -474,32 +474,6 @@ class Dataset:
         temp.domain = '__ALL__'
         all_data = pd.concat([temp, self.df])
         unique_domain_pairs: list[tuple[str, str]] = list(combinations(iterable=all_data.domain.unique(), r=2))
-
-        # def pairwise_rank_corr(metric_id: MetricID) -> pd.DataFrame:
-        #     dict_list: list[dict[str, Union[str, float]]] = [ ]
-
-        #     for udp in unique_domain_pairs:
-        #         data1 = all_data[(all_data.domain == udp[0]) & (all_data.metric == metric_id.name)].value.to_numpy()
-        #         data2 = all_data[(all_data.domain == udp[1]) & (all_data.metric == metric_id.name)].value.to_numpy()
-
-        #         l1, l2 = len(data1), len(data2)
-        #         ll, ls = max(l1, l2), min(l1, l2)
-        #         if ll != ls:
-        #             # We need to resample the data if length not equal
-        #             x_long = np.linspace(start=0., stop=1., num=ll)
-        #             x_short = np.linspace(start=0., stop=1., num=ls)
-
-        #             if l1 < l2:
-        #                 data1 = interp1d(x=x_short, y=data1, kind='nearest')(x_long)
-        #             else:
-        #                 data2 = interp1d(x=x_short, y=data2, kind='nearest')(x_long)
-
-        #         corr, pval = spearmanr(a=np.sort(data1), b=np.sort(data2), alternative='greater', nan_policy='raise')
-        #         dict_list.append({
-        #             'metric': metric_id.name, 'stat': corr, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
-        #         })
-            
-        #     return pd.DataFrame(dict_list)
         
         def compare(metric_id: MetricID) -> pd.DataFrame:
             dict_list: list[dict[str, Union[str, float]]] = [ ]
