@@ -37,14 +37,6 @@ def generate_densities(distr: Dataset, dens_fun: type[Density]=Empirical, unique
         uvals = True if unique_vals else (dens_fun == Empirical)
         data = distr.data(metric_id=metric_id, unique_vals=uvals, systems=systems)
 
-        if dens_fun == ParametricCDF:
-            df = None
-            try:
-                df = Distribution.fit_parametric(data=data, alpha=0.001, max_samples=30_000, metric_id=metric_id, domain=domain, dist_transform=dist_transform)
-            except Exception as e:
-                df = ParametricCDF(dist=norm, pval=np.nan, dstat=np.nan, dist_params=None, range=(np.min(data), np.max(data)), compute_ranges=False, ideal_value=np.nan, dist_transform=dist_transform, transform_value=np.nan, metric_id=metric_id, domain=domain)
-            return (f'{domain}_{row.metric}', df)
-
         # Do transformation manually for other types of DensityFunc
         transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform)
 
@@ -52,6 +44,11 @@ def generate_densities(distr: Dataset, dens_fun: type[Density]=Empirical, unique
 
     cdfs = Parallel(n_jobs=-1)(delayed(get_density)(i) for i in range(len(expanded_grid.index)))
     return dict(cdfs)
+
+
+
+def parametric_fits_to_df(fits: list[dict[str, Any]]) -> pd.DataFrame:
+    return pd.DataFrame([flatten_dict(d) for d in fits])
 
 
 def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_continuous: bool) -> dict[str, Union[Parametric, Parametric_discrete]]:
@@ -98,6 +95,7 @@ def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_c
     return the_dict
 
 
+
 if __name__ == '__main__':
     clazzes = [Empirical, KDE_approx] # We'll do Parametric below.
     transfs = list(DistTransform)
@@ -109,5 +107,15 @@ if __name__ == '__main__':
             with open(f'./results/densities_{clazz.__name__}_{transf.name}.pickle', 'wb') as f:
                 dump(temp, f)
             print(f'Finished generating Densities for {clazz.__name__} with transform {transf.name}.')
+    
+
+    clazzes = [Parametric, Parametric_discrete]
+    for transf in transfs:
+        distns = pd.read_csv(f'./results/parametric_distns_{transf.name}.csv')
+
+        for clazz in clazzes:
+            use_continuous = clazz == Parametric
+            temp = fits_to_MaS_densities(df=distns, dist_transform=transf, use_continuous=use_continuous)
+            with open(f'./results/densities_{clazz.__name__}_{transf.name}.pickle', 'wb') as f:
                 dump(temp, f)
-            print(f'Finished generating CDFs for {clazz.__name__} with transform {transf.name}.')
+            print(f'Finished generating Densities for {clazz.__name__} with transform {transf.name}.')
