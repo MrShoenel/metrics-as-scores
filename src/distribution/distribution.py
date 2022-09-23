@@ -1,10 +1,12 @@
 from abc import ABC
 from functools import lru_cache
 from itertools import combinations
-from typing import Any, Callable, Iterable, Union
+from typing import Any, Callable, Iterable, Literal, Union
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
 from src.data.metrics import MetricID
+from src.distribution.fitting import StatisticalTest
+from src.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.interpolate import interp1d
 from scipy.stats import gaussian_kde, kstest, ks_2samp, f_oneway, mode, ttest_ind
@@ -12,7 +14,6 @@ from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from statsmodels.distributions.empirical_distribution import monotone_fn_inverter
 from strenum import StrEnum
 import pandas as pd
 import numpy as np
@@ -161,7 +162,7 @@ class KDE_integrate(Density):
         m_lb = direct(func=pdf, bounds=((lb - ext, lb),), f_min=1e-6)
         m_ub = direct(func=pdf, bounds=((ub, ub + ext),), f_min=1e-6)
         
-        ppf = monotone_fn_inverter(fn=np.vectorize(cdf), x=data, vectorized=True)
+        ppf = cdf_to_ppf(cdf=np.vectorize(cdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
         super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
@@ -178,9 +179,11 @@ class KDE_approx(Density):
         self._kde = gaussian_kde(dataset=np.asarray(data))
         data = self._kde.resample(size=resample_samples, seed=1).reshape((-1,))
         self._ecdf = SMEcdf(x=data)
-        self._ppf_interp = monotone_fn_inverter(fn=np.vectorize(self._ecdf), x=data, vectorized=True)
+        self._ppf_interp = cdf_to_ppf(cdf=np.vectorize(self._ecdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
         super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+
+        self.stat_test = StatisticalTest(data1=data, cdf=self._ecdf, ppf_or_data2=self._ppf_from_ecdf)
 
         if compute_ranges:
             self.practical_domain
@@ -191,13 +194,21 @@ class KDE_approx(Density):
     
     def _ppf_from_ecdf(self, q: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
         return self._ppf_interp(q)
+    
+    @property
+    def pval(self) -> float:
+        return self.stat_test.tests['ks_2samp_jittered']['pval']
+    
+    @property
+    def stat(self) -> float:
+        return self.stat_test.tests['ks_2samp_jittered']['stat']
 
 
 
 class Empirical(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self._ecdf = SMEcdf(data)
-        self._ppf_interp = monotone_fn_inverter(fn=np.vectorize(self._ecdf), x=data, vectorized=True)
+        self._ppf_interp = cdf_to_ppf(cdf=np.vectorize(self._ecdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
         super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
 
@@ -208,11 +219,67 @@ class Empirical(Density):
         return self._ppf_interp(q)
 
 
+class Empirical_discrete(Empirical):
+    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
+        self._data_valid = not (data.shape[0] == 1 and np.isnan(data[0]))
+        data_int = np.rint(data).astype(int)
+        if self._data_valid and not np.allclose(a=data, b=data_int, rtol=1e-10, atol=1e-12):
+            raise Exception('The data does not appear to be integral.')
+
+        self._unique, self._counts = np.unique(data_int, return_counts=True)
+        self._unique, self._counts = self._unique.astype(int), self._counts.astype(int)
+        self._idx: dict[int, int] = { self._unique[i]: self._counts[i] for i in range(self._unique.shape[0]) }
+
+        if self._data_valid:
+            super().__init__(data=data_int, compute_ranges=False, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
+        else:
+            self._dist_transform = dist_transform
+            self._transform_value = transform_value
+            self._metric_id = metric_id
+            self._domain = domain
+            self._cdf = self.cdf = self._non_fit_cdf_ppf
+            self._ppf = self.ppf = self._non_fit_cdf_ppf
+
+        self._pdf = self._pmf = self._pmf_from_frequencies
+        self.pdf = self.pmf = np.vectorize(self._pdf)
+
+        self._practical_domain = (np.min(data_int), np.max(data_int))
+        self._practical_range_pdf = (0., float(np.max(self._counts)) / float(np.sum(self._counts)))
+
+    @property
+    def is_fit(self) -> bool:
+        return self._data_valid
+    
+    def _non_fit_cdf_ppf(self, x) -> NDArray[Shape["*"], Float]:
+        x = np.asarray([x] if np.isscalar(x) else x)
+        return np.asarray([np.nan] * x.shape[0])
+
+
+    def _pmf_from_frequencies(self, x: int) -> float:
+        x = int(x)
+        if not x in self._idx.keys():
+            return 0.
+
+        return float(self._idx[x]) / float(np.sum(self._counts))
+
+    @staticmethod
+    def unfitted(dist_transform: DistTransform) -> 'Empirical_discrete':
+        return Empirical_discrete(data=np.asarray([np.nan]), dist_transform=dist_transform)
+
+
+StatTest_Types = Literal[
+    'cramervonmises_jittered', 'cramervonmises_ordinary',
+    'cramervonmises_2samp_jittered', 'cramervonmises_2samp_ordinary',
+    'epps_singleton_2samp_jittered', 'epps_singleton_2samp_ordinary',
+    'ks_1samp_jittered', 'ks_1samp_ordinary',
+    'ks_2samp_jittered', 'ks_2samp_ordinary']
+
+
 class Parametric(Density):
-    def __init__(self, dist: rv_generic, pval: float, dstat: float, dist_params: tuple, range: tuple[float, float], compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
+    def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
         self.dist: Union[rv_generic, rv_continuous] = dist
-        self.pval = pval
-        self.dstat = dstat
+        self.stat_tests = stat_tests
+        self._use_stat_test = use_stat_test
         self.dist_params = dist_params
 
         super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
@@ -224,11 +291,32 @@ class Parametric(Density):
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric':
         from scipy.stats._continuous_distns import norm_gen
-        return Parametric(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
+        return Parametric(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
+
+    @property
+    def use_stat_test(self) -> StatTest_Types:
+        return self._use_stat_test
+    
+    @use_stat_test.setter
+    def use_stat_test(self, st: StatTest_Types) -> Self:
+        self._use_stat_test = st
+        return self
+    
+    @property
+    def pval(self) -> float:
+        if not self.is_fit:
+            raise Exception('Cannot return p-value for non-fitted random variable.')
+        return self.stat_tests[f'{self.use_stat_test}_pval']
+    
+    @property
+    def stat(self) -> float:
+        if not self.is_fit:
+            raise Exception('Cannot return statistical test statistic for non-fitted random variable.')
+        return self.stat_tests[f'{self.use_stat_test}_stat']
     
     @property
     def is_fit(self) -> bool:
-        return not self.dist_params is None
+        return not self.dist_params is None and not np.any(np.isnan(self.dist_params))
     
     @property
     def practical_domain(self) -> tuple[float, float]:
@@ -278,7 +366,7 @@ class Parametric_discrete(Parametric):
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric_discrete':
         from scipy.stats._continuous_distns import norm_gen
-        return Parametric_discrete(dist=norm_gen(), pval=np.nan, dstat=np.nan, dist_params=None, range=(np.nan, np.nan), dist_transform=dist_transform)
+        return Parametric_discrete(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
 
 
 
@@ -380,6 +468,7 @@ class Dataset:
             rng = np.random.default_rng(seed=1)
             data = rng.choice(data, size=max_samples, replace=False)
         
+        best_st: StatisticalTest = None
         best_kst = None
         use_dist: tuple[Union[rv_generic, rv_continuous], tuple[Any]] = None
         res = float('inf')
@@ -393,6 +482,7 @@ class Dataset:
                 if kst.pvalue >= alpha and kst.statistic < res:
                     res = kst.statistic
                     best_kst = kst
+                    best_st = StatisticalTest(data, cdf=lambda x, dist_params=dist_params: dist.cdf(*(x, *dist_params)), ppf_or_data2=lambda x, dist_params=dist_params: dist.ppf(*(x, *dist_params)))
                     use_dist = (dist, dist_params)
                     break
             except Exception as ex:
@@ -406,7 +496,7 @@ class Dataset:
         metrics_ideal_df.replace({ np.nan: None }, inplace=True)
         metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
         
-        return Parametric(dist=use_dist[0], pval=best_kst.pvalue, dstat=best_kst.statistic, dist_params=use_dist[1], range=(np.min(data), np.max(data)), compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
+        return Parametric(dist=use_dist[0], dist_params=use_dist[1], range=(np.min(data), np.max(data)), stat_tests=best_st.tests, use_stat_test='ks_2samp_jittered', compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
 
 
     @lru_cache(maxsize=None)
