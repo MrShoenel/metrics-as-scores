@@ -1,24 +1,24 @@
-from os import getcwd
+from os import getcwd, cpu_count
 from sys import path
 from typing import Any, Union
-
-from src.tools.funcs import flatten_dict
 path.append(getcwd())
 
 import pandas as pd
 import numpy as np
-from pickle import dump
+from pickle import dump, load
 from joblib import Parallel, delayed
 from scipy.stats import norm
-from src.data.metrics import Dataset, MetricID
+from src.tools.funcs import flatten_dict
+from src.data.metrics import MetricID
 from src.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
-from src.distribution.distribution import Density, DistTransform, Dataset, Empirical, KDE_approx, Parametric, Parametric_discrete
+from src.distribution.distribution import Dataset, Density, DistTransform, Dataset, Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
+from src.distribution.fitting import StatisticalTest
 from sklearn.model_selection import ParameterGrid
 
 
 
 
-def generate_densities(distr: Dataset, dens_fun: type[Density]=Empirical, unique_vals: bool=None, resample_samples=250_000, dist_transform: DistTransform=DistTransform.NONE) -> dict[str, Density]:
+def generate_densities(dataset: Dataset, clazz: type[Density]=Empirical, unique_vals: bool=None, resample_samples=250_000, dist_transform: DistTransform=DistTransform.NONE) -> dict[str, Density]:
     metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
     metrics_ideal_df.replace({ np.nan: None }, inplace=True)
     metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
@@ -34,26 +34,21 @@ def generate_densities(distr: Dataset, dens_fun: type[Density]=Empirical, unique
         metric_id = MetricID[row.metric]
         
         # Only use unique values if explicitly requested or CDF-type is ECDF!
-        uvals = True if unique_vals else (dens_fun == Empirical)
-        data = distr.data(metric_id=metric_id, unique_vals=uvals, systems=systems)
+        uvals = True if unique_vals else (clazz == Empirical)
+        data = dataset.data(metric_id=metric_id, unique_vals=uvals, systems=systems)
 
         # Do transformation manually for other types of DensityFunc
         transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform)
 
-        return (f'{domain}_{row.metric}', dens_fun(data=data, resample_samples=resample_samples, compute_ranges=True, ideal_value=metrics_ideal[metric_id], dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain))
+        return (f'{domain}_{row.metric}', clazz(data=data, resample_samples=resample_samples, compute_ranges=True, ideal_value=metrics_ideal[metric_id], dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain))
 
     cdfs = Parallel(n_jobs=-1)(delayed(get_density)(i) for i in range(len(expanded_grid.index)))
     return dict(cdfs)
 
 
-
-def parametric_fits_to_df(fits: list[dict[str, Any]]) -> pd.DataFrame:
-    return pd.DataFrame([flatten_dict(d) for d in fits])
-
-
-def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_continuous: bool) -> dict[str, Union[Parametric, Parametric_discrete]]:
-    data_df = pd.read_csv('./csv/metrics.csv')
-
+def fits_to_MaS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any]], dist_transform: DistTransform, use_continuous: bool) -> dict[str, Union[Parametric, Parametric_discrete]]:
+    df = pd.DataFrame([flatten_dict(d) for d in distns_dict.values()])
+    data_df = dataset.df
     metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
     metrics_ideal_df.replace({ np.nan: None }, inplace=True)
     metrics_ideal = { x: y for (x, y) in zip(metrics_ideal_df.Metric, metrics_ideal_df.Ideal) }
@@ -61,8 +56,8 @@ def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_c
     domains = Dataset.domains(include_all_domain=True)
     metrics = list(MetricID)
     the_type = 'continuous' if use_continuous else 'discrete'
-    use_stat = 'stat_tests_tests_ks_2samp_ordinary_stat' if use_continuous else 'stat_tests_tests_epps_singleton_2samp_jittered_stat'
-    use_pval = 'stat_tests_tests_ks_2samp_ordinary_pval' if use_continuous else 'stat_tests_tests_epps_singleton_2samp_jittered_pval'
+    use_test = 'ks_2samp_ordinary' if use_continuous else 'epps_singleton_2samp_jittered'
+    use_stat = f'stat_tests_tests_{use_test}_stat'
     use_vars = Continuous_RVs_dict if use_continuous else Discrete_RVs_dict
     Use_class = Parametric if use_continuous else Parametric_discrete
 
@@ -75,8 +70,9 @@ def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_c
                 # No fit at all :(
                 the_dict[key] = Use_class.unfitted(dist_transform=dist_transform)
             else:
-                candidates.sort_values(by=[use_stat], ascending=True, inplace=True) # Lowest D-stat first
+                candidates = candidates.sort_values(by=[use_stat], ascending=True, inplace=False) # Lowest D-stat first
                 best = candidates.head(1).iloc[0,]
+                stat_tests_dict = StatisticalTest.from_dict(d=best, key_prefix='stat_tests_tests_')
                 dist_type = use_vars[best.rv]
                 dist = dist_type()
                 params = ()
@@ -88,7 +84,7 @@ def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_c
                     data = data[(data.domain == domain)]
                 data = data.value.to_numpy()
                 
-                the_dict[key] = Use_class(dist=dist, pval=best[use_pval], dstat=best[use_stat], dist_params=params, range=(data.min(), data.max()),
+                the_dict[key] = Use_class(dist=dist, stat_tests=stat_tests_dict, use_stat_test=use_test, dist_params=params, range=(data.min(), data.max()),
                     compute_ranges=True, ideal_value=metrics_ideal[best.metric], dist_transform=dist_transform,
                     transform_value=best.transform_value, metric_id=metric, domain=domain)
     
@@ -96,26 +92,75 @@ def fits_to_MaS_densities(df: pd.DataFrame, dist_transform: DistTransform, use_c
 
 
 
+def generate_empirical(dataset: Dataset, clazz: Union[Empirical, KDE_approx], transform: DistTransform):
+    temp = generate_densities(dataset=dataset, clazz=clazz, dist_transform=transform, unique_vals=True, resample_samples=75_000)
+    with open(f'./results/densities_{clazz.__name__}_{transform.name}.pickle', 'wb') as f:
+        dump(temp, f)
+    print(f'Finished generating Densities for {clazz.__name__} with transform {transform.name}.')
+
+
+
+def generate_parametric(dataset: Dataset, clazz: Union[Parametric, Parametric_discrete], transform: DistTransform):
+    with open(f'./results/pregnerate_distns_{transform.name}.pickle', 'rb') as f:
+        distns_list = load(f)
+        distns_dict = { item['grid_idx']: item for item in distns_list }
+    use_continuous = clazz == Parametric
+    temp = fits_to_MaS_densities(dataset=dataset, distns_dict=distns_dict, dist_transform=transform, use_continuous=use_continuous)
+    with open(f'./results/densities_{clazz.__name__}_{transform.name}.pickle', 'wb') as f:
+        dump(temp, f)
+    print(f'Finished generating Densities for {clazz.__name__} with transform {transform.name}.')
+
+
+
+def generate_empirical_discrete(dataset: Dataset, transform: DistTransform):
+    metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
+    metrics_ideal_df.replace({ np.nan: None }, inplace=True)
+    metrics_ideal = { x: y for (x, y) in zip(metrics_ideal_df.Metric, metrics_ideal_df.Ideal) }
+
+    metrics_discrete_df = pd.read_csv('./files/metrics-discrete.csv')
+    metrics_discrete = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_discrete_df.Metric), metrics_discrete_df.Discrete) }
+    the_dict: dict[str, Empirical_discrete] = {}
+
+    for domain in Dataset.domains(include_all_domain=True):
+        use_domain = None if domain == '__ALL__' else domain
+        for metric_id in list(MetricID):
+            key = f'{domain}_{metric_id.name}'
+
+            if not metrics_discrete[metric_id]:
+                the_dict[key] = Empirical_discrete.unfitted(dist_transform=transform)
+            else:
+                data = dataset.data(metric_id=metric_id, domain=use_domain, unique_vals=False)
+                transform_value, data = Dataset.transform(data=data, dist_transform=transform, continuous_value=False)
+                the_dict[key] = Empirical_discrete(data=data.astype(int), ideal_value=metrics_ideal[metric_id.name], dist_transform=transform, transform_value=transform_value, metric_id=metric_id, domain=use_domain)
+
+    with open(f'./results/densities_{Empirical_discrete.__name__}_{transform.name}.pickle', 'wb') as f:
+        dump(the_dict, f)
+    print(f'Finished generating Densities for {Empirical_discrete.__name__} with transform {transform.name}.')
+
+
+
+
+
+
 if __name__ == '__main__':
-    clazzes = [Empirical, KDE_approx] # We'll do Parametric below.
-    transfs = list(DistTransform)
+    dataset = Dataset(df=pd.read_csv('csv/metrics.csv'))
 
-    d = Dataset(df=pd.read_csv('csv/metrics.csv'))
-    for transf in transfs:
-        for clazz in clazzes:
-            temp = generate_densities(distr=d, dens_fun=clazz, unique_vals=True, resample_samples=75_000, dist_transform=transf)
-            with open(f'./results/densities_{clazz.__name__}_{transf.name}.pickle', 'wb') as f:
-                dump(temp, f)
-            print(f'Finished generating Densities for {clazz.__name__} with transform {transf.name}.')
-    
+    grid = dict(
+        clazz = [Parametric, Parametric_discrete],
+        transform = list(DistTransform))
+    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
+    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_parametric)(dataset, expanded_grid.iloc[i,]['clazz'], expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))
 
-    clazzes = [Parametric, Parametric_discrete]
-    for transf in transfs:
-        distns = pd.read_csv(f'./results/parametric_distns_{transf.name}.csv')
 
-        for clazz in clazzes:
-            use_continuous = clazz == Parametric
-            temp = fits_to_MaS_densities(df=distns, dist_transform=transf, use_continuous=use_continuous)
-            with open(f'./results/densities_{clazz.__name__}_{transf.name}.pickle', 'wb') as f:
-                dump(temp, f)
-            print(f'Finished generating Densities for {clazz.__name__} with transform {transf.name}.')
+    grid = dict(
+        clazz = [Empirical, KDE_approx],
+        transform = list(DistTransform))
+    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
+    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_empirical)(dataset, expanded_grid.iloc[i,]['clazz'], expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))
+
+    # Also, let's pre-generate the discrete empiricals.
+    grid = dict(
+        clazz = [Empirical_discrete],
+        transform = list(DistTransform))
+    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
+    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_empirical_discrete)(dataset, expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))

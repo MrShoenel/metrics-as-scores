@@ -65,15 +65,6 @@ def generate_parametric_fits(dist_transform: DistTransform, data_dict: dict[str,
 
 
 if __name__ == '__main__':
-    #df = pd.read_csv('./results/temp.csv')
-    #bla = fits_to_mas_cdfs(df=df, dist_transform=DistTransform.EXPECTATION, use_continuous=False)
-    #with open('./results/cdfs_ParametricCDF_discrete_EXPECTATION.pickle', 'wb') as f:
-    #    dump(bla, f)
-    #with open('./results/distns_NONE.pickle', 'rb') as f:
-    #    from pickle import load
-    #    bla = load(f)
-    #    print(bla)
-
     print('Reading data file...')
     dist = Dataset(df=pd.read_csv('csv/metrics.csv'))
 
