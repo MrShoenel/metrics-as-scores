@@ -1,7 +1,8 @@
+import numpy as np
 from collections.abc import MutableMapping
-from nptyping import NDArray
-from numpy import abs, cumsum, linspace, max, min, square, sum, vectorize
-from typing import Any, Callable
+from nptyping import Float, NDArray, Shape
+from numpy import abs, cumsum, linspace, max, min, square, sum, vectorize, interp
+from typing import Any, Callable, Union
 
 
 def nonlinspace(start: float, stop: float, num: int, func: Callable[[float], float]=lambda x: 1. - .9 * square(x)) -> NDArray:
@@ -28,3 +29,26 @@ def flatten_dict(d: dict[str, Any], parent_key: str='', sep: str='_') -> dict[st
         else:
             items.append((new_key, v))
     return dict(items)
+
+
+class Interpolator:
+    def __init__(self, xp: NDArray[Shape["*"], Float], fp: NDArray[Shape["*"], Float], left: float=None, right: float=None) -> None:
+        self.xp = xp
+        self.fp = fp
+        self.left = left
+        self.right = right
+    
+    def __call__(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        return interp(x=x, xp=self.xp, fp=self.fp, left=self.left, right=self.right)
+
+
+def cdf_to_ppf(cdf: Callable[[float], float], x: NDArray[Shape["*"], Float], cdf_samples: int=5_000, y_left: float=None, y_right: float=None) -> Union[Interpolator, Callable[[float], float]]:
+    """
+    Adapted implementation from statsmodels.distributions.empirical_distribution.monotone_fn_inverter
+    that handles out-of-bounds values explicitly.
+    Also, we assume fn is vectorized.
+    """
+    x_vals = np.linspace(start=np.min(x), stop=np.max(x), num=cdf_samples)
+    y_vals = cdf(x_vals) # x is sorted, then so is y if fn is monotone increasing (which it should be)
+
+    return Interpolator(xp=y_vals, fp=x_vals, left=y_left, right=y_right)
