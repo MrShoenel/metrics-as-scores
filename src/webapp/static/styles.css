@@ -19,3 +19,11 @@ ul {
 	list-style-type: '–  ';
 	padding-left: 2em;
 }
+
+.error {
+	color: #b00;
+	font-weight: 600;
+}
+
+.flower-12l-24x24 { animation: flower-12l-24x24 1s steps(12) infinite; display: block; width: 24px; height: 24px; background-image:url(loading.png); }
+@keyframes flower-12l-24x24 { from { background-position: 0px 0px; } to { background-position: 0px -288px; } }
