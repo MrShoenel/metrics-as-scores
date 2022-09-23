@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.random import default_rng
 from math import pow
+from collections.abc import MutableMapping
 from typing import Any, Callable, Sequence, Union
 from nptyping import Float, NDArray, Shape
 from scipy.stats import _continuous_distns, _discrete_distns, _fit
@@ -301,3 +302,11 @@ class StatisticalTest:
         yield ('tests', self.tests)
         yield ('discrete_data1', self.discrete_data1)
         yield ('discrete_data2', self.discrete_data2)
+    
+    @staticmethod
+    def from_dict(d: MutableMapping[str, Any], key_prefix: str='stat_tests_tests') -> dict[str, float]:
+        res: dict[str, float] = {}
+        for k in d.keys():
+            if k.startswith(key_prefix):
+                res[k.replace(key_prefix, '')] = d[k]
+        return res
