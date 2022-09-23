@@ -3,7 +3,7 @@ from sys import path, argv
 path.append(os.getcwd())
 from pickle import load
 from src.tools.lazy import SelfResetLazy
-from src.distribution.distribution import Empirical, DistTransform, KDE_approx, Parametric, Parametric_discrete
+from src.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 
 from . import data
 
@@ -18,7 +18,7 @@ def unpickle(file: str):
 
 def load_data(preload: bool=False):
     print('Loading data')
-    clazzes = [Empirical, KDE_approx, Parametric, Parametric_discrete]
+    clazzes = [Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete]
     transfs = list(DistTransform)
 
     data.cdfs = {}
