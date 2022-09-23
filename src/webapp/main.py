@@ -26,6 +26,7 @@ if 'BOKEH_VS_DEBUG' in os.environ and os.environ['BOKEH_VS_DEBUG'] == 'true':
 
 import pandas as pd
 import numpy as np
+from src.webapp.exception import PlotException
 from typing import Union
 from src.data.metrics import MetricID
 from src.tools.funcs import nonlinspace
@@ -38,7 +39,7 @@ from bokeh.models.widgets.inputs import Spinner
 from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
-from src.distribution.distribution import Empirical, DistTransform, KDE_approx, Parametric
+from src.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 from numbers import Integral
 
 
@@ -59,9 +60,18 @@ domains_labels['__ALL__'] = '[All domain types combined]'
 
 
 
+metrics_discrete_df = pd.read_csv('./files/metrics-discrete.csv')
+metrics_discrete = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_discrete_df.Metric), metrics_discrete_df.Discrete) }
+
 # Data and UI for the metric/score types
-dd_scores_items = list([(f'[{item.name}] {item.value}', item.name) for item in list(MetricID)])
-selected_score = dd_scores_items[13] # LCOM
+metrics = list(MetricID)
+metrics.sort(key=lambda m: m.name)
+dd_scores_items = list([(f'[{item.name}] {item.value}{" (integral)" if metrics_discrete[item] else ""}', item.name) for item in metrics])
+dd_scores_items = [('------------ Discrete (integral) Metrics', '-')] + \
+    list([(f'[{item.name}] {item.value}', item.name) for item in metrics if metrics_discrete[item]]) + \
+    [(' ', '-'), ('------------ Continuous (real) Metrics', '-')] + \
+    list([(f'[{item.name}] {item.value}', item.name) for item in metrics if not metrics_discrete[item]])
+selected_score = dd_scores_items[21+2] # RMI # 13/LCOM
 dd_scores = Dropdown(label=selected_score[0], menu=dd_scores_items)
 
 
@@ -78,7 +88,7 @@ cbg_cutoff = CheckboxGroup(labels=cbg_cutoff_items, active=[])
 
 
 # Input for own metric's value
-input_own = Spinner(mode='float', placeholder='Check Own Metric Value')
+input_own = Spinner(mode='float', placeholder='Check Own Metric Value', min_width=350)
 
 # Checkbox for automatic transform
 cbg_autotrans_items = ['Apply transform using ideal value']
@@ -127,20 +137,73 @@ tbl_transf_cols = [
     TableColumn(field='metric_value', title='Metric Value (not transformed)'),
     TableColumn(field='own_value', title='Corresponding Score'),
     TableColumn(field='pdist', title='Parametric Distrib.'),
-    TableColumn(field='pdist_dval', title='D-Statistic')]
+    TableColumn(field='pdist_dval', title='Statistic')]
 tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=list([tc.field for tc in tbl_transf_cols])))
 tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_both')
 
 
-def update_transf():
+
+def update_discrete_cont_mismatch():
+    discrete = metrics_discrete[MetricID[selected_score[1]]]
+    sd = selected_denstype[1]
+    if not discrete and 'discrete' in sd:
+        raise PlotException(msg='There are no discrete fits for continuous metrics.')
+
+
+def get_score_type(val: str) -> str:
+    if 'PDF' in val:
+        if 'Param' in val:
+            return 'PDF_Param'
+        return 'PDF'
+    if 'PMF' in val:
+        if 'EPMF' in val:
+            return 'EPMF'
+        return 'PMF'
+    if 'CCDF' in val:
+        return 'CCDF'
+    if 'PPF' in val:
+        return 'PPF'
+    return 'CDF'
+
+
+def update_labels():
+    global selected_denstype, selected_transf, selected_autotransf
+    sd = selected_denstype[1]
+    st = selected_transf[1]
+    is_ppf = 'PPF' in sd
+
+
     if selected_autotransf:
-        if selected_transf[1] == 'NONE':
+        if st == 'NONE':
             tbl_transf_cols[2].title = 'Metric Value (no transformation chosen)'
         else:
             tbl_transf_cols[2].title = 'Metric Distance (transformed using ideal)'
     else:
-        tbl_transf_cols[2].title = 'Metric Value'
+        tbl_transf_cols[2].title = 'Probability' if is_ppf else 'Metric Value'
 
+    
+    if 'PDF' in sd:
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Relative Likelihood'
+    elif 'PMF' in sd:
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Probability Mass'
+    elif 'CCDF' in sd:
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Corresponding Score'
+    elif is_ppf:
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Value of Random Variable'
+    else:
+        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Cumulative Probability'
+    
+
+    if is_ppf:
+        input_own.placeholder = 'Check Probability To Sample A Value'
+    else:
+        input_own.placeholder = 'Check Own Metric Value'
+
+
+    if st == DistTransform.NONE.name:
+        plot.xaxis.axis_label = 'Metric Value'
+    else:
+        plot.xaxis.axis_label = 'Metric Distance from Ideal'
 
 
 # Import the data; Note this is process-static!
@@ -151,43 +214,92 @@ cdfs = data.cdfs
 
 # Data and UI for selected CDF type
 dd_denstype_items = [
-    ('PDF from Parametric', 'Param_PDF'),
-    ('PDF from KDE', 'PDF'),
-    ('CDF from Parametric', 'Param_CDF'),
-    ('CDF from Empirical (ECDF)', 'ECDF'),
-    ('Smoothed approx. ECDF from KDE', 'KDE_CDF_approx'),
+    ('[Rel. Lik.] PDF from Parametric', 'Param_PDF'),
+    ('[Rel. Lik.] PDF from KDE (EPDF)', 'KDE_PDF'),
+    ('[Prob. Mass] PMF from Parametric (discrete)', 'Param_PMF_discrete'),
+    ('[Prob. Mass] PMF from Empirical (EPMF, discrete)', 'EPMF_discrete'),
+    ('------------', '-'),
+    ('[Cum. Prob.] CDF from Parametric', 'Param_CDF'),
+    ('[Cum. Prob.] CDF from Parametric (discrete)', 'Param_CDF_discrete'),
+    ('[Cum. Prob.] CDF from Empirical (ECDF)', 'ECDF'),
+    ('[Cum. Prob.] Smoothed approx. ECDF from KDE', 'KDE_CDF'),
+    ('------------', '-'),
     ('[Score] CCDF from Parametric', 'Param_CCDF'),
+    ('[Score] CCDF from Parametric (discrete)', 'Param_CCDF_discrete'),
     ('[Score] CCDF from Empirical (ECCDF)', 'ECCDF'),
-    ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF_approx')
+    ('[Score] Smoothed approx. ECCDF from KDE', 'KDE_CCDF'),
+    ('------------', '-'),
+    ('[Quantiles] PPF from Parametric', 'Param_PPF'),
+    ('[Quantiles] PPF from Parametric (discrete)', 'Param_PPF_discrete'),
+    ('[Quantiles] PPF from Empirical (EPPF, discrete)', 'EPPF_discrete'),
+    ('[Quantiles] Smoothed approx. inverse ECCDF from KDE', 'KDE_PPF')
 ]
-selected_denstype = dd_denstype_items[7]
-dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items)
+selected_denstype = dd_denstype_items[0]
+dd_denstype = Dropdown(label=selected_denstype[0], menu=dd_denstype_items, min_width=350, sizing_mode='stretch_width')
 
+
+throbber = Div(text='<span class="flower-12l-24x24"></span>')
+throbber.visible = False
+status = Div(text='Ready.', sizing_mode='stretch_width')
 
 def update_plot(contain_plot: bool=False):
-    global selected_cutoff
+    throbber.visible = True
+    status.text = 'Loading ...'
+    status.css_classes = []
+    def temp():
+        try:
+            update_plot_internal(contain_plot=contain_plot)
+            status.text = 'Ready.'
+        except PlotException as pex:
+            status.css_classes = ['error']
+            status.text = pex.msg
+        except Exception as e:
+            status.text = getattr(e, 'message', repr(e))
+            status.css_classes = ['error']
+        finally:
+            throbber.visible = False
+
+    curdoc().add_next_tick_callback(temp)
+
+def update_plot_internal(contain_plot: bool=False):
+    global selected_cutoff, selected_autotransf
     sd = selected_denstype[1]
+    is_empirical = sd.startswith('E')
     is_ecdf = 'ECDF' in sd or 'ECCDF' in sd
     is_ccdf = 'CCDF' in sd
-    is_pdf = 'PDF' in sd
+    is_pdf = 'PDF' in sd or 'PMF' in sd # In either case, we'll call .pdf(..)
+    is_ppf = 'PPF' in sd
     is_parametric = 'Param' in sd
+    is_discrete = 'discrete' in sd
+    is_kde = 'KDE' in sd
 
-    # The E(C)CDF is always cut off.
+    # The E(C)CDF is already cut off.
     cbg_cutoff.disabled = is_ecdf
     if cbg_cutoff.disabled:
         # We also should uncheck it, since it's not possible.
         cbg_cutoff.active = []
         selected_cutoff = False
+    
+    if is_ppf:
+        cbg_autotrans.disabled = True
+        cbg_autotrans.active = []
+        selected_autotransf = False
 
-    densities: dict[str, Union[Empirical, KDE_approx, Parametric]] = {}
+    densities: dict[str, Union[Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete]] = {}
     df_cols = {}
     lb, ub = 0.0, 1e-10
 
     clazz = None
-    if is_ecdf:
-        clazz = Empirical
+    if is_empirical:
+        if is_ecdf:
+            clazz = Empirical
+        elif is_discrete:
+            clazz = Empirical_discrete
     elif is_parametric:
-        clazz = Parametric
+        if is_discrete:
+            clazz = Parametric_discrete
+        else:
+            clazz = Parametric
     else:
         clazz = KDE_approx
     use_densities = cdfs[f'{clazz.__name__}_{selected_transf[1]}'].value
@@ -198,9 +310,9 @@ def update_plot(contain_plot: bool=False):
         return d._range_data
 
     for domain in domains.keys():
-        density: Union[Empirical, KDE_approx, Parametric] = use_densities[f'{domain}_{selected_score[1]}']
+        density: Union[Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete] = use_densities[f'{domain}_{selected_score[1]}']
         densities[domain] = density
-        if is_parametric and not density.is_fit:
+        if (is_parametric or (is_empirical and is_discrete)) and not density.is_fit:
             continue
 
         prd = density.practical_domain
@@ -223,19 +335,27 @@ def update_plot(contain_plot: bool=False):
             plot.y_range.end = max([1e-10] + list(map(lambda _dens: _dens.practical_range_pdf[1], densities.values())))
             plot.y_range.start = 0. - .02 * plot.y_range.end
             plot.y_range.end += .02 * plot.y_range.end
+        elif is_ppf:
+            plot.x_range.start = 0. - 1e-2
+            plot.x_range.end = 1. + 1e-2
+            plot.y_range.start = lb - ext * 1e-2
+            plot.y_range.end = ub + ext * 1e-2
         else:
             plot.y_range.start = 0. - .02
             plot.y_range.end = 1. + .02
+
+        update_discrete_cont_mismatch()
         return
 
 
     v = input_own.value
     has_own = isinstance(v, int) or isinstance(v, float) or isinstance(v, Integral)
     own_values = []
-    # We should not limit what the user can input
-    #input_own.low = lb
-    #input_own.high = ub
-    input_own.step = (ub - lb) / 25.
+
+    if is_ppf:
+        input_own.step = 1. / 25.
+    else:
+        input_own.step = (ub - lb) / 25.
 
     for domain in domains.keys():
         density = densities[domain]
@@ -251,12 +371,21 @@ def update_plot(contain_plot: bool=False):
         if lb_domain == ub_domain:
             ub_domain = lb + 1e-10
         npoints = 350
-        if not is_pdf:
-            npoints *= 2
-        if is_ecdf:
-            npoints *= 2
-        domain_x = nonlinspace(lb_domain, ub_domain, npoints)
+
+
+        if is_ppf:
+            domain_x = np.linspace(start=1e-6, stop=1-1e-6, num=npoints)
+        else:
+            if is_ecdf or not is_pdf:
+                npoints *= 2
+            if is_empirical and is_discrete:
+                npoints *= 3
+            domain_x = nonlinspace(lb_domain, ub_domain, npoints)
+
         df_cols[f'x_{domain}'] = domain_x
+        if has_own:
+            use_v = np.rint(use_v)
+
         if is_parametric and not density.is_fit:
             df_cols[domain] = np.zeros((domain_x.size,))
             if has_own:
@@ -267,6 +396,10 @@ def update_plot(contain_plot: bool=False):
             df_cols[domain] = density.pdf(domain_x)
             if has_own:
                 own_values.append(density.pdf(use_v))
+        elif is_ppf:
+            df_cols[domain] = density.ppf(df_cols[f'x_{domain}'])
+            if has_own:
+                own_values.append(density.ppf(use_v))
         else:
             df_cols[domain] = density.cdf(domain_x)
             if is_ccdf:
@@ -306,33 +439,31 @@ def update_plot(contain_plot: bool=False):
     pdist_dval: list[str] = None
     if is_parametric:
         pdist = list([pdist_format(densities[domain]) for domain in domains.keys()])
-        pdist_dval = list([tbl_format(None if np.isnan(densities[domain].dstat) else densities[domain].dstat) for domain in domains.keys()])
+        pdist_dval = list([tbl_format(None if not densities[domain].is_fit else densities[domain].stat) for domain in domains.keys()])
     else:
         pdist = ['<not parametric>'] * len(domains.keys())
-        pdist_dval = list([tbl_format(None) for _ in range(len(domains.keys()))])
+        if is_kde:
+            pdist_dval = list([tbl_format(None if np.isnan(densities[domain].stat) else densities[domain].stat) for domain in domains.keys()])
+        else:
+            pdist_dval = list([tbl_format(None) for _ in range(len(domains.keys()))])
+
+    use_v = v
+    if has_own and is_discrete:
+        use_v = np.rint(v)
     tbl_transf_src.data = {
         'domain': list(map(lambda domain: domains_labels[domain], domains.keys())),
         'transf_value': list(map(lambda domain: tbl_format(None if not densities[domain].transform_value is None and np.isnan(densities[domain].transform_value) else densities[domain].transform_value), domains.keys())),
-        'metric_value': list(map(lambda domain: tbl_format(np.abs(densities[domain].transform_value - v) if has_own and selected_autotransf and densities[domain].transform_value is not None else v), domains.keys())),
+        'metric_value': list(map(lambda domain: tbl_format(np.abs(densities[domain].transform_value - use_v) if has_own and selected_autotransf and densities[domain].transform_value is not None else use_v), domains.keys())),
         'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(domains.keys()))]),
         'pdist': pdist,
         'pdist_dval': pdist_dval
     }
 
     update_own_line()
-    update_transf()
+    update_discrete_cont_mismatch()
+    update_labels()
 
 
-
-
-def get_score_type(val: str) -> str:
-    if 'PDF' in val:
-        if 'Param' in val:
-            return 'PDF_Param'
-        return 'PDF'
-    if 'CCDF' in val:
-        return 'CCDF'
-    return 'CDF'
 
 
 def cbg_cutoff_click(active: list[int]):
@@ -347,20 +478,16 @@ def cbg_autotrans_click(active: list[int]):
     update_plot()
 
 
+
 def dd_denstype_click(evt: MenuItemClick):
     global selected_denstype
+    if evt.item == '-':
+        return # Ignore, this is just a separator
     type_before = get_score_type(selected_denstype[1])
     type_after = get_score_type(evt.item)
     temp = { key: val for (val, key) in dd_denstype_items }
     dd_denstype.label = temp[evt.item]
     selected_denstype = (temp[evt.item], evt.item)
-    
-    if 'PDF' in selected_denstype[1]:
-        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Relative Likelihood'
-    elif 'CCDF' in selected_denstype[1]:
-        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Corresponding Score'
-    else:
-        plot.yaxis.axis_label = tbl_transf_cols[3].title = 'Cumulative Probability'
 
     update_plot()
     if type_before != type_after:
@@ -377,14 +504,12 @@ def dd_transf_click(evt: MenuItemClick):
     update_plot()
     if transf_before != transf_after:
         update_plot(contain_plot=True)
-    if selected_transf[1] == DistTransform.NONE.name:
-        plot.xaxis.axis_label = 'Metric Value'
-    else:
-        plot.xaxis.axis_label = 'Metric Distance from Ideal'
 
 
 def dd_scores_click(evt: MenuItemClick):
     global selected_score
+    if evt.item == '-':
+        return # Ignore, this is just a separator
     score_before = selected_score[1]
     score_after = evt.item
     temp = { key: val for (val, key) in dd_scores_items }
@@ -422,7 +547,7 @@ footer = Div(text=read_text('./src/webapp/footer.html'))
 
 
 input_row1 = row([
-    dd_scores, dd_denstype
+    dd_scores, dd_denstype, throbber, status
     #column(Div(text='Metric:'), dd_scores),
     #column(Div(text='Transformation:'), dd_transf)
 ])
