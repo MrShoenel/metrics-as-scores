@@ -1,10 +1,12 @@
 from os import getcwd, cpu_count
 from sys import path
 from typing import Any, Union
+from warnings import warn
 path.append(getcwd())
 
 import pandas as pd
 import numpy as np
+from os.path import exists
 from pickle import dump, load
 from joblib import Parallel, delayed
 from scipy.stats import norm
@@ -79,7 +81,7 @@ def fits_to_MaS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any
                 for pi in dist._param_info():
                     params += (best[f'params_{pi.name}'],)
                 
-                data = data_df[(data_df.metric == metric.name)]
+                data = data_df[(data_df.Metric == metric.name)]
                 if domain != '__ALL__':
                     data = data[(data.domain == domain)]
                 data = data.value.to_numpy()
@@ -101,14 +103,19 @@ def generate_empirical(dataset: Dataset, clazz: Union[Empirical, KDE_approx], tr
 
 
 def generate_parametric(dataset: Dataset, clazz: Union[Parametric, Parametric_discrete], transform: DistTransform):
-    with open(f'./results/pregnerate_distns_{transform.name}.pickle', 'rb') as f:
+    use_file = f'./results/pregnerate_distns_{transform.name}.pickle'
+    if not exists(use_file):
+        warn(f'Cannot generate parametric distribution for {clazz.__name__} and transformation {transform.name}, because the file {use_file} does not exist. Did you forget to create the fits using the script pregenerate_distns.py?')
+        return
+
+    with open(use_file, 'rb') as f:
         distns_list = load(f)
         distns_dict = { item['grid_idx']: item for item in distns_list }
     use_continuous = clazz == Parametric
     temp = fits_to_MaS_densities(dataset=dataset, distns_dict=distns_dict, dist_transform=transform, use_continuous=use_continuous)
     with open(f'./results/densities_{clazz.__name__}_{transform.name}.pickle', 'wb') as f:
         dump(temp, f)
-    print(f'Finished generating Densities for {clazz.__name__} with transform {transform.name}.')
+    print(f'Finished generating parametric Densities for {clazz.__name__} with transform {transform.name}.')
 
 
 
@@ -135,7 +142,7 @@ def generate_empirical_discrete(dataset: Dataset, transform: DistTransform):
 
     with open(f'./results/densities_{Empirical_discrete.__name__}_{transform.name}.pickle', 'wb') as f:
         dump(the_dict, f)
-    print(f'Finished generating Densities for {Empirical_discrete.__name__} with transform {transform.name}.')
+    print(f'Finished generating empirical Densities for {Empirical_discrete.__name__} with transform {transform.name}.')
 
 
 
