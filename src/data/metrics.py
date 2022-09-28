@@ -54,7 +54,7 @@ class QualitasCorpusMetricsExtractor:
             qcme = QualitasCorpusMetricsExtractor(file=f'{files_dir}/{file}')
             for mid in set(MetricID):
                 for v in qcme.metrics_values(metric_id=mid):
-                    dicts.append({ 'system': system, 'metric': mid.name, 'value': v })
+                    dicts.append({ 'System': system, 'Metric': mid.name, 'Value': v })
 
         df = pd.DataFrame(dicts)
         df.to_csv(f'{csv_dir}/{system}.csv', index=False)
