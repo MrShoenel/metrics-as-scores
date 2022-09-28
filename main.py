@@ -1,27 +1,68 @@
+from src.distribution.fitting import Discrete_RVs
+
+
+for rv in Discrete_RVs:
+    print(rv.__class__.__name__)
+    for p in rv._param_info():
+        print(f' - {p.__dict__}')
+
+
+
+
+
+
+
+
+
+
+from copyreg import pickle
 from os import walk
 from typing import Iterable
 from src.data.metrics import QualitasCorpusMetricsExtractor, MetricID
+from pickle import dump
 import pandas as pd
 import numpy as np
+from src.distribution.distribution import DistTransform, Dataset, Empirical, KDE_approx
+
+
+d = Dataset(df=pd.read_csv('csv/metrics.csv'), attach_domain=False, attach_system=False)
+anova = d.analyze_ANOVA(metric_ids=list(MetricID), domains=Dataset.domains(include_all_domain=True))
+anova.to_csv('results/anova.csv', index=False)
+pwrank = d.analyze_distr(metric_ids=list(MetricID))
+pwrank.to_csv('results/pwrank_wtt.csv', index=False)
+
+
+tukey = d.analyze_TukeyHSD(metric_ids=list(MetricID))
+tukey.to_csv('results/tukey.csv', index=False)
 
 
 
+anova = d.analyze_ANOVA(metric_ids=list(MetricID), domains=Dataset.domains(include_all_domain=True))
+anova.to_csv('results/anova.csv', index=False)
 
-from src.data.metrics import MetricID
-from src.distribution.distribution import Distribution, ECDF, KDECDF_approx
+with open('./results/anova.pickle', 'wb') as f:
+    dump(anova, f)
+
+#data = d.get_cdf_data(metric_id=MetricID.TLOC, unique_vals=True, systems=['aspectj', 'jre', 'jruby'])
+data = d.data(metric_id=MetricID.VG, unique_vals=True)
+temp = Empirical(data=data, compute_ranges=True)
+print(temp.cdf(np.asarray([-1., 0., .9, 1., 1.1,])))
+
+data = np.abs(data - np.min(data))
+temp = d.fit_parametric(data, metric_id=MetricID.TLOC, dist_transform=DistTransform.EXPECTATION)
+temp.save_to_file('c:/temp/bla.pickle')
 
 
-d = Distribution(df=pd.read_csv('csv/metrics.csv'))
-data = d.get_cdf_data(metric_id=MetricID.VG, unique_vals=True)
+dens = KDE_approx(data, compute_ranges=True)
+print(dens.practical_domain)
+print(dens.practical_range_pdf)
+print(dens.cdf([-1.0, 0.8, 1.0, 1.5, 2.0, 20.34]))
+print(dens.pdf([-1.0, 0.8, 1.0, 1.5, 2.0, 20.34]))
 
-ecdf = ECDF(data=data)
+ecdf = Empirical(data=data)
 print(ecdf([-1.0, 0.8, 1.0, 20.34]))
 
-kde = KDECDF_approx(data=d.get_cdf_data(metric_id=MetricID.VG, unique_vals=False))
-print(kde.practical_range)
-print(kde([-1.0, 0.8, 1.0, 1.5, 2.0, 20.34]))
-
-cdf = Distribution.fit_parametric(data=data, max_samples=1_000)
+cdf = Dataset.fit_parametric(data=data, max_samples=1_000)
 cdf.save_to_file(file='./results/cdf_VG.pickle')
 
 
@@ -30,6 +71,11 @@ cdf.save_to_file(file='./results/cdf_VG.pickle')
 
 
 
+
+
+bla = pd.read_csv('files/systems-domains.csv', sep=';', quotechar='"')
+bla['System_QC_name'] = d.df.System.unique()
+bla.to_csv('files/systems-domains2.csv')
 
 
 
@@ -57,7 +103,7 @@ def get_file_metrics(files: list[str], proj: str, files_dir: str='./files', csv_
         qcme = QualitasCorpusMetricsExtractor(file=f'{files_dir}/{file}')
         for mid in set(MetricID):
             for v in qcme.metrics_values(metric_id=mid):
-                dicts.append({ 'project': proj, 'metric': mid.name, 'value': v })
+                dicts.append({ 'Project': proj, 'Metric': mid.name, 'Value': v })
 
     df = pd.DataFrame(dicts)
     df.to_csv(f'{csv_dir}/{proj}.csv', index=False)
