@@ -27,7 +27,7 @@ def get_data_tuple(dist: Dataset, metric_id: MetricID, dist_transform: DistTrans
     return l
 
 
-def fit(grid_idx: int, row, metrics_discrete: dict[MetricID, bool], the_data: NDArray[Shape["*"], Float], the_data_unique: NDArray[Shape["*"], Float], transform_value: Union[float, None], dist_transform: DistTransform) -> dict[str, Any]:
+def fit(grid_idx: int, row, metrics_discrete: dict[MetricID, bool], the_data: NDArray[Shape["*"], Float], the_data_unique: NDArray[Shape["*"], Float], transform_value: Union[float, None], dist_transform: DistTransform, write_temporary_results: bool=True) -> dict[str, Any]:
     start = timer()
     import sys
     if not sys.warnoptions:
@@ -79,9 +79,10 @@ def fit(grid_idx: int, row, metrics_discrete: dict[MetricID, bool], the_data: ND
         # Do nothing at the moment, and allow returning a dict without params and stat_tests
         pass
     finally:
-        end = timer() - start
-        print(f'DONE! it took {format(end, "0>5.0f")} seconds ({row.type}), [{row.rv}]')
-        with open(f'./results/temp/{grid_idx}_{format(end, "0>5.0f")}', 'wb') as f:
-            dump(ret_dict, f)
+        if write_temporary_results:
+            end = timer() - start
+            print(f'DONE! it took {format(end, "0>5.0f")} seconds ({row.type}), [{row.rv}]')
+            with open(f'./results/temp/{grid_idx}_{format(end, "0>5.0f")}', 'wb') as f:
+                dump(ret_dict, f)
 
     return ret_dict
