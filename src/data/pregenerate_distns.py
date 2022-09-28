@@ -66,13 +66,13 @@ def generate_parametric_fits(dist_transform: DistTransform, data_dict: dict[str,
 
 if __name__ == '__main__':
     print('Reading data file...')
-    dist = Dataset(df=pd.read_csv('csv/metrics.csv'))
+    dataset = Dataset(df=pd.read_csv('csv/metrics.csv'))
 
     for dist_transform in list(DistTransform):
         print(f'Parallel pre-processing of datasets for transform {dist_transform.name} ({dist_transform.value})...')
 
         use_metrics = list([m for m in MetricID if metrics_discrete[m]])
-        res = Parallel(n_jobs=min(len(use_metrics), cpu_count()))(delayed(get_data_tuple)(dist, m, dist_transform, False) for m in tqdm(use_metrics))
+        res = Parallel(n_jobs=min(len(use_metrics), cpu_count()))(delayed(get_data_tuple)(dataset, m, dist_transform, False) for m in tqdm(use_metrics))
         data_discrete_dict: dict[str, NDArray[Shape["*"], Float]] = dict([(item[0], item[1]) for sublist in res for item in sublist])
         transform_values_discrete_dict: dict[str, float] = dict([(item[0], item[2]) for sublist in res for item in sublist])
         del res
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         print(f'Having {len(list(data_discrete_dict.keys()))} pre-processed datasets (discrete).')
         
         use_metrics = list(MetricID)
-        res = Parallel(n_jobs=min(len(use_metrics), cpu_count()))(delayed(get_data_tuple)(dist, m, dist_transform, True) for m in tqdm(use_metrics))
+        res = Parallel(n_jobs=min(len(use_metrics), cpu_count()))(delayed(get_data_tuple)(dataset, m, dist_transform, True) for m in tqdm(use_metrics))
         data_dict: dict[str, NDArray[Shape["*"], Float]] = dict([(item[0], item[1]) for sublist in res for item in sublist])
         transform_values_dict: dict[str, float] = dict([(item[0], item[2]) for sublist in res for item in sublist])
         del res
