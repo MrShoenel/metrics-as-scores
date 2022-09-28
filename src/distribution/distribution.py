@@ -374,23 +374,23 @@ class Dataset:
     def __init__(self, df: pd.DataFrame, attach_domain: bool=False, attach_system: bool=False) -> None:
         self.df = df
         if attach_domain:
-            df['domain'] = [Dataset.domain_for_system(system=system, is_qc_name=True) for system in df.system]
+            df['Domain'] = [Dataset.domain_for_system(system=system, is_qc_name=True) for system in df.System]
         if attach_system:
-            df['system_org'] = [Dataset.system_qc_to_system(system_qc=system_qc) for system_qc in df.system]
+            df['System_org'] = [Dataset.system_qc_to_system(system_qc=system_qc) for system_qc in df.System]
 
     @property
     def available_systems(self) -> NDArray[Shape["*"], String]:
-        return self.df['project'].unique()
+        return self.df['Project'].unique()
 
 
     def data(self, metric_id: MetricID, domain: str=None, systems: Iterable[str]=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
-        new_df = self.df[self.df['metric'] == metric_id.name]
+        new_df = self.df[self.df['Metric'] == metric_id.name]
         if domain is not None:
-            new_df = new_df[new_df['domain'] == domain]
+            new_df = new_df[new_df['Domain'] == domain]
         if systems is not None:
-            new_df = new_df[new_df['system'].isin(systems)]
+            new_df = new_df[new_df['System'].isin(systems)]
         
-        vals = new_df['value']
+        vals = new_df['Value']
         if unique_vals:
             rng = np.random.default_rng(seed=1_337)
             r = rng.choice(a=np.linspace(1e-8, 1e-6, vals.size), size=vals.size, replace=False)
