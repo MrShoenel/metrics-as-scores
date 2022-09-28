@@ -3,6 +3,16 @@ Metrics as Scores
 
 Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://metrics-as-scores.ml/>.
 
+This package accompanies the paper entitled "_Contextual Operationalization of Metrics As Scores: Is My Metric Value Good?_", which is currently under single-blind review.
+It seeks to answer the question whether or not the context a metric was captured in, matters.
+It enables the user to compare contexts and to understand their differences.
+In order to answer the question of whether a metric value is actually good, we need to transform it into a **score**.
+Scores are normalized **and rectified** distances, that can be compared in an apples-to-apples manner, across contexts.
+The same metric value might be good in one context, while it is not in another.
+To borrow an example from the context of software: It is much more acceptable (or common) to have large applications (in terms of lines of code) in the contexts/domains of games and databases than it is for the domains of IDEs and SDKs.
+Given an *ideal* value for a metric (which may also be user-defined), we can transform observed metrics values to distances from that value and then use the cumulative distribution function to map distances to scores.
+
+
 Jump to:
 
 - [1. Use Your Own Data](#1-use-your-own-data)
