@@ -133,3 +133,6 @@ csv/metrics.csv
 
 # Pre-computed and pickled results:
 results/*.pickle
+
+# Paper PDF:
+paper/*.pdf
