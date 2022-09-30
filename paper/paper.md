@@ -49,24 +49,24 @@ title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive Applicatio
 <!-- Short introduction into the problem, then -->
 Raw data can be aggregated according to some well-defined standard, method, or calculation, which makes it a metric.
 In software processes, such aggregations are often counts of events or certain properties [@carleton1999].
-However, without the aggretation that is done in a quality model, raw data and metrics are rarely of great value to analysts and decision makers. This is because quality models are conceived to establish a connection between metrics and certain quality goals [@kaner2004software].
-It is therefore difficult to answer the question ``is my metric value good?''.
+However, without the aggregation that is done in a quality model, raw data and metrics are rarely of great value to analysts and decision-makers. This is because quality models are conceived to establish a connection between metrics and certain quality goals [@kaner2004software].
+It is, therefore, difficult to answer the question ``is my metric value good?''.
 With \emph{Metrics As Scores} (\mas) we present an approach that, given some \emph{ideal} value, can transform any metric into a score, given an observation of sufficiently many relevant metrics values.
 While such ideal values were previously attempted to be derived from, e.g., experience or surveys [@benlarbi2000thresh], benchmarks [@alves2010thresh], or by setting practical values [@grady1992practical], with \mas we suggest deriving ideal values additionally in non-parametric, statistical ways.
 To do so, data first needs to be captured in a \emph{relevant} context. A metric value might be good in one context, while it is less so in another.
-We therefore suggest to generalize and contextualize the approach taken by [@UlanLEW21], in which a score is defined to always have a range of $[0,1]$ and linear behavior.
+Therefore, we suggest generalizing and contextualizing the approach taken by [@UlanLEW21], in which a score is defined to always have a range of $[0,1]$ and linear behavior.
 This means that scores can now also be compared and that a unit change in any score is equally valuable among scores.
 This is not the case for raw data or metrics.
 
 
-\mas consists of a tool- and analysis suite and an interactive application that allows researchers to explore and understand differences of scores across contexts.
-The operationalization of raw data or metrics as scores lies in gathering values that are context-specific (usual), determining an ideal value non-parametrically or by user preference, and to then transform the observed values into distances.
+\mas consists of a tool- and analysis suite and an interactive application that allows researchers to explore and understand differences in scores across contexts.
+The operationalization of raw data or metrics as scores lies in gathering values that are context-specific (usual), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
 \mas enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
 More than $120$ different parametric distributions (approx. $20$ of which a discrete) are fitted through a common interface.
 While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, \mas solves a mixed-variable global optimization problem using Pymoo [@pymoo].
 Additionally to that, empirical distributions (continuous and discrete) and smooth approximate Kernel density estimates are available. Applicable statistical tests, such as the Cramér--von Mises- or Epps--Singleton-tests, are automatically performed.
 \mas was created for and includes the ``Qualitas.class'' corpus of software metrics [@terra2013qualitas].
-However, we include a guide for using own datasets. By following three (two) steps (one is optional), own data formatted as plain CSV-files can be imported and leveraged.
+However, we include a guide for using own datasets. By following three (two) steps (one is optional), own data formatted as plain CSV files can be imported and leveraged.
 
 
 
@@ -77,14 +77,14 @@ While some have attempted to associate blank metrics with quality (e.g, @basili1
 Most often metrics cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematical sound way to do so [@ulan2018jointprobs].
 Furthermore, none of the existing approaches that attempted to associate metrics with quality paid great attention to the fact that metrics have different distributions and therefore different statistical properties across contexts.
 Therefore, the operationalization of metrics as scores ought to be conditional on the context.
-The results of studying the metrics of the Qualitas.class corpus show that the context metrics were captured in is always of importance and must not be neglegted.
+The results of studying the metrics of the Qualitas.class corpus show that the context metrics were captured in is always of importance and must not be neglected.
 In addition, some of the metrics in the corpus are \emph{never} similar across contexts and must be applied with great care when used in quality models. [@honel2022mas].
 The \mas approach enables these and similar insights and supports decision-makers in selecting and comparing scores.
 
 
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
-The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, and to enable the exploration of context-depdendent distributions.
+The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, and to enable the exploration of context-dependent distributions.
 Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as Kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
 When obtaining any of these types of distributions for a univariate sample, the following statistical tests are carried out automatically (if applicable): Cramér--von Mises- [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér-von Mises- [@Anderson1962], Kolmogorov–Smirnov-, and Epps–Singleton [@Epps1986] two-sample tests.
@@ -108,7 +108,7 @@ Lastly, the two-sample T-test compares the means of two samples to give an indic
 The interactive application is partially shown in @fig:mas. Not shown are the header, UI controls, a tabular with numerical data for the current selection, and the footer which contains help.
 The application supports all transforms, continuous and discrete distributions, obtaining scores for own metrics/sampling from inverse CDFs (PPFs), and grouping of metrics into discrete/continuous.
 The main tool, the plot, allows the user to zoom, pan, select, enable/disable contexts, and manually hover the graphs to obtain precise $x$/$y$-values.
-The interactive application is built using Bokeh [@bokeh] and allows to be customized using a few steps described in the software's manual.
+The interactive application is built using Bokeh [@bokeh] and allows for customization using a few steps described in the software's manual.
 
 
 
@@ -118,14 +118,14 @@ The interactive application is built using Bokeh [@bokeh] and allows to be custo
 <!-- A list of key references, including to other software addressing related needs. Note that the references should include full names of venues, e.g., journals and conferences, not abbreviations only understood in the context of a specific discipline. -->
 
 
-# Acknowledgements
+# Acknowledgments
 <!-- Acknowledgement of any financial support. -->
 This work is supported by the [Linnaeus University Centre for Data Intensive Sciences and Applications (DISA)](https://lnu.se/forskning/sok-forskning/linnaeus-university-centre-for-data-intensive-sciences-and-applications) High-Performance Computing Center.
 
 
 # Applications
 
-The \mas tool- and analysis suite and interactive application have been used to to study the Qualitas.class corpus of software metrics [@honel2022mas].
+The \mas tool- and analysis suite and interactive application have been used to study the Qualitas.class corpus of software metrics [@honel2022mas].
 
 
 
