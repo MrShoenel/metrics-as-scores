@@ -1,5 +1,5 @@
 bokeh==2.4.3
-joblib==1.1.0
+joblib==1.2.0
 jupyterlab==3.4.5
 matplotlib==3.5.3
 nptyping==2.2.0
