@@ -120,7 +120,7 @@ The interactive application is built using Bokeh [@bokeh] and allows to be custo
 
 # Acknowledgements
 <!-- Acknowledgement of any financial support. -->
-This work is supported by the [Linnaeus University Centre for Data Intensive Sciences and Applications (DISA)](https://lnu.se/forskning/sok-forskning/linnaeus-university-centre-for-data-intensive-sciences-and-applications) High-Performance Computing Center
+This work is supported by the [Linnaeus University Centre for Data Intensive Sciences and Applications (DISA)](https://lnu.se/forskning/sok-forskning/linnaeus-university-centre-for-data-intensive-sciences-and-applications) High-Performance Computing Center.
 
 
 # Applications
