@@ -1,4 +1,4 @@
-Metrics as Scores
+Metrics as Scores [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119)
 =================
 
 Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://metrics-as-scores.ml/>.
