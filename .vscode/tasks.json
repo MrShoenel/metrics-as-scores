@@ -21,8 +21,10 @@
 			"command": "./venv/Scripts/bokeh",
 			"args": [
 					"serve",
-					"sliders.py",
-					"--port", "5678"
+					"src\\webapp",
+					"--port", "5678",
+					"--allow-websocket-origin", "*",
+					//"--args", "preload"
 			],
 			"options": {
 					"env": {
@@ -49,6 +51,14 @@
 							"beginsPattern": "^this should not match on anything"
 					}
 			}
+		},
+
+		{
+			"label": "Build JOSS paper",
+			"type": "process",
+			"command": "paper/build.cmd",
+			"presentation": {"echo": true, "reveal": "always", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": true},
+			"group": {"kind": "build", "isDefault": true},
 		}
 	]
 }
