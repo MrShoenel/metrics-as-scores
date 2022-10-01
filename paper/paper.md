@@ -62,7 +62,7 @@ This is not the case for raw data or metrics.
 \mas consists of a tool- and analysis suite and an interactive application that allows researchers to explore and understand differences in scores across contexts.
 The operationalization of raw data or metrics as scores lies in gathering values that are context-specific (usual), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
 \mas enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
-More than $120$ different parametric distributions (approx. $20$ of which a discrete) are fitted through a common interface.
+More than $120$ different parametric distributions (approx. $20$ of which are discrete) are fitted through a common interface.
 While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, \mas solves a mixed-variable global optimization problem using Pymoo [@pymoo].
 Additionally to that, empirical distributions (continuous and discrete) and smooth approximate Kernel density estimates are available. Applicable statistical tests, such as the Cramér--von Mises- or Epps--Singleton-tests, are automatically performed.
 \mas was created for and includes the ``Qualitas.class'' corpus of software metrics [@terra2013qualitas].
