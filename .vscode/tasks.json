@@ -18,10 +18,10 @@
 			"label": "launch Bokeh server",
 			"type": "shell",
 			"isBackground": true,
-			"command": "./venv/Scripts/bokeh",
+			"command": "venv\\Scripts\\bokeh",
 			"args": [
 					"serve",
-					"src\\webapp",
+					"src\\metrics_as_scores\\webapp",
 					"--port", "5678",
 					"--allow-websocket-origin", "*",
 					//"--args", "preload"
