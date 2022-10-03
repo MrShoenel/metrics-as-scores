@@ -84,7 +84,7 @@ The \mas approach enables these and similar insights and supports decision-maker
 
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
-The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, and to enable the exploration of context-dependent distributions.
+The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, enable the exploration of, and sample from context-dependent distributions.
 Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as Kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
 When obtaining any of these types of distributions for a univariate sample, the following statistical tests are carried out automatically (if applicable): Cramér--von Mises- [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér-von Mises- [@Anderson1962], Kolmogorov–Smirnov-, and Epps–Singleton [@Epps1986] two-sample tests.
