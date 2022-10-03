@@ -86,8 +86,8 @@ def fits_to_MaS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any
                 
                 data = data_df[(data_df.Metric == metric.name)]
                 if domain != '__ALL__':
-                    data = data[(data.domain == domain)]
-                data = data.value.to_numpy()
+                    data = data[(data.Domain == domain)]
+                data = data.Value.to_numpy()
                 
                 the_dict[key] = Use_class(dist=dist, stat_tests=stat_tests_dict, use_stat_test=use_test, dist_params=params, range=(data.min(), data.max()),
                     compute_ranges=True, ideal_value=metrics_ideal[best.metric], dist_transform=dist_transform,
