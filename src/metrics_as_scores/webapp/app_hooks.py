@@ -17,7 +17,7 @@ def unpickle(file: str):
         with open(file=file, mode='rb') as f:
             return load(f)
     except Exception as e:
-        raise Exception('The webapp relies on precomputed results. Please generate them using the file src/data/pregenerate.py before running this webapp.') from e
+        raise Exception('The webapp relies on precomputed results. Please generate them using the file pregenerate.py before running this webapp.') from e
 
 
 def load_data(preload: bool=False):
