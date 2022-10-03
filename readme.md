@@ -16,16 +16,16 @@ Given an *ideal* value for a metric (which may also be user-defined), we can tra
 Jump to:
 
 
-- [1. Installation](#2-installation)
-- [2. Stand-alone Usage / Development Setup](#3-stand-alone-usage--development-setup)
-	- [2.1. Setting Up a Virtual Environment](#31-setting-up-a-virtual-environment)
-	- [2.2. Installing Packages](#32-installing-packages)
-- [3. Use Your Own Data](#4-use-your-own-data)
-	- [3.1. Data Preparation](#41-data-preparation)
-	- [3.2. [Optional] Computing Fits For Parametric Distributions](#42-optional-computing-fits-for-parametric-distributions)
-	- [3.3. Pre-generating Distributions](#43-pre-generating-distributions)
-- [4. Personalizing the Web Application](#5-personalizing-the-web-application)
-- [References](#6-references)
+- [1. Installation](#1-installation)
+- [2. Stand-alone Usage / Development Setup](#2-stand-alone-usage--development-setup)
+	- [2.1. Setting Up a Virtual Environment](#21-setting-up-a-virtual-environment)
+	- [2.2. Installing Packages](#22-installing-packages)
+- [3. Use Your Own Data](#3-use-your-own-data)
+	- [3.1. Data Preparation](#31-data-preparation)
+	- [3.2. [Optional] Computing Fits For Parametric Distributions](#32-optional-computing-fits-for-parametric-distributions)
+	- [3.3. Pre-generating Distributions](#33-pre-generating-distributions)
+- [4. Personalizing the Web Application](#4-personalizing-the-web-application)
+- [References](#references)
 
 
 # 1. Installation
@@ -90,7 +90,7 @@ Although this application was built primarily for analyzing the software metrics
 
 In order to use your own data, two steps are required:
 
-1. Provide your data in form of a `CSV`-file.
+1. Provide your data in form of a `CSV`-file and adapt the enum `MetricID`.
 2. Run the scripts for pre-generating the distributions for high performance in the web application.
 3. [Optional] You may run additional scripts that perform additional statistical tests. Currently, we support these tests:
 	* ANOVA [[3]](#cite-3): analysis of variance of your data across the available contexts,
@@ -108,9 +108,11 @@ Note that the tests are automatically carried out for either continuous or discr
 
 ## 3.1. Data Preparation
 
-You will have to provide the following `CSV`-files:
+You will have to adapt the enum [__`src/metrics_as_scores/data/metrics.py/MetricID`__](./src/metrics_as_scores/data/metrics.py).
+This is a simple Key-Value enumeration, where the key is the metric's short name or abbreviation (letters only, e.g., "KPI"). The value can be any string. It is shown in the web application like "`[Metric] Value`".
 
-* [__`files/MetricID.csv`__](./files/MetricID.csv): A simple file with two columns (additional columns are ignored, but you may want to store extra meta information there): `Metric` and `Value`. The first column should contain the metric's short name or abbreviation (letters only, e.g., "KPI") and the value can be any string. It is shown in the web application like "`[Metric] Value`".
+Next, you will have to provide the following `CSV`-files:
+
 * [__`files/metrics-discrete.csv`__](./files/metrics-discrete.csv): Another simple two-column `CSV` with columns `Metric` and `Discrete`. This file is used to indicate whether a metric is discrete or continuous. Use the metric's short name in the first column, and either `True` or `False` in the other column.
 * [__`files/metrics-ideal.csv`__](./files/metrics-ideal.csv): A third simple file. Similar to the previous one, in this file you can indicate a numeric ideal value for each metric (if any). Again, use the metric's short name in the first column, and either keep the second column empty (no ideal value) or fill in an ideal value. Note that this file indicates the global ideal values, not user-preferred ideal values. The value from this file is used when distributions are pre-generated.
 * [__`csv/metrics.csv`__](./csv/metrics.csv.7z): This is the <u>***main data file***</u>. It has three columns: `Metric`, `Domain`, and `Value`. Here you save the values that you have recorded for each metric, in each context/domain.

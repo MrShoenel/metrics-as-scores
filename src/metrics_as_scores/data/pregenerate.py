@@ -12,7 +12,6 @@ from warnings import warn
 from os.path import exists
 from pickle import dump, load
 from joblib import Parallel, delayed
-from scipy.stats import norm
 from metrics_as_scores.tools.funcs import flatten_dict
 from metrics_as_scores.data.metrics import MetricID
 from metrics_as_scores.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
