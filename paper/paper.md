@@ -63,7 +63,7 @@ This is not the case for raw data or metrics.
 The operationalization of raw data or metrics as scores lies in gathering values that are context-specific (usual), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
 \mas enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
 More than $120$ different parametric distributions (approx. $20$ of which are discrete) are fitted through a common interface.
-While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, \mas solves a mixed-variable global optimization problem using Pymoo [@pymoo].
+While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, \mas solves a mixed-variable global optimization problem using a genetic algorithm and Pymoo [@pymoo].
 Additionally to that, empirical distributions (continuous and discrete) and smooth approximate Kernel density estimates are available. Applicable statistical tests, such as the Cramér--von Mises- or Epps--Singleton-tests, are automatically performed.
 \mas was created for and includes the ``Qualitas.class'' corpus of software metrics [@terra2013qualitas].
 However, we include a guide for using own datasets. By following three (two) steps (one is optional), own data formatted as plain CSV files can be imported and leveraged.
@@ -84,7 +84,7 @@ The \mas approach enables these and similar insights and supports decision-maker
 
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
-The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, and to enable the exploration of context-dependent distributions.
+The main purpose of the \mas tool- and analysis suite for Python is to approximate or estimate, enable the exploration of, and sample from context-dependent distributions.
 Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as Kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
 When obtaining any of these types of distributions for a univariate sample, the following statistical tests are carried out automatically (if applicable): Cramér--von Mises- [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér-von Mises- [@Anderson1962], Kolmogorov–Smirnov-, and Epps–Singleton [@Epps1986] two-sample tests.
@@ -101,11 +101,9 @@ Lastly, the two-sample T-test compares the means of two samples to give an indic
 # MAS -- The Interactive Application
 <!-- Here, we will introduce the actual application. Also, the application hosted under https://metrics-as-scores.ml/ is *an* actual application of the QCC. -->
 
-\label{fig:mas}
-
 ![Main plot area of the application ``Metrics As Scores''. Using the Qualitas.class corpus, metrics values of own applications can be scored against the corpus' domains. Shown are the CCDFs (scores) of the fitted parametric distributions for the metric TLOC transformed using the infimum (per domain). Available online: <https://metrics-as-scores.ml/>.](MAS.png){#fig:mas}
 
-The interactive application is partially shown in @fig:mas. Not shown are the header, UI controls, a tabular with numerical data for the current selection, and the footer which contains help.
+The interactive application is partially shown in Figure \ref{fig:mas}. Not shown are the header, UI controls, a tabular with numerical data for the current selection, and the footer which contains help.
 The application supports all transforms, continuous and discrete distributions, obtaining scores for own metrics/sampling from inverse CDFs (PPFs), and grouping of metrics into discrete/continuous.
 The main tool, the plot, allows the user to zoom, pan, select, enable/disable contexts, and manually hover the graphs to obtain precise $x$/$y$-values.
 The interactive application is built using Bokeh [@bokeh] and allows for customization using a few steps described in the software's manual.
