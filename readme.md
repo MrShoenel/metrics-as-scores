@@ -15,16 +15,75 @@ Given an *ideal* value for a metric (which may also be user-defined), we can tra
 
 Jump to:
 
-- [1. Use Your Own Data](#1-use-your-own-data)
-	- [1.1. Data Preparation](#11-data-preparation)
-	- [1.2. [Optional] Computing Fits For Parametric Distributions](#12-optional-computing-fits-for-parametric-distributions)
-	- [1.3. Pre-generating Distributions](#13-pre-generating-distributions)
-- [2. Personalizing the Web Application](#14-personalizing-the-web-application)
-- [3. Setup (development)](#2-setup-development)
-- [References](#references)
+
+- [1. Installation](#2-installation)
+- [2. Stand-alone Usage / Development Setup](#3-stand-alone-usage--development-setup)
+	- [2.1. Setting Up a Virtual Environment](#31-setting-up-a-virtual-environment)
+	- [2.2. Installing Packages](#32-installing-packages)
+- [3. Use Your Own Data](#4-use-your-own-data)
+	- [3.1. Data Preparation](#41-data-preparation)
+	- [3.2. [Optional] Computing Fits For Parametric Distributions](#42-optional-computing-fits-for-parametric-distributions)
+	- [3.3. Pre-generating Distributions](#43-pre-generating-distributions)
+- [4. Personalizing the Web Application](#5-personalizing-the-web-application)
+- [References](#6-references)
 
 
-# 1. Use Your Own Data
+# 1. Installation
+
+For using the package in your own project, install it from PyPI:
+
+```shell
+pip install metrics-as-scores
+```
+
+However, if you are interested in importing your own data (see below), it is perhaps best to just clone this repo and run Metrics As Scores as a standalone application.
+
+# 2. Stand-alone Usage / Development Setup
+
+This project was developed using and requires Python `3.10`.
+For using Metrics As Scores as standalone application (you want to do this when importing your own data, customizing the web application, or supporting development),
+
+1. Clone the Repository,
+2. Set up  a virtual environment,
+3. Install packages.
+
+## 2.1. Setting Up a Virtual Environment
+
+It is recommended to use a virtual environment.
+To use a virtual environment, follow these steps (Windows specific; activation of the environment might differ).
+
+```shell
+virtualenv --python=C:/Python310/python.exe venv # Use specific Python version for virtual environment
+venv/Scripts/activate
+```
+
+Here is a Linux example that assumes you have Python `3.10` installed (this may also require installing `python3.10-venv` and/or `python3.10-dev`):
+
+```shell
+python3.10 -m venv venv
+source venv/bin/activate # Linux
+```
+
+## 2.2. Installing Packages
+
+The project is managed with `Poetry`.
+To install the required packages, simply run the following.
+
+```shell
+venv/Scripts/activate
+# Assuming you are in the activate virtual environment (Windows)
+(venv) C:\repos\lnu_metrics-as-scores> poetry install
+```
+
+The same in Linux:
+
+```shell
+source venv/bin/activate # Linux
+(venv) ubuntu@vm:/tmp/metrics-as-scores$ poetry install
+```
+
+
+# 3. Use Your Own Data
 
 Although this application was built primarily for analyzing the software metrics from the "Qualitas.class" corpus [[1]](#cite-1)[[2]](#cite-2), it can work with any kind of data! Everything required for importing and operationalizing own data is implemented in a use case-agnostic way. Also, the web application can be adapted quickly by swapping out the header and footer (see below).
 
@@ -47,7 +106,7 @@ Note that in step \#2, if you decide to also pre-generate fitted parametric dist
 Note that the tests are automatically carried out for either continuous or discrete data (not each test is valid for discrete data, such as the KS two-sample test).
 
 
-## 1.1. Data Preparation
+## 3.1. Data Preparation
 
 You will have to provide the following `CSV`-files:
 
@@ -57,7 +116,7 @@ You will have to provide the following `CSV`-files:
 * [__`csv/metrics.csv`__](./csv/metrics.csv.7z): This is the <u>***main data file***</u>. It has three columns: `Metric`, `Domain`, and `Value`. Here you save the values that you have recorded for each metric, in each context/domain.
 
 
-## 1.2. [Optional] Computing Fits For Parametric Distributions
+## 3.2. [Optional] Computing Fits For Parametric Distributions
 
 This step can be skipped if you **do not** want make use of parametric distributions. You will still have access to empirical distributions and Kernel density estimates.
 Please note that this step is, computationally, **extremely expensive**. This is because for each metric, in each context, up to 120 distributions are fitted. About 20 of these (the discrete distributions) are fit using __`Pymoo`__ [[9]](#cite-9) and a mixed-variable global optimization. Some other distributions are currently deliberately disabled, because computing a single fit can take up to one day and longer (see the variable `ignored_dists` in [`src/data/pregenerate_distns.py`](./src/data/pregenerate_distns.py)). Enable those at your own risk.
@@ -76,7 +135,7 @@ python3.10 src/data/pregenerate_distns.py
 Note that this script exploits all available CPU cores and thus is heavily parallelized.
 
 
-## 1.3. Pre-generating Distributions
+## 3.3. Pre-generating Distributions
 
 This step is obligatory. If you have not previously created the fits for parametric distributions, the script called here will warn (can be ignored if you had no intention).
 The purpose of this step is to trade space for computing time. The pre-generated distributions require disk space and RAM (a few hundred megabytes per transform and -distribution type [Empirical, Empirical_discrete, and KDE_approx]).
@@ -95,7 +154,7 @@ python3.10 src/data/pregenerate.py
 ```
 
 
-# 2. Personalizing the Web Application
+# 4. Personalizing the Web Application
 
 The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/webapp/`](./src/webapp/).
 The app itself has three vertical blocks: a header, the interactive part, and a footer.
@@ -111,24 +170,6 @@ curdoc().title = "Metrics As Scores"
 **Important**: If you modify the web application, you must always maintain two links: one to <https://metrics-as-scores.ml/> and one to this repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
 
 
-# 3. Setup (development)
-
-This project was developed using and requires Python `3.10`.
-To use a virtual environment, follow these steps (Windows specific; activation of the environment might differ).
-
-```shell
-virtualenv --python=C:/Python310/python.exe venv # Use specific Python version for virtual environment
-venv/Scripts/activate
-pip install -r requirements.txt
-```
-
-Here is a Linux example that assumes you have Python `3.10` installed (this may also require installing `python3.10-venv` and/or `python3.10-dev`):
-
-```shell
-python3.10 -m venv venv
-source venv/bin/activate # Linux
-pip install -r requirements.txt
-```
 
 
 # References
