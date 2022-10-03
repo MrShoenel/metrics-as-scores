@@ -4,7 +4,7 @@ jobs:
   paper:
     runs-on: ubuntu-latest
     name: Paper Draft
-    if: contains('refs/heads/paper', github.ref)
+    if: github.ref == 'refs/heads/paper'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
