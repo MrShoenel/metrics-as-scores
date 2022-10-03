@@ -11,12 +11,13 @@ at your command prompt. Then navigate to the URL
 in your browser.
 
 '''
-import os
+from os import environ, getcwd
+from os.path import join
 from sys import path
+from pathlib import Path
+path.append(f'{Path(join(getcwd(), "src")).resolve()}')
 
-path.append(os.getcwd())
-
-if 'BOKEH_VS_DEBUG' in os.environ and os.environ['BOKEH_VS_DEBUG'] == 'true':
+if 'BOKEH_VS_DEBUG' in environ and environ['BOKEH_VS_DEBUG'] == 'true':
     import ptvsd
     # 5678 is the default attach port in the VS Code debug configurations
     print('Waiting for debugger attach')
@@ -26,10 +27,11 @@ if 'BOKEH_VS_DEBUG' in os.environ and os.environ['BOKEH_VS_DEBUG'] == 'true':
 
 import pandas as pd
 import numpy as np
-from src.webapp.exception import PlotException
+from metrics_as_scores.webapp.exception import PlotException
 from typing import Union
-from src.data.metrics import MetricID
-from src.tools.funcs import nonlinspace
+from metrics_as_scores.data.metrics import MetricID
+from metrics_as_scores.tools.funcs import nonlinspace
+from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 from collections import OrderedDict
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
@@ -39,7 +41,6 @@ from bokeh.models.widgets.inputs import Spinner
 from bokeh.palettes import Category20_12
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
-from src.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 from numbers import Integral
 
 
@@ -541,8 +542,8 @@ btn_contain.on_click(btn_contain_click)
 input_own.on_change('value', input_own_change)
 
 
-header = Div(text=read_text('./src/webapp/header.html'))
-footer = Div(text=read_text('./src/webapp/footer.html'))
+header = Div(text=read_text('./src/metrics_as_scores/webapp/header.html'))
+footer = Div(text=read_text('./src/metrics_as_scores/webapp/footer.html'))
 
 
 

@@ -11,7 +11,7 @@ from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 Continuous_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_continuous), getmembers(_continuous_distns))))
 Discrete_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_discrete), getmembers(_discrete_distns))))
 
-from src.distribution import fitting_problems
+from metrics_as_scores.distribution import fitting_problems
 temp = list(filter(lambda rv: hasattr(fitting_problems, f'Fit_{type(rv).__name__}'), Discrete_RVs))
 Discrete_Problems = { x: y for (x, y) in zip(
     map(lambda rv: type(rv).__name__, temp),

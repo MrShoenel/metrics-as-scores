@@ -1,9 +1,13 @@
-import os
+from os import getcwd
+from os.path import join
 from sys import path, argv
-path.append(os.getcwd())
+from pathlib import Path
+path.append(f'{Path(join(getcwd(), "src")).resolve()}')
+
+
 from pickle import load
-from src.tools.lazy import SelfResetLazy
-from src.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
+from metrics_as_scores.tools.lazy import SelfResetLazy
+from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 
 from . import data
 

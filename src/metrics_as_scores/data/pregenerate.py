@@ -1,20 +1,23 @@
 from os import getcwd, cpu_count
+from os.path import join
 from sys import path
-from typing import Any, Union
-from warnings import warn
-path.append(getcwd())
+from pathlib import Path
+path.append(f'{Path(join(getcwd(), "src")).resolve()}')
+
 
 import pandas as pd
 import numpy as np
+from typing import Any, Union
+from warnings import warn
 from os.path import exists
 from pickle import dump, load
 from joblib import Parallel, delayed
 from scipy.stats import norm
-from src.tools.funcs import flatten_dict
-from src.data.metrics import MetricID
-from src.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
-from src.distribution.distribution import Dataset, Density, DistTransform, Dataset, Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
-from src.distribution.fitting import StatisticalTest
+from metrics_as_scores.tools.funcs import flatten_dict
+from metrics_as_scores.data.metrics import MetricID
+from metrics_as_scores.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
+from metrics_as_scores.distribution.distribution import Dataset, Density, DistTransform, Dataset, Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
+from metrics_as_scores.distribution.fitting import StatisticalTest
 from sklearn.model_selection import ParameterGrid
 
 

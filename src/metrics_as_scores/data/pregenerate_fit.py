@@ -1,12 +1,17 @@
-from pickle import dump
+from os import getcwd
+from os.path import join
+from sys import path
+from pathlib import Path
+path.append(f'{Path(join(getcwd(), "src")).resolve()}')
+
 import numpy as np
+from pickle import dump
 from typing import Any, Union
 from nptyping import Float, NDArray, Shape
-from src.data.metrics import MetricID
-from src.distribution.distribution import DistTransform, Dataset
-from src.distribution.fitting import Continuous_RVs, Discrete_RVs, StatisticalTest
+from metrics_as_scores.data.metrics import MetricID
+from metrics_as_scores.distribution.distribution import DistTransform, Dataset
+from metrics_as_scores.distribution.fitting import Continuous_RVs, Discrete_RVs, FitterPymoo, StatisticalTest
 from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
-from src.distribution.fitting import FitterPymoo
 from timeit import default_timer as timer
 
 

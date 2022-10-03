@@ -1,11 +1,13 @@
 from os import getcwd, cpu_count
+from os.path import join
 from sys import path
-from typing import Any
-path.append(getcwd())
+from pathlib import Path
+path.append(f'{Path(join(getcwd(), "src")).resolve()}')
 
 
 import numpy as np
 import pandas as pd
+from typing import Any
 from pickle import dump
 from nptyping import Float, NDArray, Shape
 from gc import collect
@@ -13,9 +15,9 @@ from tqdm import tqdm
 from numpy.random import default_rng
 from pickle import dump
 from joblib import Parallel, delayed
-from src.data.metrics import MetricID
-from src.distribution.distribution import DistTransform, Dataset, Parametric, Parametric_discrete
-from src.data.pregenerate_fit import fit, get_data_tuple, Continuous_RVs_dict, Discrete_RVs_dict
+from metrics_as_scores.data.metrics import MetricID
+from metrics_as_scores.distribution.distribution import DistTransform, Dataset
+from metrics_as_scores.data.pregenerate_fit import fit, get_data_tuple, Continuous_RVs_dict, Discrete_RVs_dict
 from sklearn.model_selection import ParameterGrid
 
 

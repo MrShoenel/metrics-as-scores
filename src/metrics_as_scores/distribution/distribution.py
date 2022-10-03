@@ -1,12 +1,16 @@
+import pandas as pd
+import numpy as np
+import scipy.stats
+import pickle
 from abc import ABC
 from functools import lru_cache
 from itertools import combinations
 from typing import Any, Callable, Iterable, Literal, Union
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
-from src.data.metrics import MetricID
-from src.distribution.fitting import StatisticalTest
-from src.tools.funcs import cdf_to_ppf
+from metrics_as_scores.data.metrics import MetricID
+from metrics_as_scores.distribution.fitting import StatisticalTest
+from metrics_as_scores.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.interpolate import interp1d
 from scipy.stats import gaussian_kde, kstest, ks_2samp, f_oneway, mode, ttest_ind
@@ -15,10 +19,6 @@ from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from strenum import StrEnum
-import pandas as pd
-import numpy as np
-import scipy.stats
-import pickle
 
 
 
