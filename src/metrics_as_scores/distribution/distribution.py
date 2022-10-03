@@ -12,7 +12,6 @@ from metrics_as_scores.data.metrics import MetricID
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
-from scipy.interpolate import interp1d
 from scipy.stats import gaussian_kde, kstest, ks_2samp, f_oneway, mode, ttest_ind
 from scipy.integrate import quad
 from scipy.optimize import direct
@@ -469,7 +468,6 @@ class Dataset:
             data = rng.choice(data, size=max_samples, replace=False)
         
         best_st: StatisticalTest = None
-        best_kst = None
         use_dist: tuple[Union[rv_generic, rv_continuous], tuple[Any]] = None
         res = float('inf')
         for dist_name in distNames:

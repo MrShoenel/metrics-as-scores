@@ -41,7 +41,6 @@ class MetricID(StrEnum):
 
 class QualitasCorpusMetricsExtractor:
     def __init__(self, file: str) -> None:
-        #self.xml: Document = parse(file=file)
         self.xml = parse(source=file).getroot()
         self.xml, self.ns = QualitasCorpusMetricsExtractor.parse_xml(file=file)
     
