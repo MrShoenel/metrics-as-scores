@@ -121,7 +121,7 @@ Next, you will have to provide the following `CSV`-files:
 ## 3.2. [Optional] Computing Fits For Parametric Distributions
 
 This step can be skipped if you **do not** want make use of parametric distributions. You will still have access to empirical distributions and Kernel density estimates.
-Please note that this step is, computationally, **extremely expensive**. This is because for each metric, in each context, up to 120 distributions are fitted. About 20 of these (the discrete distributions) are fit using __`Pymoo`__ [[9]](#cite-9) and a mixed-variable global optimization. Some other distributions are currently deliberately disabled, because computing a single fit can take up to one day and longer (see the variable `ignored_dists` in [`src/data/pregenerate_distns.py`](./src/data/pregenerate_distns.py)). Enable those at your own risk.
+Please note that this step is, computationally, **extremely expensive**. This is because for each metric, in each context, up to 120 distributions are fitted. About 20 of these (the discrete distributions) are fit using __`Pymoo`__ [[9]](#cite-9) and a mixed-variable global optimization. Some other distributions are currently deliberately disabled, because computing a single fit can take up to one day and longer (see the variable `ignored_dists` in [`src/metrics_as_scores/data/pregenerate_distns.py`](./src/metrics_as_scores/data/pregenerate_distns.py)). Enable those at your own risk.
 
 
 If you read this far, you probably want to compute parametric fits :)
@@ -131,7 +131,7 @@ In order to do that, run the below script from the root of this repository:
 # Activate venv (Linux)
 source venv/bin/activate
 # Call the script with Python >= 3.10 (no further arguments):
-python3.10 src/data/pregenerate_distns.py
+python3.10 src/metrics_as_scores/data/pregenerate_distns.py
 ```
 
 Note that this script exploits all available CPU cores and thus is heavily parallelized.
@@ -152,17 +152,17 @@ You will need to run this script:
 # Activate venv (Linux)
 source venv/bin/activate
 # Call the script with Python >= 3.10 (no further arguments):
-python3.10 src/data/pregenerate.py
+python3.10 src/metrics_as_scores/data/pregenerate.py
 ```
 
 
 # 4. Personalizing the Web Application
 
-The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/webapp/`](./src/webapp/).
+The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/metrics_as_scores/webapp/`](./src/metrics_as_scores/webapp/).
 The app itself has three vertical blocks: a header, the interactive part, and a footer.
-Header and footer can be easily edited by modifing the files [`src/webapp/header.html`](./src/webapp/header.html) and [`src/webapp/footer.html`](./src/webapp/footer.html).
+Header and footer can be easily edited by modifing the files [`src/metrics_as_scores/webapp/header.html`](./src/metrics_as_scores/webapp/header.html) and [`src/metrics_as_scores/webapp/footer.html`](./src/metrics_as_scores/webapp/footer.html).
 
-If you want to change the title of the application, you will have to modify the file [`src/webapp/main.py`](./src/webapp/main.py) at the very end:
+If you want to change the title of the application, you will have to modify the file [`src/metrics_as_scores/webapp/main.py`](./src/metrics_as_scores/webapp/main.py) at the very end:
 
 ```python
 # Change this line to your desired title.
