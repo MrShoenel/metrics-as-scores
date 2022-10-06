@@ -1,4 +1,4 @@
-Metrics as Scores [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119)
+Metrics as Scores [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119) [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)
 =================
 
 Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://metrics-as-scores.ml/>.
@@ -16,6 +16,7 @@ Given an *ideal* value for a metric (which may also be user-defined), we can tra
 Jump to:
 
 
+- [Metrics as Scores ![DOI](https://zenodo.org/badge/latestdoi/524333119) [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)](#metrics-as-scores--)
 - [1. Installation](#1-installation)
 - [2. Stand-alone Usage / Development Setup](#2-stand-alone-usage--development-setup)
 	- [2.1. Setting Up a Virtual Environment](#21-setting-up-a-virtual-environment)
