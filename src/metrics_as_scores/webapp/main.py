@@ -99,6 +99,8 @@ cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
 
 # Contain button
 btn_contain = Button(label='Contain Plot')
+# Toggle Legend button
+btn_toggle_legend = Button(label='Toggle Legend')
 
 
 
@@ -525,6 +527,10 @@ def btn_contain_click(*args):
     update_plot(contain_plot=True)
 
 
+def btn_toggle_legend_click(*args):
+    plot.legend.visible = not plot.legend.visible
+
+
 def input_own_change(attr, old, new):
     update_plot()
 
@@ -540,6 +546,7 @@ dd_transf.on_click(dd_transf_click)
 dd_denstype.on_click(dd_denstype_click)
 btn_contain.on_click(btn_contain_click)
 input_own.on_change('value', input_own_change)
+btn_toggle_legend.on_click(btn_toggle_legend_click)
 
 
 header = Div(text=read_text('./src/metrics_as_scores/webapp/header.html'))
@@ -558,7 +565,7 @@ input_row2 = row([
     #column(Div(text='Check Own Value (press Enter):'), input_own, cbg_autotrans)
 ])
 input_row3 = row([
-    btn_contain, cbg_cutoff
+    btn_contain, btn_toggle_legend, cbg_cutoff
     #column(Div(text='Plot Controls:'), btn_contain),
     #column(Div(text=''), cbg_cutoff)
 ])
