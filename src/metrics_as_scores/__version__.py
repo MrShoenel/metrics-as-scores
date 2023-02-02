@@ -1,6 +1,5 @@
-from typing import Callable
-from poetry.utils._compat import metadata
+from toml import load
+from pathlib import Path
 
-version: Callable[[str], str] = metadata.version
-
-__version__ = version("metrics-as-scores")
+proj_dir = Path(__file__).parent.parent.parent
+__version__ = load(proj_dir.joinpath('./pyproject.toml')).get('version')
