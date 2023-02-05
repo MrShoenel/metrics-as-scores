@@ -61,7 +61,7 @@ class MixedVariableDistributionFittingProblem(ElementwiseProblem):
         variables (stored in ``X``). This method is called by ``pymoo``, so be
         sure to check out their references, too.
         Note that the ``X``-dictionary is used to build :math:`\theta`, the vector
-        of parameters for the random variable. The order of the parameters is that
+        of parameters for the random variable. The order of the parameters in that
         vector depends on the order of ``self.vars``.
         This method usually does not need to be overridden, except for when, e.g.,
         it is required to evaluate (in-)equality constraints (that is, whenever
@@ -94,10 +94,11 @@ class Fit_bernoulli_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
-    - ``p``: (``int``) :math:`\left[0,1\right]]`
+    - ``p``: (``int``) :math:`\left[0,1\right]`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=bernoulli_gen(), data=data, vars={
@@ -112,7 +113,8 @@ class Fit_betabinom_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``n``: (``int``) :math:`\left(0,1e^{4}\right)`
@@ -134,7 +136,8 @@ class Fit_binom_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``n``: (``int``) :math:`\left(1,25e^{3}\right)`
@@ -154,7 +157,8 @@ class Fit_boltzmann_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``lambda`` [:math:`\lambda`]: (``float``) :math:`\left(0,1e^{5}\right)`
@@ -174,7 +178,8 @@ class Fit_dlaplace_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``a``: (``float``) :math:`\left(5e^{-324},1e^4\right)`
@@ -192,7 +197,8 @@ class Fit_geom_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``p``: (``float``) :math:`\left(0,1\right)`
@@ -235,7 +241,7 @@ class Fit_hypergeom_gen(MixedVariableDistributionFittingProblem):
     def _evaluate(self, X, out, *args, **kwargs) -> dict:
         """
         Overridden to evaluate the inequality constraints, too.
-        For all other documentaion, check out ``MixedVariableDistributionFittingProblem._evaluate()``.
+        For all other documentaion, check out :meth:`MixedVariableDistributionFittingProblem._evaluate()`.
         """
         out = super()._evaluate(X, out, *args, **kwargs)
         M, n, N = X['M'], X['n'], X['N']
@@ -255,7 +261,8 @@ class Fit_logser_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``p``: (``float``) :math:`\left(0,1\right)`
@@ -273,7 +280,8 @@ class Fit_nbinom_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``n``: (``int``) :math:`\left(0,25e^{3}\right)`
@@ -321,7 +329,7 @@ class Fit_nchypergeom_fisher_gen(MixedVariableDistributionFittingProblem):
     def _evaluate(self, X, out, *args, **kwargs) -> dict:
         """
         Overridden to evaluate the inequality constraints, too.
-        For all other documentaion, check out ``MixedVariableDistributionFittingProblem._evaluate()``.
+        For all other documentaion, check out :meth:`MixedVariableDistributionFittingProblem._evaluate()`.
         """
         out = super()._evaluate(X=X, out=out, *args, **kwargs)
         M, n, N, b = X['M'], X['n'], X['N'], np.max(self.data)
@@ -360,7 +368,8 @@ class Fit_nhypergeom_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``M``: (``int``) :math:`\left(0,25e^3\right)`
@@ -383,7 +392,8 @@ class Fit_planck_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``p``: (``float``) :math:`\left(5e^{-324},1e^2\right)`
@@ -403,7 +413,8 @@ class Fit_poisson_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``mu`` [:math:`\mu`]: (``float``) :math:`\left(0,1e^{6}\right)`
@@ -421,7 +432,8 @@ class Fit_randint_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``low``: (``int``) :math:`\left(-25e^{3},25e^{3}\right)`
@@ -441,7 +453,8 @@ class Fit_skellam_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``mu1`` [:math:`\mu_1`]: (``float``) :math:`\left(5e^{-324},5e^{3}\right)`
@@ -461,7 +474,8 @@ class Fit_yulesimon_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``alpha`` [:math:`\alpha`]: (``float``) :math:`\left(5e^{-324},2e^{4}\right)`
@@ -479,7 +493,8 @@ class Fit_zipf_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``a``: (``float``) :math:`\left(1+1e^{-12},2e^{4}\right)`
@@ -497,7 +512,8 @@ class Fit_zipfian_gen(MixedVariableDistributionFittingProblem):
 
     Notes
     -----
-    Does not override `_evaluate()` and does not have any (in-)equality constraints.
+    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`
+    and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
     - ``a``: (``float``) :math:`\left(0,2e^{4}\right)`
