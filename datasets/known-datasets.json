@@ -1,0 +1,16 @@
+[
+	{
+		"name": "Qualitas.class Corpus",
+		"author": "Sebastian Hönel",
+		"id": "qcc",
+		"info_url": "https://zenodo.org/...",
+		"download": "https://zenodo.org/..."
+	},
+	{
+		"name": "ELISA Spectrophotometer Samples",
+		"author": "Sebastian Hönel",
+		"id": "elisa",
+		"info_url": "https://zenodo.org/...",
+		"download": "https://zenodo.org/..."
+	}
+]
