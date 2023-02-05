@@ -21,6 +21,9 @@ classifiers = [
 		"Topic :: Utilities"
 ]
 
+[tool.poetry.scripts]
+mas = "metrics_as_scores.cli.Cli:cli"
+
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
 bokeh = "^2.4.3"
