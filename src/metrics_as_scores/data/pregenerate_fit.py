@@ -74,10 +74,8 @@ def fit(grid_idx: int, row, metrics_discrete: dict[MetricID, bool], the_data: ND
             return dist.cdf(*(x, *params_tuple))
         temp_ppf = lambda x: dist.ppf(*(x, *params_tuple))
 
-        # BUG: https://github.com/scipy/scipy/issues/17026
-        max_samples = 500 if row.rv == 'ncf_gen' else 25_000
         data_st = data if not unique_vals else np.rint(data) # Remove jitter for test
-        st = StatisticalTest(data1=data_st, cdf=temp_cdf, ppf_or_data2=temp_ppf, max_samples=max_samples)
+        st = StatisticalTest(data1=data_st, cdf=temp_cdf, ppf_or_data2=temp_ppf, max_samples=25_000)
         ret_dict.update(dict(stat_tests = dict(st)))
     except Exception as e:
         print(e)
