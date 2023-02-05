@@ -38,6 +38,11 @@ sklearn = "^0.0"
 statsmodels = "^0.13.2"
 StrEnum = "^0.4.8"
 tqdm = "^4.64.1"
+Sphinx = "^5.3.0"
+sphinx-rtd-theme = "^1.1.1"
+toml = "^0.10.2"
+rich = "^13.3.1"
+questionary = "^1.10.0"
 
 
 [tool.poetry.group.dev.dependencies]
