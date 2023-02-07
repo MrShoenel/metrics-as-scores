@@ -1,6 +1,7 @@
 from typing import Literal, Union
 from Workflow import Workflow
-from helpers import LocalDataset, isint, isnumeric
+from helpers import isint, isnumeric
+from metrics_as_scores.distribution.distribution import LocalDataset
 from re import match
 from os import makedirs
 from json import dump
@@ -112,6 +113,7 @@ class CreateDatasetWorkflow(Workflow):
         self.print_info(text_normal='Having an original data frame with ', text_vital=f'{len(df.index)} rows.')
         qtypes = list([str(a) for a in df[col_type].unique()])
         contexts = list([str(a) for a in df[col_ctx].unique()])
+        jsd['contexts'] = contexts
         self.print_info(text_normal='The following quantity types were found: ', text_vital=', '.join(qtypes))
         self.print_info(text_normal='The following contexts exist in the data: ', text_vital=', '.join(contexts))
 
@@ -170,13 +172,16 @@ cannot be resumed.
         dataset_dir = datasets_dir.joinpath(f'./{manifest["id"]}')
         if not dataset_dir.exists():
             makedirs(str(dataset_dir.resolve()))
+        fits_dir = dataset_dir.joinpath('./fits')
+        if not fits_dir.exists():
+            makedirs(str(fits_dir))
         
         path_manifest = str(dataset_dir.joinpath('./manifest.json'))
         path_data = str(dataset_dir.joinpath('./org-data.csv'))
         
         with open(file=path_manifest, mode='w', encoding='utf-8') as fp:
             dump(obj=manifest, fp=fp, indent=2)
-        df.to_csv(path_or_buf=path_data)
+        df.to_csv(path_or_buf=path_data, index=False)
 
         self.q.print('')
         self.print_info(text_normal='Wrote manifest to: ', text_vital=path_manifest)

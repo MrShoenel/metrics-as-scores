@@ -3,7 +3,8 @@ from Workflow import Workflow
 from bokeh.command.util import build_single_handler_application
 from bokeh.server.server import Server
 from pathlib import Path
-from helpers import Dataset, isint
+from helpers import isint, get_local_datasets
+from metrics_as_scores.distribution.distribution import LocalDataset
 from questionary import Choice
 
 this_dir = Path(__file__).resolve().parent
@@ -15,7 +16,7 @@ class LocalWebserverWorkflow(Workflow):
         super().__init__()
     
 
-    def _port_and_dataset(self) -> tuple[int, Dataset]:
+    def _port_and_dataset(self) -> tuple[int, LocalDataset]:
         def check_port(p: str) -> bool:
             if not isint(p):
                 return False
@@ -26,7 +27,7 @@ class LocalWebserverWorkflow(Workflow):
             int(self.q.text(message='Enter a Port number:', default=f'{5678}', validate=check_port).ask()),
             self.q.select(
                 message='Please choose one of the following Datasets:',
-                choices=list([Choice(title=ds.name, value=ds) for ds in Dataset.get_available_datasets()])).ask())
+                choices=list([Choice(title=ds['name'], value=ds) for ds in get_local_datasets()])).ask())
     
     def _type_quit_to_exit(self) -> None:
         self.q.text(message='Enter "q" to shut down the application:', validate=lambda q: q.lower().startswith('q')).ask()
@@ -58,7 +59,7 @@ class LocalWebserverWorkflow(Workflow):
                 str(webapp_dir),
                 '--port', f'{port}',
                 '--show',
-                '--args', f'dataset={use_dataset.id}',
+                '--args', f'dataset={use_dataset["id"]}',
             ], cwd=str(root_dir.resolve()), stdout=DEVNULL, stderr=DEVNULL)
         finally:
             self._type_quit_to_exit()
@@ -84,7 +85,7 @@ class LocalWebserverWorkflow(Workflow):
         }
         
         app = build_single_handler_application(
-            path = webapp_dir.resolve(), argv=[f'dataset={use_dataset.id}'])
+            path = webapp_dir.resolve(), argv=[f'dataset={use_dataset["id"]}'])
 
         
         server = Server({'/webapp': app}, **kwargs)
