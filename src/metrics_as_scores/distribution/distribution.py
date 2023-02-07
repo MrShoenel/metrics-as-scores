@@ -464,47 +464,6 @@ class Dataset:
             data = np.abs(data - transform_value)
 
         return (transform_value, data)
-    
-    @staticmethod
-    def fit_parametric(data: NDArray[Shape["*"], Float], alpha: float=0.05, max_samples: int=5_000, metric_id: MetricID=None, domain: str=None, dist_transform: DistTransform=DistTransform.NONE) -> Parametric:
-        distNames = ['gamma', 'gennorm', 'genexpon', 'expon', 'exponnorm',
-            'exponweib', 'exponpow', 'genextreme', 'gausshyper', 'dweibull', 'invgamma', 'gilbrat','genhalflogistic', 'ncf', 'nct', 'ncx2', 'pareto', 'uniform', 'pearson3', 'mielke', 'moyal', 'nakagami', 'laplace', 'laplace_asymmetric', 'rice', 'rayleigh', 'trapezoid', 'vonmises','kappa4', 'lomax', 'loguniform', 'loglaplace', 'foldnorm', 'kstwobign', 'erlang', 'ksone','chi2', 'logistic', 'johnsonsb', 'gumbel_l', 'gumbel_r', 'genpareto', 'powerlognorm', 'bradford', 'alpha', 'tukeylambda', 'wald', 'maxwell', 'loggamma', 'fisk', 'cosine', 'burr', 'beta', 'betaprime', 'crystalball', 'burr12', 'anglit', 'arcsine', 'gompertz', 'geninvgauss']
-        
-        transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform)
-        
-        if data.shape[0] > max_samples:
-            # Then we will sub-sample to speed up the process.
-            rng = np.random.default_rng(seed=1)
-            data = rng.choice(data, size=max_samples, replace=False)
-        
-        best_st: StatisticalTest = None
-        use_dist: tuple[Union[rv_generic, rv_continuous], tuple[Any]] = None
-        res = float('inf')
-        for dist_name in distNames:
-            print(f'Trying distribution: {dist_name}')
-            try:
-                dist = getattr(scipy.stats, dist_name)
-                dist_params = dist.fit(data)
-                kst = kstest(data, cdf=dist.cdf, args=dist_params)
-
-                if kst.pvalue >= alpha and kst.statistic < res:
-                    res = kst.statistic
-                    best_kst = kst
-                    best_st = StatisticalTest(data, cdf=lambda x, dist_params=dist_params: dist.cdf(*(x, *dist_params)), ppf_or_data2=lambda x, dist_params=dist_params: dist.ppf(*(x, *dist_params)))
-                    use_dist = (dist, dist_params)
-                    break
-            except Exception as ex:
-                print(ex)
-        
-        if use_dist is None:
-            raise Exception('Cannot fit parametric distribution for given data.')
-
-        
-        metrics_ideal_df = pd.read_csv('./files/metrics-ideal.csv')
-        metrics_ideal_df.replace({ np.nan: None }, inplace=True)
-        metrics_ideal = { x: y for (x, y) in zip(map(lambda m: MetricID[m], metrics_ideal_df.Metric), metrics_ideal_df.Ideal) }
-        
-        return Parametric(dist=use_dist[0], dist_params=use_dist[1], range=(np.min(data), np.max(data)), stat_tests=best_st.tests, use_stat_test='ks_2samp_jittered', compute_ranges=True, ideal_value=metrics_ideal[metric_id], transform_value=transform_value, dist_transform=dist_transform, metric_id=metric_id, domain=domain)
 
 
     @lru_cache(maxsize=None)
