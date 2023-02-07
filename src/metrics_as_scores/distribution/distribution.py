@@ -466,83 +466,89 @@ class Dataset:
         return (transform_value, data)
 
 
-    @lru_cache(maxsize=None)
-    @staticmethod
-    def domains(include_all_domain: bool=True) -> list[str]:
-        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
-        domains: list[str] = systems_domains_df.Domain.unique().tolist()
-        if include_all_domain:
-            domains.append('__ALL__')
-        return domains
+    def analyze_ANOVA(self, qtypes: Iterable[str], contexts: Iterable[str], unique_vals: bool=True) -> pd.DataFrame:
+        """
+        For each given type of quantity, this method performs an ANOVA across all
+        given contexts.
 
-
-    @lru_cache(maxsize=None)
-    @staticmethod
-    def systems_for_domain(domain: str) -> list[str]:
-        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
-        systems_domains = dict(zip(systems_domains_df.System, systems_domains_df.Domain))
-        systems_qc_names = dict(zip(systems_domains_df.System, systems_domains_df.System_QC_name))
-
-        if domain == '__ALL__':
-            return list(systems_qc_names.values())
+        qtypes: `Iterable[str]`
+            An iterable of quantity types to conduct the analysis for. For each given
+            type, a separate analysis is performed and the result appended to the
+            returned data frame.
         
-        # Gather all systems with the selected domain.
-        temp = filter(lambda di: di[1] == domain, systems_domains.items())
-        # Map the names to the Qualitas compiled corpus:
-        return list(map(lambda di: systems_qc_names[di[0]], temp))
-    
+        contexts: `Iterable[str]`
+            An iterable of contexts across which each of the quantity types shall be
+            analyzed.
+        
+        unique_vals: `bool`
+            Passed to :meth:`self.data()`. If true, than small, random, and unique
+            noise is added to the data before it is analyzed. This will effectively
+            deduplicate any samples in the data (if any).
 
-    @lru_cache(maxsize=None)
-    @staticmethod
-    def domain_for_system(system: str, is_qc_name: bool=False) -> str:
-        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
-        domain_dict = dict(zip(systems_domains_df[('System_QC_name' if is_qc_name else 'System')], systems_domains_df.Domain))
-        return domain_dict[system]
-    
+        :rtype: ``pd.DataFrame``
+        
+        :return: A data frame with the columns ``qtype`` (name of the quantity type),
+            ``stat`` (ANOVA test statistic), ``pval``, and ``across_contexts``, where
+            the latter is a semicolon-separated list of contexts the quantity type was
+            compared across.
+        """
 
-    @lru_cache(maxsize=None)
-    @staticmethod
-    def system_qc_to_system(system_qc: str) -> str:
-        systems_domains_df = pd.read_csv('./files/systems-domains.csv')
-        domain_dict = dict(zip(systems_domains_df.System_QC_name, systems_domains_df.System))
-        return domain_dict[system_qc]
-
-
-    def analyze_ANOVA(self, metric_ids: Iterable[MetricID], domains: Iterable[str], unique_vals: bool=True) -> pd.DataFrame:
         # We first have to build the data; f_oneway requires *args, where each
         # arg is a data series.
-        if len(list(metric_ids)) < 1 or len(list(domains)) < 2:
-            raise Exception('Requires one or metrics and two or more domains.')
+        if len(list(qtypes)) < 1 or len(list(contexts)) < 2:
+            raise Exception('Requires one or quantity types and two or more contexts.')
 
-        def anova_for_metric(metric_id: MetricID) -> dict[str, Union[MetricID, str, float]]:
+        def anova_for_qtype(qtype: str) -> dict[str, Union[str, str, float]]:
             data_tuple = ()
-            for domain in domains:
-                data_tuple += (self.data(metric_id=metric_id, systems=Dataset.systems_for_domain(domain=domain), unique_vals=unique_vals),)
+            for domain in contexts:
+                data_tuple += (self.data(qtype=qtype, systems=Dataset.systems_for_domain(domain=domain), unique_vals=unique_vals),)
             
             stat, pval = f_oneway(*data_tuple)
-            return { 'metric': metric_id.name, 'stat': stat, 'pval': pval, 'across_domains': ';'.join(domains) }
+            return { 'qtype': qtype, 'stat': stat, 'pval': pval, 'across_contexts': ';'.join(contexts) }
 
         from joblib import Parallel, delayed
-        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_metric)(metric_id) for metric_id in metric_ids)
+        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(metric_id) for metric_id in qtypes)
 
         return pd.DataFrame(res_dicts)
     
 
-    def analyze_TukeyHSD(self, metric_ids: Iterable[MetricID]) -> pd.DataFrame:
-        if len(list(metric_ids)) < 1:
-            raise Exception('Requires one or metrics.')
+    def analyze_TukeyHSD(self, qtypes: Iterable[str]) -> pd.DataFrame:
+        r"""
+        Calculate all pairwise comparisons for the given quantity types with Tukey's
+        Honest Significance Test (HSD) and return the confidence intervals. For each
+        type of quantity, this method performs all of its associated contexts pair-wise
+        comparisons.
+        For example, given a quantity :math:`Q` and its contexts :math:`C_1,C_2,C_3`,
+        this method will examine the pairs :math:`\left[\{C_1,C_2\},\{C_1,C_3\},\{C_2,C_3\}\right]`.
+        For a single type of quantity, e.g., this test is useful to understand how
+        different the quantity manifests across contexts. For multiple quantities, it
+        also allows understanding how contexts distinguish from one another, holistically.
+
+        qtypes: ``Iterable[str]``
+            An iterable of quantity types to conduct the analysis for. For each given
+            type, a separate analysis is performed and the result appended to the
+            returned data frame.
+
+        :rtype: ``pd.DataFrame``
+
+        :return: A data frame with the columns ``group1``, ``group2``, ``meandiff``,
+            ``p-adj``, ``lower``, ``upper``, and ``reject``. For details see
+            :meth:`statsmodels.stats.multicomp.pairwise_tukeyhsd()`.
+        """
+        if len(list(qtypes)) < 1:
+            raise Exception('Requires one or quantity types.')
         
         temp = self.df.copy()
-        temp.domain = '__ALL__' # Erase domain
+        temp[self.ds['colname_context']] = '__ALL__' # Erase context
         all_data = pd.concat([temp, self.df])
         
-        def tukeyHSD_for_metric(metric_id: MetricID) -> pd.DataFrame:
-            data = all_data[all_data.metric == metric_id.name]
-            tukey = pairwise_tukeyhsd(endog=data.value, groups=data.domain)
+        def tukeyHSD_for_metric(qtype: str) -> pd.DataFrame:
+            data = all_data[all_data[self.ds['colname_type']] == qtype]
+            tukey = pairwise_tukeyhsd(endog=data[self.ds['colname_data']], groups=data[self.ds['colname_context']])
             temp = tukey.summary().data
             return pd.DataFrame(data=temp[1:], columns=temp[0])
 
         from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(metric_id) for metric_id in metric_ids)
+        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(metric_id) for metric_id in qtypes)
 
         return pd.concat(res_dfs)
