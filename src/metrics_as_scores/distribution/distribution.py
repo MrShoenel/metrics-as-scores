@@ -546,37 +546,3 @@ class Dataset:
         res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(metric_id) for metric_id in metric_ids)
 
         return pd.concat(res_dfs)
-    
-
-    def analyze_distr(self, metric_ids: Iterable[MetricID], use_ks_2samp: bool=True) -> pd.DataFrame:
-        if len(list(metric_ids)) < 1:
-            raise Exception('Requires one or metrics.')
-        
-        temp = self.df.copy()
-        temp.domain = '__ALL__'
-        all_data = pd.concat([temp, self.df])
-        unique_domain_pairs: list[tuple[str, str]] = list(combinations(iterable=all_data.domain.unique(), r=2))
-        
-        def compare(metric_id: MetricID) -> pd.DataFrame:
-            dict_list: list[dict[str, Union[str, float]]] = [ ]
-
-            for udp in unique_domain_pairs:
-                data1 = all_data[(all_data.domain == udp[0]) & (all_data.metric == metric_id.name)].value.to_numpy()
-                data2 = all_data[(all_data.domain == udp[1]) & (all_data.metric == metric_id.name)].value.to_numpy()
-
-                stat = pval = None
-                if use_ks_2samp:
-                    stat, pval = ks_2samp(data1=data1, data2=data2, alternative='two-sided', method='exact')
-                else:
-                    stat, pval = ttest_ind(a=data1, b=data2, equal_var=False, alternative='two-sided')
-
-                dict_list.append({
-                    'metric': metric_id.name, 'stat': stat, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
-                })
-            
-            return pd.DataFrame(dict_list)
-
-        from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(metric_id) for metric_id in metric_ids)
-
-        return pd.concat(res_dfs)
