@@ -3,14 +3,13 @@ import numpy as np
 import pickle
 from abc import ABC
 from functools import lru_cache
-from itertools import combinations
-from typing import Any, Callable, Iterable, Literal, Union, TypedDict
+from typing import Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
-from nptyping import NDArray, Shape, Float, String
+from nptyping import NDArray, Shape, Float
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
-from scipy.stats import gaussian_kde, kstest, ks_2samp, f_oneway, mode, ttest_ind
+from scipy.stats import gaussian_kde, f_oneway, mode
 from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
@@ -380,26 +379,34 @@ class Parametric_discrete(Parametric):
 
 
 class Dataset:
-    def __init__(self, df: pd.DataFrame, attach_domain: bool=False, attach_system: bool=False) -> None:
+    """
+    This class encapsulates a local (self created) dataset and provides help with transforming
+    it, as well as giving some convenience getters.
+    """
+    def __init__(self, ds: LocalDataset, df: pd.DataFrame) -> None:
+        self.ds = ds
         self.df = df
-        if attach_domain:
-            df['Domain'] = [Dataset.domain_for_system(system=system, is_qc_name=True) for system in df.System]
-        if attach_system:
-            df['System_org'] = [Dataset.system_qc_to_system(system_qc=system_qc) for system_qc in df.System]
-
+    
     @property
-    def available_systems(self) -> NDArray[Shape["*"], String]:
-        return self.df['Project'].unique()
+    @lru_cache(maxsize=None)
+    def quantity_types(self) -> list[str]:
+        return list(self.ds['qtypes'].keys())
+    
+    @property
+    @lru_cache(maxsize=None)
+    def contexts(self) -> Iterable[str]:
+        return self.ds['contexts']
 
-
-    def data(self, metric_id: MetricID, domain: str=None, systems: Iterable[str]=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
-        new_df = self.df[self.df['Metric'] == metric_id.name]
-        if domain is not None:
-            new_df = new_df[new_df['Domain'] == domain]
-        if systems is not None:
-            new_df = new_df[new_df['System'].isin(systems)]
+    def data(self, qtype: str, context: str=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
+        """
+        This method is used to select a subset of the data, that is specific to at least
+        a type of quantity, and optionally to a context, too.
+        """
+        new_df = self.df[self.df[self.ds['colname_data']] == qtype]
+        if context is not None:
+            new_df = new_df[new_df[self.ds['colname_context']] == context]
         
-        vals = new_df['Value']
+        vals = new_df[self.ds['colname_data']]
         if unique_vals:
             rng = np.random.default_rng(seed=1_337)
             r = rng.choice(a=np.linspace(1e-8, 1e-6, vals.size), size=vals.size, replace=False)
