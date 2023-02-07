@@ -417,6 +417,45 @@ class Dataset:
     
     @staticmethod
     def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE, continuous_value: bool=True) -> tuple[float, NDArray[Shape["*"], Float]]:
+        r"""
+        Transforms a distribution using an ideal value. The resulting data, therefore,
+        is a distribution of distances from the designated ideal value.
+
+        Given a distribution :math:`X` and an ideal value :math:`i`, the distribution of
+        distances is defined as :math:`D=\left|X-i\right|`.
+
+        data: ``NDArray[Shape["*"], Float]``
+            1-D array of float data, the data to be transformed. The data may also hold
+            integers (or floats that are practically integers).
+        
+        dist_transform: ``DistTransform``
+            The transform to apply. If ``DistTransform.NONE``, the data is returned as is,
+            ``None`` as the transform value. Any of the other transforms are determined
+            from the data (see notes).
+        
+        continuous_value: ``bool``
+            Whether or not the to be determined ideal value should be continuous or not.
+            For example, if using the expectation (mean) as transform, even for a discrete
+            distribution, this is likely to be a float. Setting ``continuous_value`` to
+            ``False`` will round the found mean to the nearest integer, such that the
+            resulting distribution :math:`D` is of integral nature, too.
+
+        :rtype: ``tuple[float, NDArray[Shape["*"], Float]]``
+
+        :return: A tuple holding the applied transform value (if the chosen transform was
+            not ``DistTransform.NONE``) and the array of distances.
+        
+        Notes
+        -----
+        The expectation (mean), in the continuous case, is determined by estimating a
+        Gaussian kernel using ``gaussian_kde``, and then integrating it using
+        :meth:`Density.practical_domain`. In the discrete case, we use the rounded mean
+        of the data.
+        Mode and median are similarly computed in the continuous and discrete cases,
+        except for the discrete mode we use :meth:`scipy.stats.mode`.
+        Supremum and infimum are simply computed (and rounded in the discrete case) from
+        the data.
+        """
         if dist_transform == DistTransform.NONE:
             return (None, data)
 
