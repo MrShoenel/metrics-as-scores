@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
-import scipy.stats
 import pickle
 from abc import ABC
 from functools import lru_cache
 from itertools import combinations
-from typing import Any, Callable, Iterable, Literal, Union
+from typing import Any, Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
 from metrics_as_scores.data.metrics import MetricID
@@ -29,6 +28,29 @@ class DistTransform(StrEnum):
     MODE = 'Mode (most likely value)'
     INFIMUM = 'Infimum (min. observed value)'
     SUPREMUM = 'Supremum (max. observed value)'
+
+
+
+class JsonDataset(TypedDict):
+    name: str
+    desc: str
+    id: str
+    author: list[str]
+    ideal_values: dict[str, Union[int, float]]
+
+
+class LocalDataset(JsonDataset):
+    origin: str
+    colname_data: str
+    colname_type: str
+    colname_context: str
+    qtypes: dict[str, Literal['continuous', 'discrete']]
+    contexts: list[str]
+
+
+class KnownDataset(JsonDataset):
+    info_url: str
+    download: str
 
 
 

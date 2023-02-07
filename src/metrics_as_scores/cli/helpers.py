@@ -1,26 +1,12 @@
-from typing import Iterable, Literal, Union
-from typing import TypedDict
+from os import scandir
+from typing import Iterable
+from pathlib import Path
+from json import load
+from metrics_as_scores.distribution.distribution import LocalDataset
 
+this_dir = Path(__file__).resolve().parent
+datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
-class JsonDataset(TypedDict):
-    name: str
-    desc: str
-    id: str
-    author: list[str]
-    ideal_values: dict[str, Union[int, float]]
-
-
-class LocalDataset(JsonDataset):
-    origin: str
-    colname_data: str
-    colname_type: str
-    colname_context: str
-    qtypes: dict[str, Literal['continuous', 'discrete']]
-
-
-class KnownDataset(JsonDataset):
-    info_url: str
-    download: str
 
 
 
@@ -39,14 +25,14 @@ def isnumeric(s: str) -> bool:
         return False
 
 
-class Dataset:
-    def __init__(self, name: str, id: str) -> None:
-        self.name = name
-        self.id = id
-        pass
-
-
-    @staticmethod
-    def get_available_datasets() -> Iterable['Dataset']:
-        yield Dataset('Qualitas.class Corpus', 'qcc')
-        yield Dataset('ELISA HIV Samples', 'elisa')
+def get_local_datasets() -> Iterable[LocalDataset]:
+    for d in scandir(path=str(datasets_dir.resolve())):
+        if d.is_dir():
+            try:
+                manifest = datasets_dir.joinpath(f'./{d.name}/manifest.json')
+                if manifest.exists():
+                    with open(file=str(manifest), mode='r', encoding='utf-8') as fp:
+                        manifest: LocalDataset = load(fp=fp)
+                        yield manifest
+            except:
+                pass
