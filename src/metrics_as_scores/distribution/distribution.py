@@ -54,7 +54,7 @@ class KnownDataset(JsonDataset):
 
 
 class Density(ABC):
-    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ppf: Callable[[float], float]=None, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ppf: Callable[[float], float]=None, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self.range = range
         self._pdf = pdf
         self._cdf = cdf
@@ -62,8 +62,8 @@ class Density(ABC):
         self._ideal_value = ideal_value
         self._dist_transform = dist_transform
         self._transform_value: float = None
-        self._metric_id = metric_id
-        self._domain = domain
+        self._qtype = qtype
+        self._context = context
         self._practical_domain: tuple[float, float] = None
         self._practical_range_pdf: tuple[float, float] = None
 
@@ -78,12 +78,12 @@ class Density(ABC):
     
 
     @property
-    def metric_id(self) -> Union[MetricID, None]:
-        return self._metric_id
+    def qtype(self) -> Union[str, None]:
+        return self._qtype
     
     @property
-    def domain(self) -> Union[str, None]:
-        return self._domain
+    def context(self) -> Union[str, None]:
+        return self._context
 
     @property
     def ideal_value(self) -> Union[float, None]:
@@ -165,7 +165,7 @@ class Density(ABC):
 
 
 class KDE_integrate(Density):
-    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._kde = gaussian_kde(dataset=np.asarray(data))
         lb, ub = np.min(data), np.max(data)
         ext = np.max(data) - lb
@@ -182,11 +182,11 @@ class KDE_integrate(Density):
         
         ppf = cdf_to_ppf(cdf=np.vectorize(cdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
-        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
 
 
 class KDE_approx(Density):
-    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         # First, we'll fit an extra KDE for an approximate PDF.
         # It is used to also roughly estimate its mode.
         rng = np.random.default_rng(seed=1)
@@ -199,7 +199,7 @@ class KDE_approx(Density):
         self._ecdf = SMEcdf(x=data)
         self._ppf_interp = cdf_to_ppf(cdf=np.vectorize(self._ecdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
-        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        super().__init__(range=(np.min(data), np.max(data)), pdf=self._pdf_from_kde, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
 
         self.stat_test = StatisticalTest(data1=data, cdf=self._ecdf, ppf_or_data2=self._ppf_from_ecdf)
 
@@ -223,11 +223,11 @@ class KDE_approx(Density):
 
 
 class Empirical(Density):
-    def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._ecdf = SMEcdf(data)
         self._ppf_interp = cdf_to_ppf(cdf=np.vectorize(self._ecdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
-        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, kwargs=kwargs)
+        super().__init__(range=(np.min(data), np.max(data)), pdf=gaussian_kde(dataset=data).pdf, cdf=self._ecdf, ppf=self._ppf_from_ecdf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
 
         if compute_ranges:
             self.practical_domain
@@ -237,7 +237,7 @@ class Empirical(Density):
 
 
 class Empirical_discrete(Empirical):
-    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
+    def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._data_valid = not (data.shape[0] == 1 and np.isnan(data[0]))
         data_int = np.rint(data).astype(int)
         if self._data_valid and not np.allclose(a=data, b=data_int, rtol=1e-10, atol=1e-12):
@@ -248,12 +248,12 @@ class Empirical_discrete(Empirical):
         self._idx: dict[int, int] = { self._unique[i]: self._counts[i] for i in range(self._unique.shape[0]) }
 
         if self._data_valid:
-            super().__init__(data=data_int, compute_ranges=False, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
+            super().__init__(data=data_int, compute_ranges=False, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, **kwargs)
         else:
             self._dist_transform = dist_transform
             self._transform_value = transform_value
-            self._metric_id = metric_id
-            self._domain = domain
+            self._qtype = qtype
+            self._context = context
             self._cdf = self.cdf = self._non_fit_cdf_ppf
             self._ppf = self.ppf = self._non_fit_cdf_ppf
 
@@ -285,13 +285,13 @@ class Empirical_discrete(Empirical):
 
 
 class Parametric(Density):
-    def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
+    def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, context: str=None, **kwargs) -> None:
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.stat_tests = stat_tests
         self._use_stat_test = use_stat_test
         self.dist_params = dist_params
 
-        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, metric_id=metric_id, domain=domain, **kwargs)
+        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=metric_id, context=context, **kwargs)
 
         if compute_ranges:
             self.practical_domain
