@@ -7,7 +7,6 @@ from itertools import combinations
 from typing import Any, Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float, String
-from metrics_as_scores.data.metrics import MetricID
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
@@ -165,8 +164,6 @@ class Density(ABC):
             return pickle.load(file=f)
 
 
-
-
 class KDE_integrate(Density):
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, metric_id: MetricID=None, domain: str=None, **kwargs) -> None:
         self._kde = gaussian_kde(dataset=np.asarray(data))
@@ -223,7 +220,6 @@ class KDE_approx(Density):
     @property
     def stat(self) -> float:
         return self.stat_test.tests['ks_2samp_jittered']['stat']
-
 
 
 class Empirical(Density):
