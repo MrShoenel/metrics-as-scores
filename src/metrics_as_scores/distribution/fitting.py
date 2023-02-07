@@ -230,6 +230,13 @@ class FitterPymoo(Fitter):
 
 
 
+StatTest_Types = Literal[
+    'cramervonmises_jittered', 'cramervonmises_ordinary',
+    'cramervonmises_2samp_jittered', 'cramervonmises_2samp_ordinary',
+    'epps_singleton_2samp_jittered', 'epps_singleton_2samp_ordinary',
+    'ks_1samp_jittered', 'ks_1samp_ordinary',
+    'ks_2samp_jittered', 'ks_2samp_ordinary']
+
 
 class StatisticalTest:
     def __init__(self, data1: NDArray[Shape["*"], Float], cdf: Callable[[Union[float, int]], float], ppf_or_data2: Union[NDArray[Shape["*"], Float], Callable[[Union[float, int]], float]], data2_num_samples: int=None, method = 'auto', stat_tests=[cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp], max_samples: int=10_000) -> None:

@@ -288,14 +288,6 @@ class Empirical_discrete(Empirical):
         return Empirical_discrete(data=np.asarray([np.nan]), dist_transform=dist_transform)
 
 
-StatTest_Types = Literal[
-    'cramervonmises_jittered', 'cramervonmises_ordinary',
-    'cramervonmises_2samp_jittered', 'cramervonmises_2samp_ordinary',
-    'epps_singleton_2samp_jittered', 'epps_singleton_2samp_ordinary',
-    'ks_1samp_jittered', 'ks_1samp_ordinary',
-    'ks_2samp_jittered', 'ks_2samp_ordinary']
-
-
 class Parametric(Density):
     def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, domain: str = None, **kwargs) -> None:
         self.dist: Union[rv_generic, rv_continuous] = dist
