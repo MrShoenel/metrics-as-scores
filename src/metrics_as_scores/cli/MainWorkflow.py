@@ -9,6 +9,7 @@ from Workflow import Workflow
 from LocalWebserver import LocalWebserverWorkflow
 from CreateDataset import CreateDatasetWorkflow
 from KnownDatasets import KnownDatasetsWorkflow
+from FitParametric import FitParametricWorkflow
 
 
 class MainWorkflow(Workflow):
@@ -28,33 +29,37 @@ class MainWorkflow(Workflow):
         """
 
         # The main options/Functions for M-a-S:
-        res = self.ask(options=[
-            'Show Installed Datasets',
-            'Show List of Known Datasets Available Online That Can Be Downloaded',
-            'Download and install a known or existing dataset',
-            'Create Own Dataset to be used with Metrics-As-Scores',
-            'Bundle Own dataset so it can be published',
-            'Run local, interactive Web-Application using a selected dataset',
-            'Quit'
+        res = self.askt(options=[
+            ('Show Installed Datasets', 'show_local'),
+            ('Show List of Known Datasets Available Online That Can Be Downloaded', 'show_known'),
+            ('Download and install a known or existing dataset', 'download'),
+            ('Create Own Dataset to be used with Metrics-As-Scores', 'create'),
+            ('Fit Parametric Distributions for Own Dataset', 'fit'),
+            ('Pre-generate distributions for usage in Web-Application', 'pre_gen'),
+            ('Bundle Own dataset so it can be published', 'bundle'),
+            ('Run local, interactive Web-Application using a selected dataset', 'webapp'),
+            ('Quit', 'q')
         ])
         
-        if res == 0:
+        if res == 'show_local':
             pass
-        elif res == 1:
+        elif res == 'show_known':
             known_ds = KnownDatasetsWorkflow()
             known_ds.show_datasets()
+        elif res == 'download':
             pass
-        elif res == 2:
-            pass
-        elif res == 3:
+        elif res == 'create':
             create_ds = CreateDatasetWorkflow()
             create_ds.create_own()
-        elif res == 4:
+        elif res == 'fit':
+            fit_para = FitParametricWorkflow()
+            fit_para.fit_parametric()
+        elif res == 'bundle':
             pass
-        elif res == 5:
+        elif res == 'webapp':
             local_server = LocalWebserverWorkflow()
             local_server.start_server()
-        elif res == 6:
+        elif res == 'q':
             self.stop = True
             
 
