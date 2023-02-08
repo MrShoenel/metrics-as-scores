@@ -20,6 +20,14 @@ metrics\_as\_scores.cli.CreateDataset module
    :undoc-members:
    :show-inheritance:
 
+metrics\_as\_scores.cli.FitParametric module
+--------------------------------------------
+
+.. automodule:: metrics_as_scores.cli.FitParametric
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 metrics\_as\_scores.cli.KnownDatasets module
 --------------------------------------------
 
