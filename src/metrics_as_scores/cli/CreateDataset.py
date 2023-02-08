@@ -123,6 +123,18 @@ class CreateDatasetWorkflow(Workflow):
         self.print_info(text_normal='The following quantity types were found: ', text_vital=', '.join(qtypes))
         self.print_info(text_normal='The following contexts exist in the data: ', text_vital=', '.join(contexts))
 
+        # Let's ask some descriptions for qtypes and contexts:
+        self.q.print('\nYou should now enter a very brief (max. 20 characters) description for each quantity type.\n')
+        jsd['desc_qtypes'] = { qtype: None for qtype in qtypes }
+        for qtype in qtypes:
+            jsd['desc_qtypes'][qtype] = self.q.text(message=f'Enter a description for {qtype}: ', validate=lambda s: len(s) > 0 and len(s) <= 20).ask().strip()
+        
+        self.q.print('\nYou can now enter an optional brief (max. 20 characters) description for each context.\n')
+        jsd['desc_contexts'] = { ctx: None for ctx in contexts }
+        for ctx in contexts:
+            temp = self.q.text(message=f'Enter an optional description for {ctx} (empty for none): ', validate=lambda s: len(s) <= 20).ask().strip()
+            jsd['desc_contexts'][ctx] = None if len(temp) == 0 else temp
+
         # Determine if features are discrete or continuous
         jsd['qtypes'] = { t: None for t in qtypes }
         self.q.print('\nChecking data for each type, whether it is discrete or continuous..')
