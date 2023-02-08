@@ -1,10 +1,11 @@
-from typing import Literal, Union
-from Workflow import Workflow
-from helpers import isint, isnumeric
+from typing import Union
+from metrics_as_scores.cli.Workflow import Workflow
+from metrics_as_scores.cli.helpers import isint, isnumeric
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
 from re import match
 from os import makedirs
 from json import dump
+from collections import OrderedDict
 import numpy as np
 import pandas as pd
 
@@ -94,13 +95,18 @@ class CreateDatasetWorkflow(Workflow):
         elif file_type == 'Excel':
             df = self._read_excel(path_like=jsd['origin'])
         
-        available_cols = df.columns.values.tolist()
-        col_data = self.ask(prompt='Which column holds the data?', options=available_cols, rtype=str)
+
+        available_cols = OrderedDict({ k: k for k in df.columns.values.tolist() })
+        #
+        col_data = self.ask(prompt='Which column holds the data?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_data'] = col_data
-        col_type = self.ask(prompt='What is the name of the type column?', options=list(set(available_cols) - set([col_data])), rtype=str)
+        del available_cols[col_data]
+        col_type = self.ask(prompt='What is the name of the type column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_type'] = col_type
-        col_ctx = self.ask(prompt='What is the name of the context column?', options=list(set(available_cols) - set([col_data, col_type])), rtype=str)
+        del available_cols[col_type]
+        col_ctx = self.ask(prompt='What is the name of the context column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_context'] = col_ctx
+        del available_cols[col_ctx]
 
         # Now we only retain those two columns and all complete rows
         df = df.loc[:, [col_data, col_type, col_ctx]]
