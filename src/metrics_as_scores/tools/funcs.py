@@ -44,9 +44,8 @@ class Interpolator:
 
 def cdf_to_ppf(cdf: Callable[[float], float], x: NDArray[Shape["*"], Float], cdf_samples: int=5_000, y_left: float=None, y_right: float=None) -> Union[Interpolator, Callable[[float], float]]:
     """
-    Adapted implementation from statsmodels.distributions.empirical_distribution.monotone_fn_inverter
-    that handles out-of-bounds values explicitly.
-    Also, we assume fn is vectorized.
+    Adapted implementation from :meth:`statsmodels.distributions.empirical_distribution.monotone_fn_inverter()`
+    that handles out-of-bounds values explicitly. Also, we assume that ``fn`` is vectorized.
     """
     x_vals = np.linspace(start=np.min(x), stop=np.max(x), num=cdf_samples)
     y_vals = cdf(x_vals) # x is sorted, then so is y if fn is monotone increasing (which it should be)
