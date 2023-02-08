@@ -175,13 +175,13 @@ is no best value for lines of code (size) of software.
     def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
         self.q.print('We will now perform some statistical and summarize the results.')
         
-        self.print_info(text_normal='Performing test: ', text_vital='Analysis of Variance (ANOVA)')
-        anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_domain=True)), unique_vals=True)
+        self.print_info(text_normal='Performing test: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
+        anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_contexts=True)), unique_vals=True)
         file_anova = str(tests_dir.joinpath('./anova.csv'))
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
 
-        self.print_info(text_normal='Performing test: ', text_vital="Tukey's Honest Significance Test")
+        self.print_info(text_normal='Performing test: ', text_vital="Tukey's Honest Significance Test (TukeyHSD) ...", arrow='\n')
         tukeyhsd = ds.analyze_TukeyHSD(qtypes=ds.quantity_types)
         file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
         tukeyhsd.to_csv(file_tukey, index=False)
