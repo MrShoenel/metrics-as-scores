@@ -32,6 +32,7 @@ def generate_densities(dataset: Dataset, clazz: type[Density]=Empirical, unique_
 
     domains = Dataset.domains()
     param_grid = { 'domain': domains, 'metric': list(map(lambda m: m.name, MetricID)) }
+    contexts = list(dataset.contexts(include_all_contexts=True))
     expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
 
     def get_density(grid_idx: int) -> tuple[str, Density]:

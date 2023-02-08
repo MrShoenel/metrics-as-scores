@@ -25,7 +25,7 @@ def generate_parametric_fits(ds: Dataset, num_jobs: int, fitter_type: type[Fitte
     # Also, when fitting a continuous RV to discrete data, we will add jitter to the data.
 
     param_grid = {
-        'context': list(ds.contexts(include_all_domain=True)),
+        'context': list(ds.contexts(include_all_contexts=True)),
         'qtype': ds.quantity_types, # Fit continuous to all
         'rv': list([rv.__name__ for rv in selected_rvs_c]), # continuous here, discrete below
         'type': ['continuous'],
@@ -36,7 +36,7 @@ def generate_parametric_fits(ds: Dataset, num_jobs: int, fitter_type: type[Fitte
     if len(discrete_types) > 0:
         # Only fit discrete if we have it
         param_grid = {
-            'context': list(ds.contexts(include_all_domain=True)),
+            'context': list(ds.contexts(include_all_contexts=True)),
             'qtype': discrete_types,
             'rv': list([rv.__name__ for rv in selected_rvs_d]),
             'type': ['discrete'],

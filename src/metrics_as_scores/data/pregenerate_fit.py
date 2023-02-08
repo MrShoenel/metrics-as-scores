@@ -52,7 +52,7 @@ def get_data_tuple(ds: Dataset, qtype: str, dist_transform: DistTransform, conti
         was computed using unique values (see :meth:`Dataset.transform()`).
     """
     l = []
-    for ctx in ds.contexts(include_all_domain=True):
+    for ctx in ds.contexts(include_all_contexts=True):
         for unique_vals in [True, False]:
             data = ds.data(qtype=qtype, context=(None if ctx == '__ALL__' else ctx), unique_vals=unique_vals, sub_sample=25_000)
             transform_value, data = Dataset.transform(data=data, dist_transform=dist_transform, continuous_value=continuous_transform)
