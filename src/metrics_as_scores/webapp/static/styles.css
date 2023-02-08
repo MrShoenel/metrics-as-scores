@@ -12,7 +12,7 @@ a {
 }
 
 small {
-	font-size: 60% !important;
+	font-size: 50% !important;
 }
 
 ul {
@@ -27,3 +27,28 @@ ul {
 
 .flower-12l-24x24 { animation: flower-12l-24x24 1s steps(12) infinite; display: block; width: 24px; height: 24px; background-image:url(loading.png); }
 @keyframes flower-12l-24x24 { from { background-position: 0px 0px; } to { background-position: 0px -288px; } }
+
+ol {
+	list-style-type: none;
+	padding-left: .5ex;
+}
+ol > li {
+	padding-left: 1.75em;
+	position: relative;
+}
+ol > li:before {
+	content: "[" counter(list-item) "] ";
+	padding-left: 0;
+	position: absolute;
+	left: 0;
+}
+ol > li:not(:last-child) {
+	margin-bottom: 1em;
+}
+
+div#about > p {
+	margin: .5ex auto;
+}
+div#about > p:last-child {
+	margin-bottom: 2em;
+}
