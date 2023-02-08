@@ -42,13 +42,15 @@ from bokeh.models.widgets.markups import Div
 from numbers import Integral
 
 
-this_dir = Path(__file__).resolve().parent
-
 # Import the data; Note this is process-static!
 from metrics_as_scores.webapp import data
 ds: Dataset = data.ds
 cdfs = data.cdfs
 contexts = list(ds.contexts(include_all_contexts=True))
+
+this_dir = Path(__file__).resolve().parent
+web_dir = data.dataset_dir.joinpath('./web')
+
 
 def cap(s: str) -> str:
     return s[:1].upper() + s[1:]
@@ -138,7 +140,7 @@ tbl_transf_cols = [
     TableColumn(field='pdist', title='Parametric Distrib.'),
     TableColumn(field='pdist_dval', title='Statistic')]
 tbl_transf_src = ColumnDataSource(pd.DataFrame(columns=list([tc.field for tc in tbl_transf_cols])))
-tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_both')
+tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_position=None, sizing_mode='stretch_width', min_height=30*len(contexts), height_policy='min')
 
 
 
@@ -533,7 +535,7 @@ def input_own_change(attr, old, new):
 
 
 def read_text(file: str) -> str:
-    with open(file=file, mode='r') as f:
+    with open(file=file, mode='r', encoding='utf-8') as f:
         return f.read().strip()
 
 cbg_cutoff.on_click(cbg_cutoff_click)
@@ -546,8 +548,25 @@ input_own.on_change('value', input_own_change)
 btn_toggle_legend.on_click(btn_toggle_legend_click)
 
 
-header = Div(text=read_text(this_dir.joinpath('header.html')))
-footer = Div(text=read_text(this_dir.joinpath('footer.html')))
+header = Div(text=f'''
+    {read_text(this_dir.joinpath('header.html'))}
+    <h2>Loaded Dataset: <b>{ds.ds["name"]}</b></h2>
+    <div id="about">
+        <p><b>Author(s)</b>: {', '.join(ds.ds["author"])}</p>
+        <p><b>Description</b>: {ds.ds["desc"]}</p>
+    </div>
+    <div>
+        {read_text(web_dir.joinpath('./about.html'))}
+    </div>
+    <hr/>''')
+
+footer = Div(text=f'''
+    {read_text(this_dir.joinpath('footer.html'))}
+    {read_text(web_dir.joinpath('./references.html'))}
+</ol>''')
+
+
+
 
 
 
