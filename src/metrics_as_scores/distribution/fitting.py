@@ -296,30 +296,34 @@ class StatisticalTest:
             # Sampling from a continuous PPF creates a de facto continuous data2
             data2_jittered = data2
 
-        self.tests = {}
+        self.tests: dict[str, TestJson] = {}
         test_types = ['ordinary', 'jittered']
         for test in stat_tests:
             for tt in test_types:
                 use_data1, use_data2 = (data1, data2) if tt == 'ordinary' else (data1_jittered, data2_jittered)
                 pval, stat = None, None
 
-                if test == cramervonmises:
-                    result = cramervonmises(rvs=use_data1, cdf=cdf)
-                    pval = result.pvalue
-                    stat = result.statistic
-                elif test == cramervonmises_2samp:
-                    result = cramervonmises_2samp(x=use_data1, y=use_data2, method=method)
-                    pval = result.pvalue
-                    stat = result.statistic
-                elif test == ks_1samp:
-                    stat, pval = ks_1samp(x=use_data1, cdf=cdf, method=method)
-                elif test == ks_2samp:
-                    stat, pval = ks_2samp(data1=use_data1, data2=use_data2, method=method)
-                elif test == epps_singleton_2samp:
-                    result = epps_singleton_2samp(x=use_data1, y=use_data2)
-                    pval = result.pvalue
-                    stat = result.statistic
+                try:
+                    if test == cramervonmises:
+                        result = cramervonmises(rvs=use_data1, cdf=cdf)
+                        pval = result.pvalue
+                        stat = result.statistic
+                    elif test == cramervonmises_2samp:
+                        result = cramervonmises_2samp(x=use_data1, y=use_data2, method=method)
+                        pval = result.pvalue
+                        stat = result.statistic
+                    elif test == ks_1samp:
+                        stat, pval = ks_1samp(x=use_data1, cdf=cdf, method=method)
+                    elif test == ks_2samp:
+                        stat, pval = ks_2samp(data1=use_data1, data2=use_data2, method=method)
+                    elif test == epps_singleton_2samp:
+                        result = epps_singleton_2samp(x=use_data1, y=use_data2)
+                        pval = result.pvalue
+                        stat = result.statistic
+                except:
+                    pass # Ignore a failed test; e.g. Epps requires > 4 samples
 
+                # Always create the entry, even for failed tests.
                 self.tests[f'{test.__name__}_{tt}'] = dict(pval = pval, stat = stat)
     
     def __iter__(self) -> Sequence[tuple[str, Any]]:
