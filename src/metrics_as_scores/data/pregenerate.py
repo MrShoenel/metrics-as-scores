@@ -130,26 +130,3 @@ def generate_empirical_discrete(dataset: Dataset, densities_dir: Path, transform
 
 
 
-
-if __name__ == '__main__':
-    dataset = Dataset(df=pd.read_csv('csv/metrics.csv'))
-
-    grid = dict(
-        clazz = [Parametric, Parametric_discrete],
-        transform = list(DistTransform))
-    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
-    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_parametric)(dataset, expanded_grid.iloc[i,]['clazz'], expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))
-
-
-    grid = dict(
-        clazz = [Empirical, KDE_approx],
-        transform = list(DistTransform))
-    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
-    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_empirical)(dataset, expanded_grid.iloc[i,]['clazz'], expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))
-
-    # Also, let's pre-generate the discrete empiricals.
-    grid = dict(
-        clazz = [Empirical_discrete],
-        transform = list(DistTransform))
-    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=grid))
-    Parallel(n_jobs=min(cpu_count(), len(expanded_grid.index)))(delayed(generate_empirical_discrete)(dataset, expanded_grid.iloc[i,]['transform']) for i in range(len(expanded_grid.index)))
