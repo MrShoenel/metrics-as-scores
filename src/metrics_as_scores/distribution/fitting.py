@@ -29,9 +29,16 @@ Note this list is a list of instances, rather than types.
 from metrics_as_scores.distribution import fitting_problems
 from metrics_as_scores.distribution.fitting_problems import MixedVariableDistributionFittingProblem
 temp = list(filter(lambda rv: hasattr(fitting_problems, f'Fit_{type(rv).__name__}'), Discrete_RVs))
-Discrete_Problems = { x: y for (x, y) in zip(
+Discrete_Problems: dict[str, type[MixedVariableDistributionFittingProblem]] = { x: y for (x, y) in zip(
     map(lambda rv: type(rv).__name__, temp),
     map(lambda rv: getattr(fitting_problems, f'Fit_{type(rv).__name__}'), temp))}
+"""
+List of fitting problems used by `pymoo` for fitting discrete distributions.
+Metrics As Scores only supports fitting of discrete random variables through
+`pymoo` for random variables that have a corresponding problem defined.
+However, many, if not most, are covered. In case a problem is missing, the
+ordinary fitter can be used (which uses differential evolution).
+"""
 del temp
 
 from pymoo.termination.default import DefaultTermination
@@ -160,6 +167,13 @@ class Fitter:
             n = [0, 25_000]
         )
     )
+    """
+    A dictionary of practical bounds for the parameters of discrete distributions.
+    It is used by the ``Fitter`` when using differential evolution to optimize the
+    fit of a distribution.
+    Note that the ``FitterPymoo`` does not use these. Instead, it relies on separate
+    problems that are defined for each discrete random variable.
+    """
 
     def __init__(self, dist: type[Union[rv_continuous, rv_discrete]]) -> None:
         if not issubclass(dist, rv_continuous) and not issubclass(dist, rv_discrete):
@@ -200,6 +214,8 @@ class Fitter:
 
 class FitterPymoo(Fitter):
     def __init__(self, dist: type[Union[rv_continuous, rv_discrete]]) -> None:
+        if not isclass(dist):
+            raise Exception(f'The given object {dist} is not a subclass of rv_generic.')
         if issubclass(dist, rv_discrete):
             if not dist.__name__ in Discrete_Problems.keys():
                 raise Exception('No Pymoo problem available to optimize the random variable.')
