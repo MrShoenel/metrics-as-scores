@@ -528,16 +528,16 @@ class Dataset:
         For each given type of quantity, this method performs an ANOVA across all
         given contexts.
 
-        qtypes: `Iterable[str]`
+        qtypes: ``Iterable[str]``
             An iterable of quantity types to conduct the analysis for. For each given
             type, a separate analysis is performed and the result appended to the
             returned data frame.
         
-        contexts: `Iterable[str]`
+        contexts: ``Iterable[str]``
             An iterable of contexts across which each of the quantity types shall be
             analyzed.
         
-        unique_vals: `bool`
+        unique_vals: ``bool``
             Passed to :meth:`self.data()`. If true, than small, random, and unique
             noise is added to the data before it is analyzed. This will effectively
             deduplicate any samples in the data (if any).
@@ -557,8 +557,8 @@ class Dataset:
 
         def anova_for_qtype(qtype: str) -> dict[str, Union[str, str, float]]:
             data_tuple = ()
-            for domain in contexts:
-                data_tuple += (self.data(qtype=qtype, systems=Dataset.systems_for_domain(domain=domain), unique_vals=unique_vals),)
+            for ctx in contexts:
+                data_tuple += (self.data(qtype=qtype, context=None if ctx == '__ALL__' else ctx, unique_vals=unique_vals),)
             
             stat, pval = f_oneway(*data_tuple)
             return { 'qtype': qtype, 'stat': stat, 'pval': pval, 'across_contexts': ';'.join(contexts) }
@@ -599,13 +599,13 @@ class Dataset:
         temp[self.ds['colname_context']] = '__ALL__' # Erase context
         all_data = pd.concat([temp, self.df])
         
-        def tukeyHSD_for_metric(qtype: str) -> pd.DataFrame:
+        def tukeyHSD_for_qtype(qtype: str) -> pd.DataFrame:
             data = all_data[all_data[self.ds['colname_type']] == qtype]
             tukey = pairwise_tukeyhsd(endog=data[self.ds['colname_data']], groups=data[self.ds['colname_context']])
             temp = tukey.summary().data
             return pd.DataFrame(data=temp[1:], columns=temp[0])
 
         from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(qtype) for qtype in qtypes)
+        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_qtype)(qtype) for qtype in qtypes)
 
         return pd.concat(res_dfs)
