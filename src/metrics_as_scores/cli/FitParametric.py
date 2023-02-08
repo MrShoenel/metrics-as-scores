@@ -62,35 +62,6 @@ global search has to be performed.'''.strip())
         return self.q.checkbox(message='Select discrete random variables:', choices=[Choice(title=dp[0], value=getattr(_discrete_distns, dp[0]), checked=not dp[0] in recommended_ignore) for dp in Discrete_Problems.items()]).ask()
     
 
-    # def _iterable_fits(self, rvs: Iterable[Union[rv_continuous, rv_discrete]]) -> Iterable[tuple[Path, str, str, Union[rv_continuous, rv_discrete]]]:
-    #     from itertools import product
-    #     for comb in product(self.use_ds['qtypes'].keys(), self.use_ds['contexts'], rvs):
-    #         fit_file = f'{comb[0]}_{comb[1]}_{"c" if issubclass(type(comb[2]), rv_continuous) else "d"}_{type(comb[2]).__name__}.json'
-    #         fit_path = self.fits_dir.joinpath(f'./{fit_file}')
-    #         if fit_path.exists():
-    #             self.print_info(text_normal='Fit already exists, skipping: ', text_vital=fit_file)
-    #         else:
-    #             yield (fit_path, comb[0], comb[1], comb[2])
-    
-
-    # def _fit_continuous_rvs(self, rvs: Iterable[rv_continuous]) -> None:
-    #     """
-    #     For each quantity type, and for each context, fit each random variable
-    #     once, and save the result in "`qtype_context_rv`". If that file exists,
-    #     skip to next.
-    #     """
-    #     perms = list(self._iterable_fits(rvs=rvs))
-    #     with Progress() as progress:
-    #         task1 = progress.add_task('[cyan]Fitting continuous distributions...', total=len(perms))
-    #         for fit_path, qtype, ctx, rv in perms:
-    #             data = self.df[(self.df[self.use_ds['colname_type']] == qtype) & (self.df[self.use_ds['colname_context']] == ctx)][self.use_ds['colname_data']].to_numpy()
-    #             fitter = self.use_fitter(dist=type(rv))
-    #             res = fitter.fit(data=data)
-    #             with open(file=str(fit_path.resolve()), mode='w', encoding='utf-8') as fp:
-    #                 dump(obj=res, fp=fp)
-    #             progress.update(task_id=task1, advance=1)
-    
-
     def _get_data_tuples(self, dist_transform: DistTransform, continuous: bool) -> tuple[dict[str, float], dict[str, NDArray[Shape["*"], Float]]]:
         """
         Prepares all required datasets for one distribution transform in parallel,
@@ -110,7 +81,7 @@ global search has to be performed.'''.strip())
             in the first are computed ideal values for the selected transform. The
             values in the later are 1-D arrays of the data (the distances).
         """
-        res = Parallel(n_jobs=self.num_cpus)(delayed(get_data_tuple)(ds=self.ds, qtype=qtype, dist_transform=dist_transform, continuous_transform=continuous) for qtype in tqdm(self.ds.quantity_types))
+        res = Parallel(n_jobs=min(self.num_cpus, len(self.ds.quantity_types)))(delayed(get_data_tuple)(ds=self.ds, qtype=qtype, dist_transform=dist_transform, continuous_transform=continuous) for qtype in tqdm(self.ds.quantity_types))
         data_dict = dict([(item[0], item[1]) for sublist in res for item in sublist])
         transform_values_dict = dict([(item[0], item[2]) for sublist in res for item in sublist])
         return (transform_values_dict, data_dict)
