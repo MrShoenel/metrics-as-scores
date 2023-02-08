@@ -1,8 +1,15 @@
+"""
+This module is concerned with fitting distributions to data. It supports
+both, discrete and continuous distributions. Fitting is done by a common
+helper that unifies the way either type of distribution is fitted.
+"""
+
+
 import numpy as np
 from numpy.random import default_rng
 from math import pow
 from collections.abc import MutableMapping
-from typing import Any, Callable, Sequence, Union
+from typing import Any, Callable, Literal, Sequence, TypedDict, Union
 from nptyping import Float, NDArray, Shape
 from scipy.stats import _continuous_distns, _discrete_distns, _fit
 from inspect import getmembers, isclass
@@ -12,6 +19,7 @@ Continuous_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tp
 Discrete_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_discrete), getmembers(_discrete_distns))))
 
 from metrics_as_scores.distribution import fitting_problems
+from metrics_as_scores.distribution.fitting_problems import MixedVariableDistributionFittingProblem
 temp = list(filter(lambda rv: hasattr(fitting_problems, f'Fit_{type(rv).__name__}'), Discrete_RVs))
 Discrete_Problems = { x: y for (x, y) in zip(
     map(lambda rv: type(rv).__name__, temp),

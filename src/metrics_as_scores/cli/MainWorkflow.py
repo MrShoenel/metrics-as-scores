@@ -1,16 +1,10 @@
-from pathlib import Path
-from sys import path
+from metrics_as_scores.cli.Workflow import Workflow
+from metrics_as_scores.cli.LocalWebserver import LocalWebserverWorkflow
+from metrics_as_scores.cli.CreateDataset import CreateDatasetWorkflow
+from metrics_as_scores.cli.KnownDatasets import KnownDatasetsWorkflow
+from metrics_as_scores.cli.FitParametric import FitParametricWorkflow
 
-this_dir = Path(__file__).resolve().parent
-path.append(str(this_dir.parent.parent.absolute()))
 from metrics_as_scores.__version__ import __version__ as mas_version
-
-from Workflow import Workflow
-from LocalWebserver import LocalWebserverWorkflow
-from CreateDataset import CreateDatasetWorkflow
-from KnownDatasets import KnownDatasetsWorkflow
-from FitParametric import FitParametricWorkflow
-
 
 class MainWorkflow(Workflow):
     def __init__(self) -> None:

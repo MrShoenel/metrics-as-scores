@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import pickle
 from abc import ABC
-from functools import lru_cache
 from typing import Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float
@@ -15,6 +14,7 @@ from scipy.optimize import direct
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from strenum import StrEnum
+from metrics_as_scores.distribution.fitting import StatTest_Types
 
 
 

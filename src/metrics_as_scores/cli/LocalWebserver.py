@@ -1,9 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
-from Workflow import Workflow
 from bokeh.command.util import build_single_handler_application
 from bokeh.server.server import Server
 from pathlib import Path
-from helpers import isint, get_local_datasets
+from metrics_as_scores.cli.Workflow import Workflow
+from metrics_as_scores.cli.helpers import isint, get_local_datasets
 from metrics_as_scores.distribution.distribution import LocalDataset
 from questionary import Choice
 

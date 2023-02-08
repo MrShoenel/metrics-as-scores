@@ -1,8 +1,11 @@
-from os import getcwd, cpu_count
-from os.path import join
+from os import cpu_count
 from sys import path
 from pathlib import Path
-path.append(f'{Path(join(getcwd(), "src")).resolve()}')
+
+this_dir = Path(__file__).resolve().parent
+src_dir = this_dir.parent.parent
+path.append(str(src_dir.resolve()))
+
 
 
 import pandas as pd

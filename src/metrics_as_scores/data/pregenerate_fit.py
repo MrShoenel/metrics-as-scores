@@ -1,16 +1,14 @@
-from os import getcwd
-from os.path import join
-from sys import path
-from pathlib import Path
-path.append(f'{Path(join(getcwd(), "src")).resolve()}')
+"""
+This is an extra module that holds functions globally, such that we
+can exploit multiprocessing effortlessly.
+"""
 
 import numpy as np
 from pickle import dump
-from typing import Any, Union
+from typing import Any, TypedDict, Union
 from nptyping import Float, NDArray, Shape
-from metrics_as_scores.data.metrics import MetricID
 from metrics_as_scores.distribution.distribution import DistTransform, Dataset
-from metrics_as_scores.distribution.fitting import Continuous_RVs, Discrete_RVs, FitterPymoo, StatisticalTest
+from metrics_as_scores.distribution.fitting import Continuous_RVs, Discrete_RVs, Fitter, StatisticalTest, StatisticalTestJson
 from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 from timeit import default_timer as timer
 

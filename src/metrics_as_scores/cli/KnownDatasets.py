@@ -1,6 +1,6 @@
-from Workflow import Workflow
 from pathlib import Path
 from json import load
+from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.distribution.distribution import KnownDataset
 
 this_dir = Path(__file__).resolve().parent
