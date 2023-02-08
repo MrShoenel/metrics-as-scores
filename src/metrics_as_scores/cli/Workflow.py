@@ -17,6 +17,9 @@ class Workflow:
         res = self.askt(
             options=list([(options[idx], idx) for idx in range(len(options))]),
             prompt=prompt)
+        if res == None:
+            # When user cancels
+            return None
         if rtype == str:
             return options[res]
         return res
