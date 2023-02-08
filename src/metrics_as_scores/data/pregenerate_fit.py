@@ -31,6 +31,20 @@ def get_data_tuple(dist: Dataset, metric_id: MetricID, dist_transform: DistTrans
 
 
 def fit(grid_idx: int, row, metrics_discrete: dict[MetricID, bool], the_data: NDArray[Shape["*"], Float], the_data_unique: NDArray[Shape["*"], Float], transform_value: Union[float, None], dist_transform: DistTransform, write_temporary_results: bool=True) -> dict[str, Any]:
+class FitResult(TypedDict):
+    grid_idx: int
+    dist_transform: str
+    transform_value: Union[float, None]
+    params: dict[str, Union[float, int]]
+
+    # Also, from row.to_dict():
+    context: str
+    qtype: str
+    rv: str
+    type: str
+
+    stat_tests: StatisticalTestJson
+
     start = timer()
     import sys
     if not sys.warnoptions:
