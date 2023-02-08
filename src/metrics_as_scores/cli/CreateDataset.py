@@ -1,7 +1,7 @@
 from typing import Literal, Union
 from Workflow import Workflow
 from helpers import isint, isnumeric
-from metrics_as_scores.distribution.distribution import LocalDataset
+from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
 from re import match
 from os import makedirs
 from json import dump
@@ -154,6 +154,24 @@ is no best value for lines of code (size) of software.
         return (jsd, df)
     
 
+    def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
+        self.q.print('We will now perform some statistical and summarize the results.')
+        
+        self.print_info(text_normal='Performing test: ', text_vital='Analysis of Variance (ANOVA)')
+        anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_domain=True)), unique_vals=True)
+        file_anova = str(tests_dir.joinpath('./anova.csv'))
+        anova.to_csv(file_anova, index=False)
+        self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
+
+        self.print_info(text_normal='Performing test: ', text_vital="Tukey's Honest Significance Test")
+        tukeyhsd = ds.analyze_TukeyHSD(qtypes=ds.quantity_types)
+        file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
+        tukeyhsd.to_csv(file_tukey, index=False)
+        self.print_info(text_normal='Wrote result to: ', text_vital=file_tukey)
+        
+
+    
+
     def create_own(self) -> None:
         self.q.print('\n' + 10*'-')
         self.q.print('''
@@ -170,11 +188,12 @@ cannot be resumed.
         manifest, df = self._create_manifest()
         # Let's create a folder for this dataset (by ID) and out the files there.
         dataset_dir = datasets_dir.joinpath(f'./{manifest["id"]}')
-        if not dataset_dir.exists():
-            makedirs(str(dataset_dir.resolve()))
         fits_dir = dataset_dir.joinpath('./fits')
-        if not fits_dir.exists():
-            makedirs(str(fits_dir))
+        densities_dir = dataset_dir.joinpath('./densities')
+        tests_dir = dataset_dir.joinpath('./tests')
+        for dir in [dataset_dir, fits_dir, densities_dir, tests_dir]:
+            if not dir.exists():
+                makedirs(str(dir.resolve()))
         
         path_manifest = str(dataset_dir.joinpath('./manifest.json'))
         path_data = str(dataset_dir.joinpath('./org-data.csv'))
@@ -187,4 +206,8 @@ cannot be resumed.
         self.print_info(text_normal='Wrote manifest to: ', text_vital=path_manifest)
         self.print_info(text_normal='Wrote original dataset to: ', text_vital=path_data)
         self.q.print('\n' + 10*'-' + '\n')
-    
+
+
+        dataset = Dataset(ds=manifest, df=df)
+        self._run_statistical_tests(ds=dataset, tests_dir=tests_dir)
+        self.q.print('\n' + 10*'-' + '\n')
