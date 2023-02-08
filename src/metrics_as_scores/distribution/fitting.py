@@ -246,6 +246,16 @@ StatTest_Types = Literal[
     'ks_2samp_jittered', 'ks_2samp_ordinary']
 
 
+class TestJson(TypedDict):
+    pval: float
+    stat: float
+
+class StatisticalTestJson(TypedDict):
+    tests: dict[str, TestJson]
+    discrete_data1: bool
+    discrete_data2: bool
+
+
 class StatisticalTest:
     def __init__(self, data1: NDArray[Shape["*"], Float], cdf: Callable[[Union[float, int]], float], ppf_or_data2: Union[NDArray[Shape["*"], Float], Callable[[Union[float, int]], float]], data2_num_samples: int=None, method = 'auto', stat_tests=[cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp], max_samples: int=10_000) -> None:
 
