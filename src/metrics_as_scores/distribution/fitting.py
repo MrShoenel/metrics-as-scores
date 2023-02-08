@@ -15,8 +15,16 @@ from scipy.stats import _continuous_distns, _discrete_distns, _fit
 from inspect import getmembers, isclass
 from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 
-Continuous_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_continuous), getmembers(_continuous_distns))))
-Discrete_RVs = list(map(lambda tpl: tpl[1], filter(lambda tpl: isclass(type(tpl[1])) and issubclass(type(tpl[1]), rv_discrete), getmembers(_discrete_distns))))
+Continuous_RVs: list[rv_continuous] = list(map(lambda tpl: tpl[1], filter(lambda tpl: isinstance(tpl[1], rv_continuous), getmembers(_continuous_distns))))
+"""
+List of continuous random variables that are supported by `scipy.stats`.
+Note this list is a list of instances, rather than types.
+"""
+Discrete_RVs: list[rv_discrete] = list(map(lambda tpl: tpl[1], filter(lambda tpl: isinstance(tpl[1], rv_discrete), getmembers(_discrete_distns))))
+"""
+List of discrete random variables that are supported by `scipy.stats`.
+Note this list is a list of instances, rather than types.
+"""
 
 from metrics_as_scores.distribution import fitting_problems
 from metrics_as_scores.distribution.fitting_problems import MixedVariableDistributionFittingProblem
