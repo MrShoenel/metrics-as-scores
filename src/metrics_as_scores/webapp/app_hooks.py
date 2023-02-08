@@ -35,6 +35,7 @@ def load_data(dataset_id: str, preload: bool=False):
     data.ds = ds
     print(f'Dataset loaded: {ds.ds["desc"]} by {", ".join(ds.ds["author"])}')
     densities_dir = datasets_dir.joinpath(f'./{ds.ds["id"]}/densities')
+    data.dataset_dir = datasets_dir.joinpath(f'./{ds.ds["id"]}')
 
 
     clazzes = [Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete]
