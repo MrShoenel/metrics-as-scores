@@ -284,13 +284,13 @@ class Empirical_discrete(Empirical):
 
 
 class Parametric(Density):
-    def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float = None, dist_transform: DistTransform = DistTransform.NONE, transform_value: float = None, metric_id: MetricID = None, context: str=None, **kwargs) -> None:
+    def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.stat_tests = stat_tests
         self._use_stat_test = use_stat_test
         self.dist_params = dist_params
 
-        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=metric_id, context=context, **kwargs)
+        super().__init__(range=range, pdf=self.pdf, cdf=self.cdf, ppf=self.ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, **kwargs)
 
         if compute_ranges:
             self.practical_domain
@@ -388,21 +388,32 @@ class Dataset:
         self.df = df
     
     @property
-    @lru_cache(maxsize=None)
     def quantity_types(self) -> list[str]:
         return list(self.ds['qtypes'].keys())
+
+
+    def contexts(self, include_all_domain: bool=False) -> Iterable[str]:
+        yield from self.ds['contexts']
+        if include_all_domain:
+            yield '__ALL__'
+    
+    def is_qtype_discrete(self, qtype: str) -> bool:
+        return self.ds['qtypes'][qtype] == 'discrete'
     
     @property
-    @lru_cache(maxsize=None)
-    def contexts(self) -> Iterable[str]:
-        return self.ds['contexts']
+    def quantity_types_continuous(self) -> list[str]:
+        return list(filter(lambda qtype: not self.is_qtype_discrete(qtype=qtype), self.quantity_types))
+
+    @property
+    def quantity_types_discrete(self) -> list[str]:
+        return list(filter(lambda qtype: self.is_qtype_discrete(qtype=qtype), self.quantity_types))
 
     def data(self, qtype: str, context: str=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
         """
         This method is used to select a subset of the data, that is specific to at least
         a type of quantity, and optionally to a context, too.
         """
-        new_df = self.df[self.df[self.ds['colname_data']] == qtype]
+        new_df = self.df[self.df[self.ds['colname_type']] == qtype]
         if context is not None:
             new_df = new_df[new_df[self.ds['colname_context']] == context]
         
@@ -553,7 +564,7 @@ class Dataset:
             return { 'qtype': qtype, 'stat': stat, 'pval': pval, 'across_contexts': ';'.join(contexts) }
 
         from joblib import Parallel, delayed
-        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(metric_id) for metric_id in qtypes)
+        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(qtype) for qtype in qtypes)
 
         return pd.DataFrame(res_dicts)
     
@@ -595,6 +606,6 @@ class Dataset:
             return pd.DataFrame(data=temp[1:], columns=temp[0])
 
         from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(metric_id) for metric_id in qtypes)
+        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_metric)(qtype) for qtype in qtypes)
 
         return pd.concat(res_dfs)
