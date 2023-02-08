@@ -1,12 +1,10 @@
-from sys import path
-from pathlib import Path
+"""
+This is the main entry point for the command line interface (the text
+user interface, TUI) of Metrics As Scores. It provides access to a set
+of workflows for handling data and running the Web Application.
+"""
 
-cli_dir = Path(__file__).resolve().parent
-mas_dir = cli_dir.parent
-path.append(str(cli_dir))
-path.append(str(mas_dir))
-
-from MainWorkflow import MainWorkflow
+from metrics_as_scores.cli.MainWorkflow import MainWorkflow
 
 
 def cli():
@@ -15,7 +13,6 @@ def cli():
 
     while not wf.stop:
         wf.main_menu()
-
 
 
 if __name__ == '__main__':
