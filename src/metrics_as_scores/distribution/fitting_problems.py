@@ -118,14 +118,14 @@ class Fit_betabinom_gen(MixedVariableDistributionFittingProblem):
     Calls the super constructor with these variables (in this order):
 
     - ``n``: (``int``) :math:`\left(0,1e^{4}\right)`
-    - ``a``: (``float``) :math:`\left(5e^{-324},1e^3\right)`
-    - ``b``: (``float``) :math:`\left(5e^{-324},1e^3\right)`
+    - ``a``: (``float``) :math:`\left(5e^{-308},1e^3\right)`
+    - ``b``: (``float``) :math:`\left(5e^{-308},1e^3\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=betabinom_gen(), data=data, vars={
             'n': Integer(bounds=(0, 10_000)),
-            'a': Real(bounds=(5e-324, 1e3)),
-            'b': Real(bounds=(5e-324, 1e3))
+            'a': Real(bounds=(5e-308, 1e3)),
+            'b': Real(bounds=(5e-308, 1e3))
         }, **kwargs)
 
 
@@ -182,11 +182,11 @@ class Fit_dlaplace_gen(MixedVariableDistributionFittingProblem):
     and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
-    - ``a``: (``float``) :math:`\left(5e^{-324},1e^4\right)`
+    - ``a``: (``float``) :math:`\left(5e^{-308},1e^4\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=dlaplace_gen(), data=data, vars={
-            'a': Real(bounds=(5e-324, 1e4))
+            'a': Real(bounds=(5e-308, 1e4))
         }, **kwargs)
 
 
@@ -315,14 +315,14 @@ class Fit_nchypergeom_fisher_gen(MixedVariableDistributionFittingProblem):
     - ``M``: (``int``) :math:`\left(1,5\times k\right)`
     - ``n``: (``int``) :math:`\left(1,5\times k\right)`
     - ``N``: (``int``) :math:`\left(1,5\times k\right)`
-    - ``odds``: (``float``) :math:`\left(5e^{-324},1e^{4}\right)`
+    - ``odds``: (``float``) :math:`\left(5e^{-308},1e^{4}\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         vars = {
             'M': Integer(bounds=(1, 5 * data.size)),
             'n': Integer(bounds=(1, 5 * data.size)),
             'N': Integer(bounds=(1, 5 * data.size)),
-            'odds': Real(bounds=(5e-324, 1e4))
+            'odds': Real(bounds=(5e-308, 1e4))
         }
         super().__init__(dist=nchypergeom_fisher_gen(), data=data, vars=vars, n_ieq_constr=4, **kwargs)
 
@@ -396,13 +396,13 @@ class Fit_planck_gen(MixedVariableDistributionFittingProblem):
     and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
-    - ``p``: (``float``) :math:`\left(5e^{-324},1e^2\right)`
+    - ``p``: (``float``) :math:`\left(5e^{-308},1e^2\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=planck_gen(), data=data, vars={
             # planck takes  as shape parameter. The Planck distribution can be written as a geometric distribution (geom) with p = 1 - exp(-lambda) shifted by loc = -1.
             # # exp(-lambda) get small very quickly, so we choose 100 (~3.7e-44)
-            'p': Real(bounds=(5e-324, 1e2))
+            'p': Real(bounds=(5e-308, 1e2))
         }, **kwargs)
 
 
@@ -457,13 +457,13 @@ class Fit_skellam_gen(MixedVariableDistributionFittingProblem):
     and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
-    - ``mu1`` [:math:`\mu_1`]: (``float``) :math:`\left(5e^{-324},5e^{3}\right)`
-    - ``mu2`` [:math:`\mu_2`]: (``float``) :math:`\left(5e^{-324},5e^{3}\right)`
+    - ``mu1`` [:math:`\mu_1`]: (``float``) :math:`\left(5e^{-308},5e^{3}\right)`
+    - ``mu2`` [:math:`\mu_2`]: (``float``) :math:`\left(5e^{-308},5e^{3}\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=skellam_gen(), data=data, vars={
-            'mu1': Real(bounds=(5e-324, 5e3)),
-            'mu2': Real(bounds=(5e-324, 5e3))
+            'mu1': Real(bounds=(5e-308, 5e3)),
+            'mu2': Real(bounds=(5e-308, 5e3))
         }, **kwargs)
 
 
@@ -478,11 +478,11 @@ class Fit_yulesimon_gen(MixedVariableDistributionFittingProblem):
     and does not have any (in-)equality constraints.
     Calls the super constructor with these variables (in this order):
 
-    - ``alpha`` [:math:`\alpha`]: (``float``) :math:`\left(5e^{-324},2e^{4}\right)`
+    - ``alpha`` [:math:`\alpha`]: (``float``) :math:`\left(5e^{-308},2e^{4}\right)`
     """
     def __init__(self, data: NDArray[Shape['*'], Float], **kwargs):
         super().__init__(dist=yulesimon_gen(), data=data, vars={
-            'alpha': Real(bounds=(5e-324, 2e4)) # Guessed
+            'alpha': Real(bounds=(5e-308, 2e4)) # Guessed
         }, **kwargs)
 
 

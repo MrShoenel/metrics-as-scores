@@ -90,8 +90,8 @@ class Fitter:
         ),
         betabinom_gen = dict(
             n = [0, 5_000],
-            a = [5e-324, 1e3],
-            b = [5e-324, 1e3]
+            a = [5e-308, 1e3],
+            b = [5e-308, 1e3]
         ),
         binom_gen = dict(
             n = [1, 25_000], # No. of trials
@@ -102,7 +102,7 @@ class Fitter:
             'N': [1, 25_000]
         },
         dlaplace_gen = dict(
-            a = [5e-324, 1e4] # Guessed
+            a = [5e-308, 1e4] # Guessed
         ),
         geom_gen = dict(
             p = [0., 1.]
@@ -125,14 +125,14 @@ class Fitter:
             M = [0, 25_000],
             n = [0, 25_000],
             N = [0, 25_000],
-            odds = [5e-324, 1e4]
+            odds = [5e-308, 1e4]
         ),
         nchypergeom_wallenius_gen = dict(
             # Wallenius’ noncentral hypergeometric distribution models drawing objects of two types from a bin. M is the total number of objects, n is the number of Type I objects, and odds is the odds ratio: the odds of selecting a Type I object rather than a Type II object when there is only one object of each type. The random variate represents the number of Type I objects drawn if we draw a pre-determined N objects from a bin one by one.
             M = [0, 25_000],
             n = [0, 25_000],
             N = [0, 25_000],
-            odds = [5e-324, 1e4]
+            odds = [5e-308, 1e4]
         ),
         nhypergeom_gen = dict(
             # Consider a box containing M  balls:, n red and M - n blue. We randomly sample balls from the box, one at a time and without replacement, until we have picked r blue balls. nhypergeom is the distribution of the number of red balls k we have picked.
@@ -143,7 +143,7 @@ class Fitter:
         planck_gen = {
             # planck takes  as shape parameter. The Planck distribution can be written as a geometric distribution (geom) with p = 1 - exp(-lambda) shifted by loc = -1.
             # exp(-lambda) get small very quickly, so we choose 100 (~3.7e-44)
-            'lambda': [5e-324, 100.]
+            'lambda': [5e-308, 100.]
         },
         poisson_gen = {
             'mu': [0., 1e6]
@@ -153,11 +153,11 @@ class Fitter:
             high = [-25_000, 25_000]
         ),
         skellam_gen = dict(
-            mu1 = [5e-324, 5e3],
-            mu2 = [5e-324, 5e3]
+            mu1 = [5e-308, 5e3],
+            mu2 = [5e-308, 5e3]
         ),
         yulesimon_gen = dict(
-            alpha = [5e-324, 2e4] # Guessed
+            alpha = [5e-308, 2e4] # Guessed
         ),
         zipf_gen = dict(
             a = [1. + 1e-12, 2e4] # Guessed
