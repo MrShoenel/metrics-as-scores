@@ -209,7 +209,8 @@ cannot be resumed.
         fits_dir = dataset_dir.joinpath('./fits')
         densities_dir = dataset_dir.joinpath('./densities')
         tests_dir = dataset_dir.joinpath('./tests')
-        for dir in [dataset_dir, fits_dir, densities_dir, tests_dir]:
+        web_dir = dataset_dir.joinpath('./web')
+        for dir in [dataset_dir, fits_dir, densities_dir, tests_dir, web_dir]:
             if not dir.exists():
                 makedirs(str(dir.resolve()))
         
