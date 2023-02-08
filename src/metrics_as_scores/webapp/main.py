@@ -36,7 +36,7 @@ from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Dropdown, CheckboxGroup, Button, DataTable, TableColumn
 from bokeh.models.widgets.inputs import Spinner
 # TODO: Use best palette
-from bokeh.palettes import Category20_12
+from bokeh.palettes import Category20_20
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
 from numbers import Integral
@@ -112,7 +112,7 @@ plot = figure(sizing_mode='stretch_width', height=640,
 
 
 for idx, ctx in enumerate(contexts):
-    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_12[idx], legend_label='[All contexts combined]' if ctx == '__ALL__' else ctx)
+    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All contexts combined]' if ctx == '__ALL__' else ctx)
 
 # Also add a vertical line for own quantity
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
