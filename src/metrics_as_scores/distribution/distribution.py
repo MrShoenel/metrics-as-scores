@@ -34,7 +34,6 @@ class JsonDataset(TypedDict):
     desc: str
     id: str
     author: list[str]
-    ideal_values: dict[str, Union[int, float]]
 
 
 class LocalDataset(JsonDataset):
@@ -43,7 +42,10 @@ class LocalDataset(JsonDataset):
     colname_type: str
     colname_context: str
     qtypes: dict[str, Literal['continuous', 'discrete']]
+    desc_qtypes: dict[str, str]
     contexts: list[str]
+    desc_contexts: dict[str, str]
+    ideal_values: dict[str, Union[int, float]]
 
 
 class KnownDataset(JsonDataset):
@@ -391,14 +393,23 @@ class Dataset:
     def quantity_types(self) -> list[str]:
         return list(self.ds['qtypes'].keys())
 
-
-    def contexts(self, include_all_domain: bool=False) -> Iterable[str]:
+    def contexts(self, include_all_contexts: bool=False) -> Iterable[str]:
         yield from self.ds['contexts']
-        if include_all_domain:
+        if include_all_contexts:
             yield '__ALL__'
+    
+    @property
+    def ideal_values(self) -> dict[str, Union[float, int, None]]:
+        return self.ds['ideal_values']
     
     def is_qtype_discrete(self, qtype: str) -> bool:
         return self.ds['qtypes'][qtype] == 'discrete'
+    
+    def qytpe_desc(self, qtype: str) -> str:
+        return self.ds['desc_qtypes'][qtype]
+    
+    def context_desc(self, context: str) -> Union[str, None]:
+        return self.ds['desc_contexts'][context]
     
     @property
     def quantity_types_continuous(self) -> list[str]:
