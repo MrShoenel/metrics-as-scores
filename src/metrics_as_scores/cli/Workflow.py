@@ -28,12 +28,12 @@ class Workflow:
         choices = list([Choice(title=options[idx][0], value=options[idx][1]) for idx in range(len(options))])
         return self.q.select(message=prompt, choices=choices, use_shortcuts=True).ask()
     
-    def print_info(self, text_normal: str, text_vital: str=None, end: str=None) -> None:
+    def print_info(self, text_normal: str, text_vital: str=None, end: str=None, arrow: str=' -> ') -> None:
         kwargs = {}
         if end != None:
             kwargs['end'] = end
         
-        text_normal = f' -> {text_normal}'
+        text_normal = f'{arrow}{text_normal}'
         
         if text_vital == None:
             self.q.print(text=text_normal, **kwargs)
