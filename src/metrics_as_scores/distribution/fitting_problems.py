@@ -43,7 +43,7 @@ class MixedVariableDistributionFittingProblem(ElementwiseProblem):
         
         n_ieq_constr: ``int``
             Number of inequality constraints. If there are any, then the problem also
-            overrides ``_evaluate()`` and sets values for each constraint.
+            overrides :meth:`Problem._evaluate()` and sets values for each constraint.
         """
         self.ext = int(np.max(data) - np.min(data))
         self.dist = dist
