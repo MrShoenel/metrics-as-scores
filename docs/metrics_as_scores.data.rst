@@ -4,14 +4,6 @@ metrics\_as\_scores.data package
 Submodules
 ----------
 
-metrics\_as\_scores.data.metrics module
----------------------------------------
-
-.. automodule:: metrics_as_scores.data.metrics
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 metrics\_as\_scores.data.pregenerate module
 -------------------------------------------
 
