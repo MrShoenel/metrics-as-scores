@@ -28,6 +28,8 @@ def isnumeric(s: str) -> bool:
 def get_local_datasets() -> Iterable[LocalDataset]:
     for d in scandir(path=str(datasets_dir.resolve())):
         if d.is_dir():
+            if d.name == '_default':
+                continue
             try:
                 manifest = datasets_dir.joinpath(f'./{d.name}/manifest.json')
                 if manifest.exists():
