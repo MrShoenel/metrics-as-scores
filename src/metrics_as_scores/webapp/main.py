@@ -149,21 +149,6 @@ def update_discrete_cont_mismatch():
         raise PlotException(msg='There are no discrete fits for continuous quantities.')
 
 
-# def get_score_type(val: str) -> str:
-#     if 'PDF' in val:
-#         if 'Param' in val:
-#             return 'PDF_Param'
-#         return 'PDF'
-#     if 'PMF' in val:
-#         if 'EPMF' in val:
-#             return 'EPMF'
-#         return 'PMF'
-#     if 'CCDF' in val:
-#         return 'CCDF'
-#     if 'PPF' in val:
-#         return 'PPF'
-#     return 'CDF'
-
 
 def update_labels():
     global selected_denstype, selected_transf, selected_autotransf
@@ -259,6 +244,7 @@ def update_plot(contain_plot: bool=False):
             throbber.visible = False
 
     curdoc().add_next_tick_callback(temp)
+
 
 def update_plot_internal(contain_plot: bool=False):
     global selected_cutoff, selected_autotransf
@@ -466,8 +452,6 @@ def update_plot_internal(contain_plot: bool=False):
     update_labels()
 
 
-
-
 def cbg_cutoff_click(active: list[int]):
     global selected_cutoff
     selected_cutoff = len(active) > 0
@@ -480,13 +464,10 @@ def cbg_autotrans_click(active: list[int]):
     update_plot()
 
 
-
 def dd_denstype_click(evt: MenuItemClick):
     global selected_denstype
     if evt.item == '-':
         return # Ignore, this is just a separator
-    # type_before = get_score_type(selected_denstype[1])
-    # type_after = get_score_type(evt.item)
     temp = { key: val for (val, key) in dd_denstype_items }
     dd_denstype.label = temp[evt.item]
     selected_denstype = (temp[evt.item], evt.item)
@@ -541,6 +522,7 @@ def read_text(file: str) -> str:
     with open(file=file, mode='r', encoding='utf-8') as f:
         return f.read().strip()
 
+
 cbg_cutoff.on_click(cbg_cutoff_click)
 cbg_autotrans.on_click(cbg_autotrans_click)
 dd_scores.on_click(dd_scores_click)
@@ -587,7 +569,7 @@ plot_row = row([column(tbl_transf, plot)], sizing_mode='stretch_both')
 root_col = column(header, input_row1, input_row2, input_row3, plot_row, footer, sizing_mode='stretch_both')
 
 curdoc().add_root(root_col)
-curdoc().title = "Metrics As Scores"
+curdoc().title = f'Metrics As Scores - {ds.ds["name"]}'
 
 update_plot()
 update_plot(contain_plot=True)
