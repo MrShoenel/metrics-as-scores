@@ -6,12 +6,14 @@ from re import match
 from os import makedirs
 from json import dump
 from collections import OrderedDict
+from shutil import copyfile
 import numpy as np
 import pandas as pd
 
 from pathlib import Path
 this_dir = Path(__file__).resolve().parent
 datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
+default_ds = datasets_dir.joinpath('./_default')
 
 
 class CreateDatasetWorkflow(Workflow):
@@ -173,7 +175,7 @@ is no best value for lines of code (size) of software.
     
 
     def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
-        self.q.print('We will now perform some statistical and summarize the results.')
+        self.q.print('We will now perform some statistical tests and summarize the results.')
         
         self.print_info(text_normal='Performing test: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
         anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_contexts=True)), unique_vals=True)
@@ -214,6 +216,11 @@ cannot be resumed.
             if not dir.exists():
                 makedirs(str(dir.resolve()))
         
+        # Let's copy specific files from the default over to the new dataset:
+        for file in ['./About.qmd', './web/about.html', './web/references.html']:
+            copyfile(src=str(default_ds.joinpath(file)), dst=str(dataset_dir.joinpath(file)))
+
+        
         path_manifest = str(dataset_dir.joinpath('./manifest.json'))
         path_data = str(dataset_dir.joinpath('./org-data.csv'))
         
@@ -229,4 +236,19 @@ cannot be resumed.
 
         dataset = Dataset(ds=manifest, df=df)
         self._run_statistical_tests(ds=dataset, tests_dir=tests_dir)
+        self.q.print('\n' + 10*'-' + '\n')
+
+
+        self.q.print(text=f'''
+Your dataset was created and initialized in: {str(dataset_dir.resolve())}
+
+In order to use your dataset, you need to pre-generate densities for the Web Application.
+If you would also like to fit parametric random variables and generate densities for those,
+you need to do that first, however.
+
+If you want to publicize your dataset and share it with others, you need to edit the files
+'about.html' and 'references.html' in the /web folder of your newly created dataset. Before
+bundling, you must create an 'About.pdf' file. You may use Quarto to knit the default
+'About.qmd' that will produce a nice-looking overview and include some qualitative results
+of the conducted statistical tests (ANOVA and TukeyHSD).''', style=self.style_mas)
         self.q.print('\n' + 10*'-' + '\n')
