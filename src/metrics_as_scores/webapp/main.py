@@ -29,13 +29,11 @@ from typing import Union
 from metrics_as_scores.webapp.exception import PlotException
 from metrics_as_scores.tools.funcs import nonlinspace
 from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset
-from collections import OrderedDict
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Dropdown, CheckboxGroup, Button, DataTable, TableColumn
 from bokeh.models.widgets.inputs import Spinner
-# TODO: Use best palette
 from bokeh.palettes import Category20_20
 from bokeh.plotting import figure
 from bokeh.models.widgets.markups import Div
@@ -151,20 +149,20 @@ def update_discrete_cont_mismatch():
         raise PlotException(msg='There are no discrete fits for continuous quantities.')
 
 
-def get_score_type(val: str) -> str:
-    if 'PDF' in val:
-        if 'Param' in val:
-            return 'PDF_Param'
-        return 'PDF'
-    if 'PMF' in val:
-        if 'EPMF' in val:
-            return 'EPMF'
-        return 'PMF'
-    if 'CCDF' in val:
-        return 'CCDF'
-    if 'PPF' in val:
-        return 'PPF'
-    return 'CDF'
+# def get_score_type(val: str) -> str:
+#     if 'PDF' in val:
+#         if 'Param' in val:
+#             return 'PDF_Param'
+#         return 'PDF'
+#     if 'PMF' in val:
+#         if 'EPMF' in val:
+#             return 'EPMF'
+#         return 'PMF'
+#     if 'CCDF' in val:
+#         return 'CCDF'
+#     if 'PPF' in val:
+#         return 'PPF'
+#     return 'CDF'
 
 
 def update_labels():
@@ -197,14 +195,17 @@ def update_labels():
 
     if is_ppf:
         input_own.placeholder = 'Check Probability To Sample A Value'
+        plot.xaxis.axis_label = 'Probability'
     else:
         input_own.placeholder = 'Check Own Value'
 
+        if st == DistTransform.NONE.name:
+            plot.xaxis.axis_label = 'Value'
+        else:
+            plot.xaxis.axis_label = 'Distance from Ideal'
 
-    if st == DistTransform.NONE.name:
-        plot.xaxis.axis_label = 'Value'
-    else:
-        plot.xaxis.axis_label = 'Distance from Ideal'
+
+    
 
 
 
@@ -282,6 +283,8 @@ def update_plot_internal(contain_plot: bool=False):
         cbg_autotrans.disabled = True
         cbg_autotrans.active = []
         selected_autotransf = False
+    else:
+        cbg_autotrans.disabled = False
 
     densities: dict[str, Union[Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete]] = {}
     df_cols = {}
@@ -385,9 +388,6 @@ def update_plot_internal(contain_plot: bool=False):
             domain_x = nonlinspace(lb_domain, ub_domain, npoints)
 
         df_cols[f'x_{ctx}'] = domain_x
-        if has_own:
-            use_v = np.rint(use_v)
-
         if is_parametric and not density.is_fit:
             df_cols[ctx] = np.zeros((domain_x.size,))
             if has_own:
@@ -485,15 +485,18 @@ def dd_denstype_click(evt: MenuItemClick):
     global selected_denstype
     if evt.item == '-':
         return # Ignore, this is just a separator
-    type_before = get_score_type(selected_denstype[1])
-    type_after = get_score_type(evt.item)
+    # type_before = get_score_type(selected_denstype[1])
+    # type_after = get_score_type(evt.item)
     temp = { key: val for (val, key) in dd_denstype_items }
     dd_denstype.label = temp[evt.item]
     selected_denstype = (temp[evt.item], evt.item)
 
     update_plot()
-    if type_before != type_after:
-        update_plot(contain_plot=True)
+    # For now, always call contain plot when the type changes, as even from one
+    # CDF to the next (or PDF), the results can be vastly different and warrant
+    # for a call to contain().
+    # if type_before != type_after:
+    update_plot(contain_plot=True)
 
 
 def dd_transf_click(evt: MenuItemClick):
