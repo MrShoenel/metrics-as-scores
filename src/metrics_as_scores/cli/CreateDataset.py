@@ -183,7 +183,7 @@ is no best value for lines of code (size) of software.
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
 
-        self.print_info(text_normal='Performing test: ', text_vital='TwoSample Kolmogorov-Smirnov Test ...', arrow='\n')
+        self.print_info(text_normal='Performing test: ', text_vital='Two-Sample Kolmogorov-Smirnov (KS2) ...', arrow='\n')
         ks2samp = ds.analyze_distr(qtypes=ds.quantity_types, use_ks_2samp=True)
         file_ks2samp = str(tests_dir.joinpath('./ks2samp.csv'))
         ks2samp.to_csv(file_ks2samp, index=False)
@@ -223,8 +223,15 @@ cannot be resumed.
                 makedirs(str(dir.resolve()))
         
         # Let's copy specific files from the default over to the new dataset:
-        for file in ['./About.qmd', './web/about.html', './web/references.html']:
+        for file in ['./About.qmd', './_quarto.yml', './web/about.html', './web/references.html']:
             copyfile(src=str(default_ds.joinpath(file)), dst=str(dataset_dir.joinpath(file)))
+        # We also need to write out variables for Quarto.
+        # We will write into the _quarto.yaml for better compat.
+        with open(file=str(dataset_dir.joinpath('./_quarto.yml')), mode='a', encoding='utf-8') as fp:
+            fp.write(f'\ntitle: {manifest["name"]}\n')
+            fp.write('\nauthor:')
+            for a in manifest['author']:
+                fp.write(f'\n  - {a}')
 
         
         path_manifest = str(dataset_dir.joinpath('./manifest.json'))
