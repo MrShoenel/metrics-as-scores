@@ -11,6 +11,10 @@ jupyter: python3
 
 ```{python}
 #| echo: false
+
+# You may edit this; it's the significance level used in this report.
+use_alpha = 0.05
+
 import pandas as pd
 from os import getcwd
 from pathlib import Path
@@ -137,12 +141,12 @@ contexts = list(dataset.contexts(include_all_contexts=False))
 row = df_anova.iloc[0,:].to_dict()
 
 
-null_holds = row["pval"] > 0.05
+null_holds = row["pval"] > use_alpha
 interpret: str=None
 if null_holds:
-	interpret = f'For a significance level of $\\alpha\\tight{{=}}0.05$, the null hypothesis cannot be rejected, meaning that the means of samples of the quantity type {row["qtype"]} are not statistically significantly different across contexts.'
+	interpret = f'For a significance level of $\\alpha\\tight{{=}}{use_alpha}$, the null hypothesis cannot be rejected, meaning that the means of samples of the quantity type {row["qtype"]} are not statistically significantly different across contexts.'
 else:
-	interpret = f'We cannot accept the null hypothesis for a significance level of $\\alpha\\tight{{=}}0.05$, meaning that the the means of samples of the quantity type {row["qtype"]} have statistically significantly different means across contexts.'
+	interpret = f'We cannot accept the null hypothesis for a significance level of $\\alpha\\tight{{=}}{use_alpha}$, meaning that the the means of samples of the quantity type {row["qtype"]} have statistically significantly different means across contexts.'
 
 
 dm(f'''
@@ -163,6 +167,75 @@ contexts {format_comma_and(list([f"*{c}*" for c in row["across_contexts"].split(
 temp = df_anova[['qtype', 'pval', 'stat']]
 Markdown(tabulate(tabular_data=temp, headers=['Quantity Type', 'p-Value', 'F-Statistic'], showindex=False))
 ```
+
+
+
+## KS2
+
+```{python}
+#| echo: false
+
+n = len(contexts) + 1
+r = int(n * (n - 1) / 2)
+
+dm(f'''
+The two-sample Kolmogorov--Smirnov test checks if two samples stem from an identical distribution (which is the null hypothesis).
+The KS2 test requires pairwise comparisons.
+For each type of quantity, we compare it within all the contexts.
+Therefore, all pair-wise combinations are computed.
+This dataset has ${n-1}$ contexts plus one virtual (in which we effectively disregard the context, therefore, $n\\tight{{=}}{n}$).
+The number of pair-wise comparisons per type of quantity, therefore, is $n\\tight{{\\times}}(n\\tight{{-}}1)\\tight{{\\div}}2\\tight{{=}}{r}$.
+In other words, each type of quantity can significantly stick out anywhere between zero and ${r}$ times.
+@fig-ks2 shows the results of the KS2 test using the significance threshold $\\alpha\\tight{{=}}{use_alpha}$.
+'''.strip())
+```
+
+
+```{python}
+#| label: fig-ks2
+#| fig-cap: The frequency with which quantity types were considered to come from the same distribution. Numbers close to the max indicate that the type of quantity is not significantly different across contexts.
+#| echo: false
+
+import matplotlib
+import matplotlib.pyplot as plt
+from bokeh.palettes import Category20_20
+from math import ceil
+
+temp = df_ks2samp[df_ks2samp.pval >= use_alpha]
+cnts = list([
+	temp[(temp.qtype == qtype)].shape[0]
+	for qtype in dataset.quantity_types
+])
+
+fig, ax = plt.subplots()
+fig.set_figwidth(8)
+fig.set_figheight(2.5)
+bars = ax.bar(dataset.quantity_types, cnts, width=.5, color=Category20_20)
+
+ax.set_ylim(bottom=0, top=r + ceil(r*.1))
+ax.bar_label(bars)
+ax.set_axisbelow(True)
+ax.grid(color='#dddddd', linestyle='dashed')
+
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "Computer Modern Roman"
+})
+plt.title("Frequency with which metrics are similar across contexts.")
+plt.show()
+```
+
+<!--
+The results of the KS2 tests are illustrated in Figure~\ref{fig:rq1_ks2}.
+For each metric, it shows the number of times the metric was \emph{not} distributed statistically significantly different in other domains.
+Seven metrics (\cpvar{DIT}, \cpvar{MLOC}, \cpvar{NBD}, \cpvar{NOF}, \cpvar{NOM}, \cpvar{VG}, and \cpvar{WMC}) have a count of zero.
+Those metrics are therefore \emph{always} different, across all $66$ pairwise comparisons.
+The average of how often a metric was similar is $\utight{\approx}9.43$ times.
+The metrics \cpvar{PAR}, \cpvar{SIX}, \cpvar{NSF}, \cpvar{NORM}, \cpvar{LCOM}, \cpvar{RMD}, \cpvar{CA}, and \cpvar{RMI} are rarely similar with a frequency in the range $\interval{1}{11}$.
+The metrics \cpvar{NSC}, \cpvar{NSM}, \cpvar{RMA}, \cpvar{NOC}, \cpvar{CE}, and \cpvar{NOI} are moderately often similar with a frequency between $\interval{14}{21}$.
+The metrics \cpvar{NOP} ($29$) and \cpvar{TLOC} ($34$) on the other hand are frequently similar.
+-->
+
 
 
 <!--
