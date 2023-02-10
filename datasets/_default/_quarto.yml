@@ -1,4 +1,4 @@
-number-sections: false
+number-sections: true
 bibliography: refs.bib
 pdf-engine: pdflatex
 top-level-division: section
