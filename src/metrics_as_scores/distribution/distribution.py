@@ -655,6 +655,6 @@ class Dataset:
             return pd.DataFrame(dict_list)
 
         from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(metric_id) for metric_id in metric_ids)
+        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(qtype) for qtype in self.quantity_types)
 
         return pd.concat(res_dfs)
