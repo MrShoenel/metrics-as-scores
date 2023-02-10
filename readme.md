@@ -1,5 +1,21 @@
-Metrics as Scores [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119) [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)
+Metrics As Scores [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119) [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)
 =================
+
+
+
+**Version `v2.x.x`** has the following new features:
+
+- Textual User Interface (TUI)
+	- Download and install known (3rd-party) datasets
+	- Create own datasets: Start with a single CSV and get a fully-fledged dataset, ready for publication, including a report with statistical analyses. After publication, the dataset will be added to the known ones (if you wish) and is discoverable and installable by others.
+- Proper documentation and testing
+- New version on PyPI. Install the package and run the command line interface by typing `mas`!
+
+
+**Attention**: Below is the readme of *Metrics As Scores* ___`v1.x.x`___.
+Metrics As Scores currently undergoes substantial changes, and a proper ***`v2.x`*** is soon to be released.
+
+--------------
 
 Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://metrics-as-scores.ml/>.
 
