@@ -1,8 +1,9 @@
 ---
-subtitle: "A Dataset For Metrics As Scores"
+subtitle: "A Dataset For _Metrics As Scores_"
 jupyter: python3
 ---
 
+\newcommand{\abs}[1]{\left\lvert\,#1\,\right\rvert}
 \newcommand\tightto{\!\to\!}
 \newcommand\tightmapsto{\!\mapsto\!}
 \newcommand{\tight}[1]{\,{#1}\,}
@@ -15,16 +16,26 @@ from os import getcwd
 from pathlib import Path
 from json import load
 from IPython.display import display, Markdown
+from tabulate import tabulate
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
-from metrics_as_scores.cli.helpers import format_authors
+
+def format_comma_and(lst: str) -> str:
+    if len(lst) == 1:
+        return lst[0]
+    l = lst[0:(len(lst) - 1)]
+    r = lst[len(lst) - 1]
+    if len(l) == 1:
+        return f'{l[0]} and {r}'
+    return f'{", ".join(l)}, and {r}'
 
 dm = lambda s: display(Markdown(s))
 
 # Let's load the entire dataset, except for the original df!
 dataset_dir = Path(getcwd())
 
-df_anova = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./tests/anova.csv')))
-df_tukey = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./tests/tukeyhsd.csv')))
+df_anova = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./stat-tests/anova.csv')))
+df_ks2samp = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./stat-tests/ks2samp.csv')))
+df_tukey = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./stat-tests/tukeyhsd.csv')))
 manifest: LocalDataset = None
 with open(file=str(dataset_dir.joinpath('./manifest.json')), mode='r', encoding='utf-8') as fp:
 	manifest = load(fp=fp)
@@ -58,9 +69,7 @@ dm('\n'.join(temp))
 contexts = list(dataset.contexts(include_all_contexts=False))
 
 dm(f'''
-It has a total of {len(contexts)} **Contexts**: {format_authors(list([f'*{c}*' for c in contexts]))}.
-''')
-
+It has a total of {len(contexts)} **Contexts**: {format_comma_and(list([f'*{c}*' for c in contexts]))}.''')
 ```
 
 
@@ -70,6 +79,13 @@ It has a total of {len(contexts)} **Contexts**: {format_authors(list([f'*{c}*' f
 In this section, results for the analysis of variance (ANOVA) and Tukey's Honest Significance Test (TukeyHSD) are shown.
 These tests will give a first indication as to how different the quantity types are across contexts.
 These two tests were used in the original paper [@honel2022qrs] that *Metrics As Scores* was initially conceived for.
+
+
+These tests are conducted to help answering related questions, such as:
+
+- Are there significant statistical differences for each type of quantity across all contexts?
+- Is each context in its entirety (i.e., considering all types of quantities) distinguishable from the other contexts?
+- What are good/bad or common/extreme scores for each context of the given dataset?
 
 
 ## ANOVA
@@ -88,9 +104,9 @@ The p-value then indicates how likely it is for the F-statistic to have occurred
 The Two-sample Kolmogorov--Smirnov Test (KS2) is a non-parametric and tests whether two samples stem from the same probability distribution [@stephens1974kstest].
 KS2 does not check for a certain type of probability distribution since it uses the samples' empirical CDFs.
 Its test statistic is the maximum vertical distance between the two CDFs.
-For two samples $\mathbf{x},\mathbf{y}$, the statistic is calculated as $D_{\boldmath x,y}\tight{=}\sup_t\,\abs{F_{\mathcal{X}}(t)\tight{-}F_{\mathcal{Y}}(t)}$.
+For two samples $\mathbf{x},\mathbf{y}$, the statistic is calculated as $D_{\mathbf{x},\mathbf{y}}\tight{=}\sup_t\,\abs{F_{\mathcal{X}}(t)\tight{-}F_{\mathcal{Y}}(t)}$.
 The null hypothesis is that the samples' CDFs are identical, that is, $F_{\mathcal{X}}\tight{=}F_{\mathcal{Y}}$.
-This test is used to compare one metric between two contexts.
+This test is used to compare one type of quantity between two contexts.
 
 
 ## TukeyHSD
@@ -103,8 +119,50 @@ The null hypothesis of this test is the same as for the ANOVA test.
 
 # Results
 
-Here we present some insights from conducting the ANOVA- and TukeyHSD tests.
+Here we present some insights from conducting the ANOVA- KS2-, and TukeyHSD tests.
 
+
+## ANOVA
+
+@tbl-anova show the results of the ANOVA analysis.
+For each type of quantity, it indicates whether the quantity types' means vary significantly across contexts.
+For this test, we also add a virtual contexts, in which we simply merge the values of all contexts and effectively disregard the context.
+Therefore, the ANOVA test also indicates whether quantity types' values are different in a specific context when compared to all recorded values.
+
+
+```{python}
+#| echo: false
+
+contexts = list(dataset.contexts(include_all_contexts=False))
+row = df_anova.iloc[0,:].to_dict()
+
+
+null_holds = row["pval"] > 0.05
+interpret: str=None
+if null_holds:
+	interpret = f'For a significance level of $\\alpha\\tight{{=}}0.05$, the null hypothesis cannot be rejected, meaning that the means of samples of the quantity type {row["qtype"]} are not statistically significantly different across contexts.'
+else:
+	interpret = f'We cannot accept the null hypothesis for a significance level of $\\alpha\\tight{{=}}0.05$, meaning that the the means of samples of the quantity type {row["qtype"]} have statistically significantly different means across contexts.'
+
+
+dm(f'''
+@tbl-anova shows, for each quantity type, if there was corroboration for the null hypothesis, which here is whether the samples of the same quantity type have the same mean across contexts.
+So, for example, samples of the first quantity type **{row["qtype"]}** were compared across
+contexts {format_comma_and(list([f"*{c}*" for c in row["across_contexts"].split(";")]))}.
+{interpret}
+'''.strip())
+```
+
+
+
+```{python}
+#| label: tbl-anova
+#| tbl-cap: Results of the ANOVA analysis.
+#| echo: false
+
+temp = df_anova[['qtype', 'pval', 'stat']]
+Markdown(tabulate(tabular_data=temp, headers=['Quantity Type', 'p-Value', 'F-Statistic'], showindex=False))
+```
 
 
 <!--
