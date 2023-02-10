@@ -1,0 +1,140 @@
+---
+subtitle: "A Dataset For Metrics As Scores"
+jupyter: python3
+---
+
+\newcommand\tightto{\!\to\!}
+\newcommand\tightmapsto{\!\mapsto\!}
+\newcommand{\tight}[1]{\,{#1}\,}
+\newcommand{\utight}[1]{{#1}\,}
+
+```{python}
+#| echo: false
+import pandas as pd
+from os import getcwd
+from pathlib import Path
+from json import load
+from IPython.display import display, Markdown
+from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
+from metrics_as_scores.cli.helpers import format_authors
+
+dm = lambda s: display(Markdown(s))
+
+# Let's load the entire dataset, except for the original df!
+dataset_dir = Path(getcwd())
+
+df_anova = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./tests/anova.csv')))
+df_tukey = pd.read_csv(filepath_or_buffer=str(dataset_dir.joinpath('./tests/tukeyhsd.csv')))
+manifest: LocalDataset = None
+with open(file=str(dataset_dir.joinpath('./manifest.json')), mode='r', encoding='utf-8') as fp:
+	manifest = load(fp=fp)
+
+dataset = Dataset(ds=manifest, df=pd.DataFrame())
+```
+
+
+```{python}
+#| echo: false
+
+dm(f"""
+# Description
+{manifest['desc']}
+""")
+```
+
+This dataset has the following **Quantity Types**:
+
+```{python}
+#| echo: false
+
+temp = [f'- *{qtype}*: {dataset.qytpe_desc(qtype=qtype)}' for qtype in dataset.quantity_types]
+
+dm('\n'.join(temp))
+```
+
+```{python}
+#| echo: false
+
+contexts = list(dataset.contexts(include_all_contexts=False))
+
+dm(f'''
+It has a total of {len(contexts)} **Contexts**: {format_authors(list([f'*{c}*' for c in contexts]))}.
+''')
+
+```
+
+
+
+# Analysis
+
+In this section, results for the analysis of variance (ANOVA) and Tukey's Honest Significance Test (TukeyHSD) are shown.
+These tests will give a first indication as to how different the quantity types are across contexts.
+These two tests were used in the original paper [@honel2022qrs] that *Metrics As Scores* was initially conceived for.
+
+
+## ANOVA
+
+This test analyzes the differences among means [@Chambers2017-fu].
+For each type of quantity, this test analyzes if means of its samples are significantly different across contexts.
+The null hypothesis of this test is that there are *no* significant differences.
+This test yields a p-value and an F-statistic.
+The latter is the mean square of each independent variable divided by the mean square of the residuals.
+Large F-statistics indicate that the variation among contexts is likely.
+The p-value then indicates how likely it is for the F-statistic to have occurred, given the null hypothesis is true.
+
+
+## KS2
+
+The Two-sample Kolmogorov--Smirnov Test (KS2) is a non-parametric and tests whether two samples stem from the same probability distribution [@stephens1974kstest].
+KS2 does not check for a certain type of probability distribution since it uses the samples' empirical CDFs.
+Its test statistic is the maximum vertical distance between the two CDFs.
+For two samples $\mathbf{x},\mathbf{y}$, the statistic is calculated as $D_{\boldmath x,y}\tight{=}\sup_t\,\abs{F_{\mathcal{X}}(t)\tight{-}F_{\mathcal{Y}}(t)}$.
+The null hypothesis is that the samples' CDFs are identical, that is, $F_{\mathcal{X}}\tight{=}F_{\mathcal{Y}}$.
+This test is used to compare one metric between two contexts.
+
+
+## TukeyHSD
+
+This test is used to gain insights into the results of an ANOVA test.
+While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons [@tukey1949hsd].
+For example, by choosing a certain type of quantity and context, we obtain a list of other contexts that are significantly statistically different.
+The null hypothesis of this test is the same as for the ANOVA test.
+
+
+# Results
+
+Here we present some insights from conducting the ANOVA- and TukeyHSD tests.
+
+
+
+<!--
+	The following is the cross-platform solution for correctly showing references.
+-->
+# References {-}
+
+<div id="refs"></div>
+
+<!--
+# Bla `ds.ds["name"]`{.python}
+
+For a demonstration of a line plot on a polar axis, see @fig-polar.
+
+```{python}
+#| label: fig-polar
+#| fig-cap: "A line plot on a polar axis"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+r = np.arange(0, 2, 0.01)
+theta = 2 * np.pi * r
+fig, ax = plt.subplots(
+  subplot_kw = {'projection': 'polar'} 
+)
+ax.plot(theta, r)
+ax.set_rticks([0.5, 1, 1.5, 2])
+ax.grid(True)
+plt.show()
+```
+
+-->
