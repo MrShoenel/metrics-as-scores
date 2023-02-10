@@ -5,17 +5,18 @@ from abc import ABC
 from typing import Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
 from nptyping import NDArray, Shape, Float
+from itertools import combinations
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.tools.funcs import cdf_to_ppf
 from statsmodels.distributions import ECDF as SMEcdf
 from scipy.stats import gaussian_kde, f_oneway, mode
 from scipy.integrate import quad
 from scipy.optimize import direct
+from scipy.stats import ks_2samp, ttest_ind
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from strenum import StrEnum
 from metrics_as_scores.distribution.fitting import StatTest_Types
-
+from strenum import StrEnum
 
 
 
@@ -628,21 +629,18 @@ class Dataset:
         return pd.concat(res_dfs)
     
 
-    def analyze_distr(self, metric_ids: Iterable[MetricID], use_ks_2samp: bool=True) -> pd.DataFrame:
-        if len(list(metric_ids)) < 1:
+    def analyze_distr(self, qtypes: Iterable[str], use_ks_2samp: bool=True) -> pd.DataFrame:
+        if len(list(qtypes)) < 1:
             raise Exception('Requires one or metrics.')
         
-        temp = self.df.copy()
-        temp.domain = '__ALL__'
-        all_data = pd.concat([temp, self.df])
-        unique_domain_pairs: list[tuple[str, str]] = list(combinations(iterable=all_data.domain.unique(), r=2))
+        unique_context_pairs: list[tuple[str, str]] = list(combinations(iterable=self.contexts(include_all_contexts=True), r=2))
         
-        def compare(metric_id: MetricID) -> pd.DataFrame:
+        def compare(qtype: str) -> pd.DataFrame:
             dict_list: list[dict[str, Union[str, float]]] = [ ]
 
-            for udp in unique_domain_pairs:
-                data1 = all_data[(all_data.domain == udp[0]) & (all_data.metric == metric_id.name)].value.to_numpy()
-                data2 = all_data[(all_data.domain == udp[1]) & (all_data.metric == metric_id.name)].value.to_numpy()
+            for udp in unique_context_pairs:
+                data1 = self.data(qtype=qtype, context=udp[0])
+                data2 = self.data(qtype=qtype, context=udp[1])
 
                 stat = pval = None
                 if use_ks_2samp:
@@ -651,7 +649,7 @@ class Dataset:
                     stat, pval = ttest_ind(a=data1, b=data2, equal_var=False, alternative='two-sided')
 
                 dict_list.append({
-                    'metric': metric_id.name, 'stat': stat, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
+                    'qtype': qtype, 'stat': stat, 'pval': pval, 'group1': udp[0], 'group2': udp[1]
                 })
             
             return pd.DataFrame(dict_list)
