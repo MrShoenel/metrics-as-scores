@@ -419,13 +419,19 @@ class Dataset:
     def quantity_types_discrete(self) -> list[str]:
         return list(filter(lambda qtype: self.is_qtype_discrete(qtype=qtype), self.quantity_types))
 
-    def data(self, qtype: str, context: str=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
+    def data(self, qtype: str, context: Union[str, None, Literal['__ALL__']]=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
         """
         This method is used to select a subset of the data, that is specific to at least
         a type of quantity, and optionally to a context, too.
+
+        context: ``Union[str, None, Literal['__ALL__']]``
+            You may specify a context
         """
         new_df = self.df[self.df[self.ds['colname_type']] == qtype]
-        if context is not None:
+        if context is not None and context != '__ALL__':
+            # Check if context exists:
+            if not context in list(self.contexts(include_all_contexts=False)):
+                raise Exception(f'The context "{context}" is not known.')
             new_df = new_df[new_df[self.ds['colname_context']] == context]
         
         vals = new_df[self.ds['colname_data']]
