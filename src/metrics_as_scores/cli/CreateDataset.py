@@ -183,6 +183,12 @@ is no best value for lines of code (size) of software.
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
 
+        self.print_info(text_normal='Performing test: ', text_vital='TwoSample Kolmogorov-Smirnov Test ...', arrow='\n')
+        ks2samp = ds.analyze_distr(qtypes=ds.quantity_types, use_ks_2samp=True)
+        file_ks2samp = str(tests_dir.joinpath('./ks2samp.csv'))
+        ks2samp.to_csv(file_ks2samp, index=False)
+        self.print_info(text_normal='Wrote result to: ', text_vital=file_ks2samp)
+
         self.print_info(text_normal='Performing test: ', text_vital="Tukey's Honest Significance Test (TukeyHSD) ...", arrow='\n')
         tukeyhsd = ds.analyze_TukeyHSD(qtypes=ds.quantity_types)
         file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
