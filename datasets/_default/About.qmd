@@ -227,6 +227,77 @@ plt.show()
 
 
 
+## TukeyHSD
+
+
+```{python}
+#| echo: false
+
+n = len(contexts) + 1
+m = len(dataset.quantity_types)
+r = (n-1) * m
+
+dm(f'''
+Per context, this test allows us to report how many types of quantities are different, compared to all other contexts' types of quantities.
+Consider the set of contexts $\\mathit{{C}}$ and the set of quantity types $\\mathit{{Q}}$.
+Given a context $c_i$ and a quantity type $q_j$, this test reports all other contexts $\\mathit{{C}}^{{\\setminus c_i}}$ that have a statistically significantly different distribution for $q_j$.
+However, for $c_i$, we aggregate these counts across all quantity types.
+We have a total of $n\\tight{{=}}{n-1}+1$ contexts (including the virtual context).
+Therefore, the amount of quantity types ($m\\tight{{=}}{len(dataset.quantity_types)}$) that are different in different contexts can maximally be $(n\\tight{{-}}1)\\tight{{\\times}}m\\tight{{=}}{r}$.
+'''.strip())
+```
+
+```{python}
+#| label: fig-tukey
+#| fig-cap: Number of quantity types that are different per context, by comparing each context to all other contexts.
+#| echo: false
+#| warning: false
+
+import numpy as np
+
+temp = list()
+for idx in range(len(df_tukey.index)):
+	row = df_tukey.iloc[idx,:].to_dict()
+	if row['reject']:
+		# Reject null hypothesis -> qtype's contexts are different
+		temp.append(row['group1'])
+		temp.append(row['group2'])
+
+values, counts = np.unique(np.array(temp), axis=0, return_counts=True)
+values, counts = list(values), list(counts)
+
+cnt_dict = {}
+for idx, val in enumerate(values):
+	cnt_dict[val] = counts[idx]
+
+cnts = list()
+for ctx in dataset.contexts(include_all_contexts=True):
+	if ctx in cnt_dict:
+		cnts.append(cnt_dict[ctx])
+	else:
+		cnts.append(0)
+
+fig, ax = plt.subplots()
+fig.set_figwidth(8)
+fig.set_figheight(2.5)
+bars = ax.bar(list(dataset.contexts(include_all_contexts=False)) + ['\\textbf{ALL}'], cnts, width=.5, color=Category20_20)
+
+r = max(list(cnt_dict.values()))
+ax.set_ylim(bottom=0, top=r + ceil(r*.1))
+ax.bar_label(bars)
+ax.set_axisbelow(True)
+ax.grid(color='#dddddd', linestyle='dashed')
+angle = 0 if len(contexts) < 10 else (45 if len(contexts) < 20 else 90)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=angle)
+
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "Computer Modern Roman"
+})
+plt.title("Number of quantity types different per context.")
+plt.show()
+```
+
 
 ## Common/extreme Values
 
