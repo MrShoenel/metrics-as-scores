@@ -195,6 +195,7 @@ In other words, each type of quantity can significantly stick out anywhere betwe
 #| label: fig-ks2
 #| fig-cap: The frequency with which quantity types were considered to come from the same distribution. Numbers close to the max indicate that the type of quantity is not significantly different across contexts.
 #| echo: false
+#| warning: false
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -216,6 +217,8 @@ ax.set_ylim(bottom=0, top=r + ceil(r*.1))
 ax.bar_label(bars)
 ax.set_axisbelow(True)
 ax.grid(color='#dddddd', linestyle='dashed')
+angle = 0 if len(contexts) < 10 else (45 if len(contexts) < 20 else 90)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=angle)
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -354,7 +357,7 @@ for ctx in dataset.contexts(include_all_contexts=True):
 	tf = dist.transform_value
 	templ.append([ctx] + list(['{:.2e}'.format(r) for r in list(find_score_pdf(use_quantiles, dist)) + [tf]]))
 
-Markdown(tabulate(tabular_data=pd.DataFrame(templ), headers=[dataset.ds['colname_context']] + list(str(s) for s in list(use_quantiles) + ['E[X]']), showindex=False))
+Markdown(tabulate(tabular_data=pd.DataFrame(templ), headers=[dataset.ds['colname_context']] + list(str(s) for s in list(use_quantiles) + ['$\\mathbb{E}[X]$']), showindex=False))
 ```
 
 
@@ -364,28 +367,3 @@ Markdown(tabulate(tabular_data=pd.DataFrame(templ), headers=[dataset.ds['colname
 # References {-}
 
 <div id="refs"></div>
-
-<!--
-# Bla `ds.ds["name"]`{.python}
-
-For a demonstration of a line plot on a polar axis, see @fig-polar.
-
-```{python}
-#| label: fig-polar
-#| fig-cap: "A line plot on a polar axis"
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-r = np.arange(0, 2, 0.01)
-theta = 2 * np.pi * r
-fig, ax = plt.subplots(
-  subplot_kw = {'projection': 'polar'} 
-)
-ax.plot(theta, r)
-ax.set_rticks([0.5, 1, 1.5, 2])
-ax.grid(True)
-plt.show()
-```
-
--->
