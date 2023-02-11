@@ -225,17 +225,66 @@ plt.title("Frequency with which metrics are similar across contexts.")
 plt.show()
 ```
 
-<!--
-The results of the KS2 tests are illustrated in Figure~\ref{fig:rq1_ks2}.
-For each metric, it shows the number of times the metric was \emph{not} distributed statistically significantly different in other domains.
-Seven metrics (\cpvar{DIT}, \cpvar{MLOC}, \cpvar{NBD}, \cpvar{NOF}, \cpvar{NOM}, \cpvar{VG}, and \cpvar{WMC}) have a count of zero.
-Those metrics are therefore \emph{always} different, across all $66$ pairwise comparisons.
-The average of how often a metric was similar is $\utight{\approx}9.43$ times.
-The metrics \cpvar{PAR}, \cpvar{SIX}, \cpvar{NSF}, \cpvar{NORM}, \cpvar{LCOM}, \cpvar{RMD}, \cpvar{CA}, and \cpvar{RMI} are rarely similar with a frequency in the range $\interval{1}{11}$.
-The metrics \cpvar{NSC}, \cpvar{NSM}, \cpvar{RMA}, \cpvar{NOC}, \cpvar{CE}, and \cpvar{NOI} are moderately often similar with a frequency between $\interval{14}{21}$.
-The metrics \cpvar{NOP} ($29$) and \cpvar{TLOC} ($34$) on the other hand are frequently similar.
--->
 
+
+
+## Common/extreme Values
+
+In this section, we demonstrate some common or extreme values by showing what (maximum) distance is required to achieve a score as shown in header of @tbl-common-extreme.
+The example shown here is that of the first type of quantity, which has been transformed using each context's expection, $\mathbb{E}[X]$.
+Since it is practically unlikely to have uniformly distributed quantities, a linear increase in score is usually associated with a non-linear decrease in distance.
+Note that the values in @tbl-common-extreme are approximate.
+
+
+```{python}
+#| echo: false
+
+# Let's read the file 'densities_KDE_approx_EXPECTATION' so that we can generate some table.
+# This is one example of how to do this, but feel free to generate any kind of table, using
+# any type of density, or even show multiple tables.
+
+from metrics_as_scores.distribution.distribution import KDE_approx
+from pickle import load
+
+dens: dict[str, KDE_approx] = None
+with open(file=str(dataset_dir.joinpath('./densities/densities_KDE_approx_EXPECTATION.pickle')), mode='rb') as fp:
+	dens = load(file=fp)
+```
+
+```{python}
+#| label: tbl-common-extreme
+#| tbl-cap: The required maximum distance from the context's expectation $\mathbb{E}[X]$ to achieve a score less than or equal to $x$. The __ALL__-context is shown as well.
+#| echo: false
+
+import numpy as np
+from typing import Callable
+from scipy.optimize import direct, minimize
+from scipy.integrate import quad
+from numpy import vectorize
+
+# Quantiles [8+1]: 0, 0.1, 0.25, 0.5, 0.75, 0.85, 0.95, 0.99, E[X]
+use_quantiles = np.array([0.001, 0.1, 0.2, 0.33, 0.5, 0.66, 0.75, 0.85, 0.9, 0.999])
+
+
+def find_score_pdf(score: float, dist: KDE_approx):
+	pdf_scale, _ = quad(func=dist.pdf, a=0, b=dist._range_data[1] * 10)
+	pdf = lambda x: dist.pdf(x) / pdf_scale
+	ccdf = lambda x: 1.0 - quad(func=pdf, a=0, b=x)[0]
+	#res = direct(func=lambda x: (score - ccdf(x))**2, bounds=((0,dist._range_data[1] * 10),))
+	res = minimize(fun=lambda x: (score - ccdf(x))**2, x0=0.001, bounds=((0,dist._range_data[1] * 10),))
+	return res.x[0]
+
+find_score_pdf = vectorize(find_score_pdf)
+
+templ = []
+use_qty = dataset.quantity_types[0]
+for ctx in dataset.contexts(include_all_contexts=True):
+	dist = dens[f'{ctx}_{use_qty}']
+	tf = dist.transform_value
+	templ.append([ctx] + list(['{:.2e}'.format(r) for r in list(find_score_pdf(use_quantiles, dist)) + [tf]]))
+
+Markdown(tabulate(tabular_data=pd.DataFrame(templ), headers=[dataset.ds['colname_context']] + list(str(s) for s in list(use_quantiles) + ['E[X]']), showindex=False))
+```
 
 
 <!--
