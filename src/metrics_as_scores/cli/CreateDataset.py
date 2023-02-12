@@ -2,6 +2,7 @@ from typing import Union
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import isint, isnumeric
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
+from metrics_as_scores.tools.funcs import natsort
 from re import match
 from os import makedirs
 from json import dump
@@ -120,9 +121,9 @@ class CreateDatasetWorkflow(Workflow):
         self.q.print('')
         self.print_info(text_normal='Having an original data frame with ', text_vital=f'{len(df.index)} rows.')
         qtypes = list([str(a) for a in df[col_type].unique()])
-        qtypes.sort()
+        qtypes.sort(key=natsort)
         contexts = list([str(a) for a in df[col_ctx].unique()])
-        contexts.sort()
+        contexts.sort(key=natsort)
         jsd['contexts'] = contexts
         self.print_info(text_normal='The following quantity types were found: ', text_vital=', '.join(qtypes))
         self.print_info(text_normal='The following contexts exist in the data: ', text_vital=', '.join(contexts))
