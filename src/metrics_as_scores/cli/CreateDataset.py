@@ -120,21 +120,23 @@ class CreateDatasetWorkflow(Workflow):
         self.q.print('')
         self.print_info(text_normal='Having an original data frame with ', text_vital=f'{len(df.index)} rows.')
         qtypes = list([str(a) for a in df[col_type].unique()])
+        qtypes.sort()
         contexts = list([str(a) for a in df[col_ctx].unique()])
+        contexts.sort()
         jsd['contexts'] = contexts
         self.print_info(text_normal='The following quantity types were found: ', text_vital=', '.join(qtypes))
         self.print_info(text_normal='The following contexts exist in the data: ', text_vital=', '.join(contexts))
 
         # Let's ask some descriptions for qtypes and contexts:
-        self.q.print('\nYou should now enter a very brief (max. 20 characters) description for each quantity type.\n')
+        self.q.print('\nYou should now enter a very brief (max. 30 characters) description for each quantity type.\n')
         jsd['desc_qtypes'] = { qtype: None for qtype in qtypes }
         for qtype in qtypes:
-            jsd['desc_qtypes'][qtype] = self.q.text(message=f'Enter a description for {qtype}: ', validate=lambda s: len(s) > 0 and len(s) <= 20).ask().strip()
+            jsd['desc_qtypes'][qtype] = self.q.text(message=f'Enter a description for {qtype}: ', validate=lambda s: len(s) > 0 and len(s) <= 30).ask().strip()
         
-        self.q.print('\nYou can now enter an optional brief (max. 20 characters) description for each context.\n')
+        self.q.print('\nYou can now enter an optional brief (max. 30 characters) description for each context.\n')
         jsd['desc_contexts'] = { ctx: None for ctx in contexts }
         for ctx in contexts:
-            temp = self.q.text(message=f'Enter an optional description for {ctx} (empty for none): ', validate=lambda s: len(s) <= 20).ask().strip()
+            temp = self.q.text(message=f'Enter an optional description for {ctx} (empty for none): ', validate=lambda s: len(s) <= 30).ask().strip()
             jsd['desc_contexts'][ctx] = None if len(temp) == 0 else temp
 
         # Determine if features are discrete or continuous
@@ -177,19 +179,19 @@ is no best value for lines of code (size) of software.
     def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
         self.q.print('We will now perform some statistical tests and summarize the results.')
         
-        self.print_info(text_normal='Performing test: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
+        self.print_info(text_normal='Performing tests: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
         anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_contexts=True)), unique_vals=True)
         file_anova = str(tests_dir.joinpath('./anova.csv'))
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
 
-        self.print_info(text_normal='Performing test: ', text_vital='Two-Sample Kolmogorov-Smirnov (KS2) ...', arrow='\n')
+        self.print_info(text_normal='Performing tests: ', text_vital='Two-Sample Kolmogorov-Smirnov (KS2) ...', arrow='\n')
         ks2samp = ds.analyze_distr(qtypes=ds.quantity_types, use_ks_2samp=True)
         file_ks2samp = str(tests_dir.joinpath('./ks2samp.csv'))
         ks2samp.to_csv(file_ks2samp, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_ks2samp)
 
-        self.print_info(text_normal='Performing test: ', text_vital="Tukey's Honest Significance Test (TukeyHSD) ...", arrow='\n')
+        self.print_info(text_normal='Performing tests: ', text_vital="Tukey's Honest Significance Test (TukeyHSD) ...", arrow='\n')
         tukeyhsd = ds.analyze_TukeyHSD(qtypes=ds.quantity_types)
         file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
         tukeyhsd.to_csv(file_tukey, index=False)
