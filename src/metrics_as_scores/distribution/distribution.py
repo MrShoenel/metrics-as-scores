@@ -8,14 +8,16 @@ from nptyping import NDArray, Shape, Float
 from itertools import combinations
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.tools.funcs import cdf_to_ppf
+from metrics_as_scores.distribution.fitting import StatTest_Types
 from statsmodels.distributions import ECDF as SMEcdf
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.stats import gaussian_kde, f_oneway, mode
 from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats import ks_2samp, ttest_ind
 from scipy.stats._distn_infrastructure import rv_generic, rv_continuous
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from metrics_as_scores.distribution.fitting import StatTest_Types
+from joblib import Parallel, delayed
+from tqdm import tqdm
 from strenum import StrEnum
 
 
@@ -581,8 +583,7 @@ class Dataset:
             stat, pval = f_oneway(*data_tuple)
             return { 'qtype': qtype, 'stat': stat, 'pval': pval, 'across_contexts': ';'.join(contexts) }
 
-        from joblib import Parallel, delayed
-        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(qtype) for qtype in qtypes)
+        res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(qtype) for qtype in tqdm(qtypes))
 
         return pd.DataFrame(res_dicts)
     
@@ -623,13 +624,12 @@ class Dataset:
             temp = tukey.summary().data
             return pd.DataFrame(data=temp[1:], columns=temp[0])
 
-        from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_qtype)(qtype) for qtype in qtypes)
+        res_dfs = Parallel(n_jobs=-1)(delayed(tukeyHSD_for_qtype)(qtype) for qtype in tqdm(qtypes))
 
         return pd.concat(res_dfs)
     
 
-    def analyze_distr(self, qtypes: Iterable[str], use_ks_2samp: bool=True) -> pd.DataFrame:
+    def analyze_distr(self, qtypes: Iterable[str], use_ks_2samp: bool=True, ks2_max_samples=40_000) -> pd.DataFrame:
         if len(list(qtypes)) < 1:
             raise Exception('Requires one or metrics.')
         
@@ -658,7 +658,5 @@ class Dataset:
             
             return pd.DataFrame(dict_list)
 
-        from joblib import Parallel, delayed
-        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(qtype) for qtype in self.quantity_types)
-
+        res_dfs = Parallel(n_jobs=-1)(delayed(compare)(qtype) for qtype in tqdm(self.quantity_types))
         return pd.concat(res_dfs)
