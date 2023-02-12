@@ -27,7 +27,7 @@ import numpy as np
 from pathlib import Path
 from typing import Union
 from metrics_as_scores.webapp.exception import PlotException
-from metrics_as_scores.tools.funcs import nonlinspace
+from metrics_as_scores.tools.funcs import nonlinspace, natsort
 from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
@@ -44,7 +44,9 @@ from numbers import Integral
 from metrics_as_scores.webapp import data
 ds: Dataset = data.ds
 cdfs = data.cdfs
-contexts = list(ds.contexts(include_all_contexts=True))
+contexts = list(ds.contexts(include_all_contexts=False))
+contexts.sort(key=natsort)
+contexts = contexts + ['__ALL__']
 
 this_dir = Path(__file__).resolve().parent
 web_dir = data.dataset_dir.joinpath('./web')
@@ -58,13 +60,17 @@ def cap(s: str) -> str:
 # Data and UI for the qtype/score types
 dd_scores_items: list[tuple[str, str]] = []
 if len(ds.quantity_types_discrete) > 0:
+    qtypes_discrete = ds.quantity_types_discrete
+    qtypes_discrete.sort(key=natsort)
     dd_scores_items.append(('------------ Discrete (integral) Quantities', '-'))
-    dd_scores_items += list([(f'[{qtype}] {ds.qytpe_desc(qtype=qtype)}', qtype) for qtype in ds.quantity_types_discrete])
+    dd_scores_items += list([(f'[{qtype}] {ds.qytpe_desc(qtype=qtype)}', qtype) for qtype in qtypes_discrete])
 if len(ds.quantity_types_continuous) > 0:
     if len(ds.quantity_types_discrete) > 0:
         dd_scores_items.append((' ', '-'))
+    qtypes_continuous = ds.quantity_types_continuous
+    qtypes_continuous.sort(key=natsort)
     dd_scores_items.append(('------------ Continuous (real) Quantities', '-'))
-    dd_scores_items += list([(f'[{qtype}] {ds.qytpe_desc(qtype=qtype)}', qtype) for qtype in ds.quantity_types_continuous])
+    dd_scores_items += list([(f'[{qtype}] {ds.qytpe_desc(qtype=qtype)}', qtype) for qtype in qtypes_continuous])
 
 selected_score = dd_scores_items[1]
 """Has the currently selected quantity type."""
@@ -149,7 +155,6 @@ def update_discrete_cont_mismatch():
         raise PlotException(msg='There are no discrete fits for continuous quantities.')
 
 
-
 def update_labels():
     global selected_denstype, selected_transf, selected_autotransf
     sd = selected_denstype[1]
@@ -188,11 +193,6 @@ def update_labels():
             plot.xaxis.axis_label = 'Value'
         else:
             plot.xaxis.axis_label = 'Distance from Ideal'
-
-
-    
-
-
 
 
 
@@ -538,10 +538,10 @@ header = Div(text=f'''
     <h2>Loaded Dataset: <b>{ds.ds["name"]}</b></h2>
     <div id="about">
         <p><b>Author(s)</b>: {', '.join(ds.ds["author"])}</p>
-        <p><b>Description</b>: {ds.ds["desc"]}</p>
-    </div>
-    <div>
-        {read_text(web_dir.joinpath('./about.html'))}
+        <div>
+            <p><b>Description</b>: {ds.ds["desc"]}</p>
+            {read_text(web_dir.joinpath('./about.html'))}
+        </div>
     </div>
     <hr/>''')
 
