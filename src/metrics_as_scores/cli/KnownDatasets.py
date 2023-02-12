@@ -1,19 +1,17 @@
 from pathlib import Path
-from json import load
 from metrics_as_scores.cli.Workflow import Workflow
+from metrics_as_scores.cli.helpers import get_known_datasets, format_file_size
 from metrics_as_scores.distribution.distribution import KnownDataset
 
 this_dir = Path(__file__).resolve().parent
 datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
-
 class KnownDatasetsWorkflow(Workflow):
     def __init__(self) -> None:
         super().__init__()
-        self.known_datasets: list[KnownDataset] = None
-        with open(file=str(datasets_dir.joinpath('./known-datasets.json')), mode='r', encoding='utf-8') as fp:
-            self.known_datasets = load(fp=fp)
+        self.q.print('\nFetching available datasets ...\n')
+        self.known_datasets = get_known_datasets(use_local_file=False)
     
     def _print_json_dataset(self, jsd: KnownDataset) -> None:
         self.q.print('     Name: ', style=self.style_mas, end='')
@@ -26,6 +24,8 @@ class KnownDatasetsWorkflow(Workflow):
         self.q.print(jsd['info_url'])
         self.q.print(' Download: ', style=self.style_mas, end='')
         self.q.print(jsd['download'])
+        self.q.print('     Size: ', style=self.style_mas, end='')
+        self.q.print(f'{format_file_size(jsd["size"])} ({format_file_size(jsd["size_extracted"])} extracted)')
     
     def show_datasets(self) -> None:
         for jsd in self.known_datasets:
