@@ -49,6 +49,6 @@ ol > li:not(:last-child) {
 div#about > p {
 	margin: .5ex auto;
 }
-div#about > p:last-child {
+div#about > div > p:last-child {
 	margin-bottom: 2em;
 }
