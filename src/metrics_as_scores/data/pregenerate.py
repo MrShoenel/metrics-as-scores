@@ -5,6 +5,7 @@ from warnings import warn
 from os.path import exists
 from pickle import dump, load
 from joblib import Parallel, delayed
+from tqdm import tqdm
 from metrics_as_scores.tools.funcs import flatten_dict
 from metrics_as_scores.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
 from metrics_as_scores.distribution.distribution import Dataset, Density, DistTransform, Dataset, Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
@@ -33,7 +34,7 @@ def generate_densities(dataset: Dataset, clazz: type[Density]=Empirical, unique_
 
         return (f'{context}_{qtype}', clazz(data=data, resample_samples=resample_samples, compute_ranges=True, ideal_value=dataset.ideal_values[qtype], dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context))
 
-    cdfs = Parallel(n_jobs=-1)(delayed(get_density)(i) for i in range(len(expanded_grid.index)))
+    cdfs = Parallel(n_jobs=-1)(delayed(get_density)(i) for i in tqdm(range(len(expanded_grid.index))))
     return dict(cdfs)
 
 
