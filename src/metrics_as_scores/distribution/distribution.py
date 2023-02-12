@@ -644,6 +644,10 @@ class Dataset:
 
                 stat = pval = None
                 if use_ks_2samp:
+                    rng = np.random.default_rng(seed=1)
+                    data1 = data1 if data1.shape[0] <= ks2_max_samples else rng.choice(a=data1, size=ks2_max_samples, replace=False)
+                    data2 = data2 if data2.shape[0] <= ks2_max_samples else rng.choice(a=data2, size=ks2_max_samples, replace=False)
+
                     stat, pval = ks_2samp(data1=data1, data2=data2, alternative='two-sided', method='exact')
                 else:
                     stat, pval = ttest_ind(a=data1, b=data2, equal_var=False, alternative='two-sided')
