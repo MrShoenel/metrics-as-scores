@@ -4,6 +4,7 @@ from metrics_as_scores.cli.CreateDataset import CreateDatasetWorkflow
 from metrics_as_scores.cli.KnownDatasets import KnownDatasetsWorkflow
 from metrics_as_scores.cli.FitParametric import FitParametricWorkflow
 from metrics_as_scores.cli.GenerateDensities import GenerateDensitiesWorkflow
+from metrics_as_scores.cli.BundleOwn import BundleDatasetWorkflow
 
 from metrics_as_scores.__version__ import __version__ as mas_version
 
@@ -53,7 +54,8 @@ class MainWorkflow(Workflow):
             pre_gen = GenerateDensitiesWorkflow()
             pre_gen.pre_generate()
         elif res == 'bundle':
-            pass
+            bundler = BundleDatasetWorkflow()
+            bundler.bundle()
         elif res == 'webapp':
             local_server = LocalWebserverWorkflow()
             local_server.start_server()
