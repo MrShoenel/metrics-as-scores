@@ -12,6 +12,7 @@ class Workflow:
         self.c = Console()
         self.q = questionary
         self.style_mas = 'bold fg:#8B8000 bg:#000'
+        self.style_err = 'bold fg:#8B0000 bg:#000'
     
     def ask(self, options: list[str], prompt: str='You now have the following options:', rtype: T=int) -> T:
         res = self.askt(
