@@ -1,6 +1,6 @@
 from typing import Union
 from metrics_as_scores.cli.Workflow import Workflow
-from metrics_as_scores.cli.helpers import isint, isnumeric
+from metrics_as_scores.cli.helpers import isint, isnumeric, get_known_datasets
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
 from metrics_as_scores.tools.funcs import natsort
 from re import match
@@ -170,7 +170,9 @@ is no best value for lines of code (size) of software.
 
         jsd['name'] = self.q.text(message='Name of the Dataset:', validate=lambda s: len(s) > 0).ask().strip()
         jsd['desc'] = self.q.text(message='Write a short description:', validate=lambda s: len(s) > 0).ask().strip()
-        jsd['id'] = self.q.text(message='ID (2+ chars, lowercase, start+end must be letter):', validate=lambda t: match(self.regex_id, t) is not None).ask().strip()
+        known_datasets = { ds['id']: ds for ds in get_known_datasets() }
+        self.print_info(text_normal='Now you need to choose an ID for your dataset. It must NOT be one of these: ', text_vital=', '.join(known_datasets.keys()), arrow='')
+        jsd['id'] = self.q.text(message='ID (2+ chars, lowercase, start+end must be letter):', validate=lambda t: match(self.regex_id, t) is not None and not t in known_datasets).ask().strip()
         temp: list[str] = self.q.text(message='Author(s) (first and last, separate authors by comma):', validate=lambda s: len(s) > 0).ask().strip().split(',')
         jsd['author'] = list(a.strip() for a in temp)
 
