@@ -225,7 +225,7 @@ cannot be resumed.
                 makedirs(str(dir.resolve()))
         
         # Let's copy specific files from the default over to the new dataset:
-        for file in ['./About.qmd', './_quarto.yml', './web/about.html', './web/references.html']:
+        for file in ['./About.qmd', './_quarto.yml', './refs.bib', './web/about.html', './web/references.html']:
             copyfile(src=str(default_ds.joinpath(file)), dst=str(dataset_dir.joinpath(file)))
         # We also need to write out variables for Quarto.
         # We will write into the _quarto.yaml for better compat.
