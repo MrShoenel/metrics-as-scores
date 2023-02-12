@@ -60,7 +60,7 @@ In order for an own dataset to be publishable, it needs to have all
 parametric fits, generated densities, references, about, etc. This
 workflow will check that all requirements are fulfilled.
 
-For an example dataset, check out https://doi.org/10.5281/zenodo.TODO
+For an example dataset, check out https://doi.org/10.5281/zenodo.7633950
 '''.strip())
         self.q.print('')
         self.q.print(10*'-')
