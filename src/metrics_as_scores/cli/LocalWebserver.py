@@ -27,7 +27,7 @@ class LocalWebserverWorkflow(Workflow):
             int(self.q.text(message='Enter a Port number:', default=f'{5678}', validate=check_port).ask()),
             self.q.select(
                 message='Please choose one of the following Datasets:',
-                choices=list([Choice(title=ds['name'], value=ds) for ds in get_local_datasets()])).ask())
+                choices=list([Choice(title=f"{ds['name']} [{ds['id']}]", value=ds) for ds in get_local_datasets()])).ask())
     
     def _type_quit_to_exit(self) -> None:
         self.q.text(message='Enter "q" to shut down the application:', validate=lambda q: q.lower().startswith('q')).ask()
