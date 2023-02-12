@@ -51,3 +51,13 @@ def cdf_to_ppf(cdf: Callable[[float], float], x: NDArray[Shape["*"], Float], cdf
     y_vals = cdf(x_vals) # x is sorted, then so is y if fn is monotone increasing (which it should be)
 
     return Interpolator(xp=y_vals, fp=x_vals, left=y_left, right=y_right)
+
+
+from re import split
+def natsort(s: str) -> int:
+    """
+    Natural string sorting.
+
+    Courtesy of https://stackoverflow.com/a/16090640/1785141
+    """
+    return [int(t) if t.isdigit() else t.lower() for t in split('(\d+)', f'{s}')]
