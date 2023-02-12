@@ -48,21 +48,30 @@ dataset = Dataset(ds=manifest, df=pd.DataFrame())
 ```
 
 
+# Description
+
+<!-- You can put more description here, into the following diplayed markup, or below. -->
+
 ```{python}
 #| echo: false
 
 dm(f"""
-# Description
 {manifest['desc']}
 """)
 ```
+
 
 This dataset has the following **Quantity Types**:
 
 ```{python}
 #| echo: false
 
-temp = [f'- *{qtype}*: {dataset.qytpe_desc(qtype=qtype)}' for qtype in dataset.quantity_types]
+from metrics_as_scores.tools.funcs import natsort
+
+qtypes = dataset.quantity_types
+qtypes.sort(key=natsort)
+
+temp = [f'- *{qtype}*: {dataset.qytpe_desc(qtype=qtype)}{" [discrete]" if dataset.is_qtype_discrete(qtype=qtype) else ""}' for qtype in qtypes]
 
 dm('\n'.join(temp))
 ```
@@ -71,6 +80,7 @@ dm('\n'.join(temp))
 #| echo: false
 
 contexts = list(dataset.contexts(include_all_contexts=False))
+contexts.sort(key=natsort)
 
 dm(f'''
 It has a total of {len(contexts)} **Contexts**: {format_comma_and(list([f'*{c}*' for c in contexts]))}.''')
@@ -138,6 +148,7 @@ Therefore, the ANOVA test also indicates whether quantity types' values are diff
 #| echo: false
 
 contexts = list(dataset.contexts(include_all_contexts=False))
+contexts.sort(key=natsort)
 row = df_anova.iloc[0,:].to_dict()
 
 
@@ -204,21 +215,20 @@ from math import ceil
 
 temp = df_ks2samp[df_ks2samp.pval >= use_alpha]
 cnts = list([
-	temp[(temp.qtype == qtype)].shape[0]
-	for qtype in dataset.quantity_types
+	temp[(temp.qtype == qtype)].shape[0] for qtype in qtypes
 ])
 
 fig, ax = plt.subplots()
 fig.set_figwidth(8)
 fig.set_figheight(2.5)
-bars = ax.bar(dataset.quantity_types, cnts, width=.5, color=Category20_20)
+bars = ax.bar(qtypes, cnts, width=.5, color=Category20_20)
 
 ax.set_ylim(bottom=0, top=r + ceil(r*.1))
 ax.bar_label(bars)
 ax.set_axisbelow(True)
 ax.grid(color='#dddddd', linestyle='dashed')
 angle = 0 if len(contexts) < 10 else (45 if len(contexts) < 20 else 90)
-ax.set_xticklabels(ax.get_xticklabels(), rotation=angle)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=angle, ha='right', rotation_mode='anchor')
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -237,7 +247,7 @@ plt.show()
 #| echo: false
 
 n = len(contexts) + 1
-m = len(dataset.quantity_types)
+m = len(qtypes)
 r = (n-1) * m
 
 dm(f'''
@@ -246,7 +256,7 @@ Consider the set of contexts $\\mathit{{C}}$ and the set of quantity types $\\ma
 Given a context $c_i$ and a quantity type $q_j$, this test reports all other contexts $\\mathit{{C}}^{{\\setminus c_i}}$ that have a statistically significantly different distribution for $q_j$.
 However, for $c_i$, we aggregate these counts across all quantity types.
 We have a total of $n\\tight{{=}}{n-1}+1$ contexts (including the virtual context).
-Therefore, the amount of quantity types ($m\\tight{{=}}{len(dataset.quantity_types)}$) that are different in different contexts can maximally be $(n\\tight{{-}}1)\\tight{{\\times}}m\\tight{{=}}{r}$.
+Therefore, the amount of quantity types ($m\\tight{{=}}{len(qtypes)}$) that are different in different contexts can maximally be $(n\\tight{{-}}1)\\tight{{\\times}}m\\tight{{=}}{r}$.
 '''.strip())
 ```
 
@@ -291,7 +301,7 @@ ax.bar_label(bars)
 ax.set_axisbelow(True)
 ax.grid(color='#dddddd', linestyle='dashed')
 angle = 0 if len(contexts) < 10 else (45 if len(contexts) < 20 else 90)
-ax.set_xticklabels(ax.get_xticklabels(), rotation=angle)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=angle, ha='right', rotation_mode='anchor')
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -304,10 +314,20 @@ plt.show()
 
 ## Common/extreme Values
 
+```{python}
+#| echo: false
+
+use_qty = qtypes[0]
+
+dm(f'''
 In this section, we demonstrate some common or extreme values by showing what (maximum) distance is required to achieve a score as shown in header of @tbl-common-extreme.
-The example shown here is that of the first type of quantity, which has been transformed using each context's expection, $\mathbb{E}[X]$.
+The example shown here is that of the first type of quantity (**{use_qty}**), which has been transformed using each context's expection, $\\mathbb{{E}}[X]$.
 Since it is practically unlikely to have uniformly distributed quantities, a linear increase in score is usually associated with a non-linear decrease in distance.
 Note that the values in @tbl-common-extreme are approximate.
+
+'''.strip())
+```
+
 
 
 ```{python}
@@ -318,7 +338,7 @@ Note that the values in @tbl-common-extreme are approximate.
 # any type of density, or even show multiple tables.
 
 from metrics_as_scores.distribution.distribution import KDE_approx
-from pickle import load
+from pickle import load, dump
 
 dens: dict[str, KDE_approx] = None
 with open(file=str(dataset_dir.joinpath('./densities/densities_KDE_approx_EXPECTATION.pickle')), mode='rb') as fp:
@@ -334,30 +354,47 @@ import numpy as np
 from typing import Callable
 from scipy.optimize import direct, minimize
 from scipy.integrate import quad
-from numpy import vectorize
+from itertools import product
+from joblib import Parallel, delayed
 
 # Quantiles [8+1]: 0, 0.1, 0.25, 0.5, 0.75, 0.85, 0.95, 0.99, E[X]
-use_quantiles = np.array([0.001, 0.1, 0.2, 0.33, 0.5, 0.66, 0.75, 0.85, 0.9, 0.999])
+use_quantiles = [0.001, 0.1, 0.2, 0.33, 0.5, 0.66, 0.75, 0.85, 0.9, 0.999]
+contexts = list(dataset.contexts(include_all_contexts=True))
 
-
-def find_score_pdf(score: float, dist: KDE_approx):
+def find_score_pdf(score: float, dist: KDE_approx) -> float:
 	pdf_scale, _ = quad(func=dist.pdf, a=0, b=dist._range_data[1] * 10)
 	pdf = lambda x: dist.pdf(x) / pdf_scale
 	ccdf = lambda x: 1.0 - quad(func=pdf, a=0, b=x)[0]
-	#res = direct(func=lambda x: (score - ccdf(x))**2, bounds=((0,dist._range_data[1] * 10),))
 	res = minimize(fun=lambda x: (score - ccdf(x))**2, x0=0.001, bounds=((0,dist._range_data[1] * 10),))
 	return res.x[0]
 
-find_score_pdf = vectorize(find_score_pdf)
 
-templ = []
-use_qty = dataset.quantity_types[0]
-for ctx in dataset.contexts(include_all_contexts=True):
-	dist = dens[f'{ctx}_{use_qty}']
-	tf = dist.transform_value
-	templ.append([ctx] + list(['{:.2e}'.format(r) for r in list(find_score_pdf(use_quantiles, dist)) + [tf]]))
+def compute_cell(c_idx: int, q_idx: int) -> tuple[int, int, str]:
+	dist = dens[f'{contexts[c_idx]}_{use_qty}']
+	return (c_idx, q_idx, '{:.2e}'.format(find_score_pdf(score=use_quantiles[q_idx], dist=dist)))
 
-Markdown(tabulate(tabular_data=pd.DataFrame(templ), headers=[dataset.ds['colname_context']] + list(str(s) for s in list(use_quantiles) + ['$\\mathbb{E}[X]$']), showindex=False))
+
+df: pd.DataFrame = None
+df_file = dataset_dir.joinpath('./df-common-extreme.pickle')
+if df_file.exists():
+	with open(file=str(df_file), mode='rb') as fp:
+		df = load(file=fp)
+else:
+	res = np.zeros(shape=(len(contexts), len(use_quantiles)))
+	for tpl in Parallel(n_jobs=-1)(delayed(compute_cell)(perm[0], perm[1]) for perm in product(range(len(contexts)), range(len(use_quantiles)))):
+		res[tpl[0], tpl[1]] = tpl[2]
+
+	df = pd.concat([
+		pd.DataFrame(contexts),
+		pd.DataFrame(res),
+		pd.DataFrame(list([dens[f'{ctx}_{use_qty}'].transform_value for ctx in contexts]))
+	], axis=1)
+	df.columns = [dataset.ds['colname_context']] + list(str(s) for s in list(use_quantiles) + ['$\\mathbb{E}[X]$'])
+
+	with open(file=str(df_file), mode='wb') as fp:
+		dump(obj=df, file=fp)
+
+Markdown(tabulate(tabular_data=df, showindex=False, headers=df.columns))
 ```
 
 
