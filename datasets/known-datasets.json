@@ -4,13 +4,17 @@
 		"author": "Sebastian Hönel",
 		"id": "qcc",
 		"info_url": "https://zenodo.org/...",
-		"download": "https://zenodo.org/..."
+		"download": "https://zenodo.org/...",
+		"size": 4322195829,
+		"size_extracted": 10046352180
 	},
 	{
 		"name": "ELISA Spectrophotometer Samples",
 		"author": "Sebastian Hönel",
 		"id": "elisa",
 		"info_url": "https://zenodo.org/...",
-		"download": "https://zenodo.org/..."
+		"download": "https://zenodo.org/...",
+		"size": 167000000,
+		"size_extracted": 266001345
 	}
 ]

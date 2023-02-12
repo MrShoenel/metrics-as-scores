@@ -54,6 +54,8 @@ class LocalDataset(JsonDataset):
 class KnownDataset(JsonDataset):
     info_url: str
     download: str
+    size: int
+    size_extracted: int
 
 
 
