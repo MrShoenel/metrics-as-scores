@@ -49,6 +49,7 @@ def fits_to_MAS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any
     use_vars = Continuous_RVs_dict if use_continuous else Discrete_RVs_dict
     Use_class = Parametric if use_continuous else Parametric_discrete
 
+    df_cols = list(df.columns)
     the_dict: dict[str, Parametric] = {}
     for context in contexts:
         for qtype in dataset.quantity_types:
@@ -65,7 +66,10 @@ def fits_to_MAS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any
                 dist = dist_type()
                 params = ()
                 for pi in dist._param_info():
-                    params += (best[f'params_{pi.name}'],)
+                    use_key = f'params_{pi.name}'
+                    if pi.name.endswith('_') and not use_key in df_cols:
+                        use_key = use_key.rstrip('_')
+                    params += (best[use_key],)
                 
                 data = data_df[(data_df[dataset.ds['colname_type']] == qtype)]
                 if context != '__ALL__':
