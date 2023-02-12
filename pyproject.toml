@@ -34,7 +34,6 @@ nptyping = "^2.3.1"
 ptvsd = "^4.3.2"
 pymoo = "^0.6.0"
 scipy = "^1.9.1"
-sklearn = "^0.0"
 statsmodels = "^0.13.2"
 StrEnum = "^0.4.8"
 tqdm = "^4.64.1"
@@ -44,6 +43,7 @@ toml = "^0.10.2"
 rich = "^13.3.1"
 questionary = "^1.10.0"
 tabulate = "^0.9.0"
+scikit-learn = "^1.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
