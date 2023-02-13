@@ -40,7 +40,6 @@ jobs:
           path: docs/_build/html/
       
       # Publish built docs to gh-pages branch.
-      # ===============================
       - name: Commit documentation changes
         run: |
           git clone https://github.com/MrShoenel/metrics-as-scores.git --branch gh-pages --single-branch temp
@@ -60,4 +59,3 @@ jobs:
           branch: gh-pages
           directory: temp/gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      # ===============================
