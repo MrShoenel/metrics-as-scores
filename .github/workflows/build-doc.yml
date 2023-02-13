@@ -16,11 +16,6 @@ jobs:
       - uses: actions/setup-python@v4.5.0
         with:
           python-version: '3.10'
-
-      - name: Install deps
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y python3.10-venv python3.10-dev
       
       - uses: actions/checkout@v3
 
@@ -30,12 +25,16 @@ jobs:
           source venv/bin/activate
           pip install poetry
           poetry install
-          poetry add sphinxcontrib-apidoc sphinx-autoapi
+          python -m pip install -U sphinx
+          python -m pip install sphinx-rtd-theme
+          python -m pip install sphinxcontrib-apidoc
+          python -m pip install sphinx-autoapi
       
-      - name: Build api-doc
+      - name: Make the sphinx docs
         run: |
+          make -C docs clean 
           sphinx-apidoc -o docs src/metrics_as_scores "**/webapp/*" --force
-          sphinx-build docs/ docs/_build
+          make -C docs html
       
       - uses: actions/upload-artifact@v1
         with:
