@@ -5,6 +5,8 @@ from metrics_as_scores.cli.KnownDatasets import KnownDatasetsWorkflow
 from metrics_as_scores.cli.FitParametric import FitParametricWorkflow
 from metrics_as_scores.cli.GenerateDensities import GenerateDensitiesWorkflow
 from metrics_as_scores.cli.BundleOwn import BundleDatasetWorkflow
+from metrics_as_scores.cli.Download import DownloadWorkflow
+from metrics_as_scores.cli.LocalDatasets import LocalDatasetsWorkflow
 
 from metrics_as_scores.__version__ import __version__ as mas_version
 
@@ -38,12 +40,14 @@ class MainWorkflow(Workflow):
         ])
         
         if res == 'show_local':
-            pass
+            local_ds = LocalDatasetsWorkflow()
+            local_ds.show_datasets()
         elif res == 'show_known':
             known_ds = KnownDatasetsWorkflow()
             known_ds.show_datasets()
         elif res == 'download':
-            pass
+            dwnld = DownloadWorkflow()
+            dwnld.download()
         elif res == 'create':
             create_ds = CreateDatasetWorkflow()
             create_ds.create_own()
