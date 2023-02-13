@@ -23,6 +23,8 @@ jobs:
  
       - name: Install dependencies
         run: |
+          python -m pip install poetry
+          poetry install
           python -m pip install -U sphinx
           python -m pip install sphinx-rtd-theme
           python -m pip install sphinxcontrib-apidoc
@@ -43,9 +45,8 @@ jobs:
       - name: Commit documentation changes
         run: |
           git clone https://github.com/MrShoenel/metrics-as-scores.git --branch gh-pages --single-branch temp
-          mkdir temp/gh-pages
-          cp -r docs/_build/html/* temp/gh-pages/
-          cd temp/gh-pages
+          cp -rf docs/_build/html/* temp/docs/
+          cd temp/docs
           touch .nojekyll
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -57,5 +58,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           branch: gh-pages
-          directory: temp/gh-pages
+          directory: temp/docs
           github_token: ${{ secrets.GITHUB_TOKEN }}
