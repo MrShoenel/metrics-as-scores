@@ -28,12 +28,13 @@ jobs:
         source venv/bin/activate
         pip install poetry
         poetry install
-        pip install sphinx
     
     - name: Build api-doc
       run: |
-        sphinx-apidoc -o docs src/metrics_as_scores "**/webapp/*" --force
-        sphinx-build docs/ docs/_build
+        pwd
+        ll
+        ./venv/bin/sphinx-apidoc -o docs src/metrics_as_scores "**/webapp/*" --force
+        ./venv/bin/sphinx-build docs/ docs/_build
 
     - name: Commit documentation changes
       run: |
