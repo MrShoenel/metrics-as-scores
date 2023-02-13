@@ -8,7 +8,6 @@ readme = "README.md"
 homepage = "https://github.com/mrshoenel/metrics-as-scores"
 repository = "https://github.com/mrshoenel/metrics-as-scores/issues"
 packages = [{include = "metrics_as_scores", from = "src"}]
-include = ["datasets/known-datasets.json", "datasets/_default/**/*", "pyproject.toml"]
 keywords = ["distribution fitting", "statistical tests", "context-dependent", "metrics", "quality", "score"]
 classifiers = [
     "Programming Language :: Python :: 3",
