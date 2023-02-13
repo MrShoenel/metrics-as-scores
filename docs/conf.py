@@ -7,7 +7,10 @@ from sys import path
 from pathlib import Path
 
 this_dir = Path(__file__).parent
-path.append(str(this_dir.parent.joinpath('./src').resolve()))
+src_dir = this_dir.parent.joinpath('./src')
+path.append(str(this_dir.resolve()))
+path.append(str(src_dir.resolve()))
+path.append(str(src_dir.parent.resolve()))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
