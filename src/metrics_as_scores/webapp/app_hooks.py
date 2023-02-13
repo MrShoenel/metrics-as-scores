@@ -1,14 +1,12 @@
 from pathlib import Path
 from sys import argv
 from pickle import load
+from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.tools.lazy import SelfResetLazy
 from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset
 from metrics_as_scores.cli.helpers import get_local_datasets, LocalDataset
 from metrics_as_scores.webapp import data
 
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
 def unpickle(file: str):
@@ -34,8 +32,8 @@ def load_data(dataset_id: str, preload: bool=False):
     ds = Dataset(ds=manifest, df=pd.DataFrame())
     data.ds = ds
     print(f'Dataset loaded: {ds.ds["desc"]} by {", ".join(ds.ds["author"])}')
-    densities_dir = datasets_dir.joinpath(f'./{ds.ds["id"]}/densities')
-    data.dataset_dir = datasets_dir.joinpath(f'./{ds.ds["id"]}')
+    densities_dir = DATASETS_DIR.joinpath(f'./{ds.ds["id"]}/densities')
+    data.dataset_dir = DATASETS_DIR.joinpath(f'./{ds.ds["id"]}')
 
 
     clazzes = [Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete]

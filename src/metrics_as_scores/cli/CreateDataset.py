@@ -1,4 +1,5 @@
 from typing import Union
+from metrics_as_scores.__init__ import DATASETS_DIR, MAS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import isint, isnumeric, get_known_datasets
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
@@ -8,13 +9,12 @@ from os import makedirs
 from json import dump
 from collections import OrderedDict
 from shutil import copyfile
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pathlib import Path
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
-default_ds = datasets_dir.joinpath('./_default')
+
+default_ds = MAS_DIR.joinpath('./datasets/_default')
 
 
 class CreateDatasetWorkflow(Workflow):
@@ -218,7 +218,7 @@ cannot be resumed.
 
         manifest, df = self._create_manifest()
         # Let's create a folder for this dataset (by ID) and out the files there.
-        dataset_dir = datasets_dir.joinpath(f'./{manifest["id"]}')
+        dataset_dir = DATASETS_DIR.joinpath(f'./{manifest["id"]}')
         fits_dir = dataset_dir.joinpath('./fits')
         densities_dir = dataset_dir.joinpath('./densities')
         tests_dir = dataset_dir.joinpath('./stat-tests')

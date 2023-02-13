@@ -1,13 +1,9 @@
+from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, get_local_datasets, KNOWN_DATASETS_FILE
 from requests import get
 from shutil import copyfileobj, unpack_archive
 from pathlib import Path
-
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
-
 
 
 class DownloadWorkflow(Workflow):
@@ -37,7 +33,7 @@ Known datasets are loaded from: {KNOWN_DATASETS_FILE}
             return
         
         use_ds = known_ds[id]
-        dataset_dir = datasets_dir.joinpath(f'./{use_ds["id"]}')
+        dataset_dir = DATASETS_DIR.joinpath(f'./{use_ds["id"]}')
         dataset_dir.mkdir(exist_ok=False)
 
         self.print_info(text_normal='Downloading archive from: ', text_vital=use_ds['download'])

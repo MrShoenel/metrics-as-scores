@@ -1,15 +1,12 @@
 import pandas as pd
 from os.path import commonpath
+from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_local_datasets
 from metrics_as_scores.distribution.distribution import DistTransform, Parametric, Parametric_discrete, Empirical, Empirical_discrete, KDE_approx, Dataset, LocalDataset
 from itertools import product
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
-
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
 class BundleDatasetWorkflow(Workflow):
@@ -70,7 +67,7 @@ For an example dataset, check out https://doi.org/10.5281/zenodo.7633950
         self.use_ds = self.askt(
             prompt='Select the local dataset you want to pre-generate densities for:',
             options=list([(f'{ds["name"]} [{ds["id"]}] by {", ".join(ds["author"])}', ds) for ds in datasets]))
-        self.ds_dir = datasets_dir.joinpath(f'./{self.use_ds["id"]}')
+        self.ds_dir = DATASETS_DIR.joinpath(f'./{self.use_ds["id"]}')
         self.ds = Dataset(ds=self.use_ds, df=pd.read_csv(str(self.ds_dir.joinpath('./org-data.csv'))))
 
         dir_densities = self.ds_dir.joinpath(f'./densities')

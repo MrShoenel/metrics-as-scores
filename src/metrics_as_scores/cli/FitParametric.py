@@ -15,12 +15,9 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import pandas as pd
 
+from metrics_as_scores.__init__ import DATASETS_DIR
 from scipy.stats._continuous_distns import norminvgauss_gen, gausshyper_gen, genhyperbolic_gen, geninvgauss_gen, invgauss_gen, studentized_range_gen
 from scipy.stats._discrete_distns import nhypergeom_gen, hypergeom_gen
-
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
 
@@ -141,9 +138,9 @@ This is so that this process can be interrupted and resumed.
         self.use_ds = self.askt(
             prompt='Select the local dataset you want to generate fits for:',
             options=list([(f'{ds["name"]} [{ds["id"]}] by {", ".join(ds["author"])}', ds) for ds in datasets]))
-        self.fits_dir = datasets_dir.joinpath(f'./{self.use_ds["id"]}/fits')
+        self.fits_dir = DATASETS_DIR.joinpath(f'./{self.use_ds["id"]}/fits')
 
-        datafile = datasets_dir.joinpath(f'./{self.use_ds["id"]}/org-data.csv')
+        datafile = DATASETS_DIR.joinpath(f'./{self.use_ds["id"]}/org-data.csv')
         self.print_info(text_normal='Reading original data file: ', text_vital=str(datafile))
         self.df = pd.read_csv(filepath_or_buffer=str(datafile), index_col=False)
         self.df[self.use_ds['colname_type']] = self.df[self.use_ds['colname_type']].astype(str)

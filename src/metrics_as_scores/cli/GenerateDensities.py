@@ -1,16 +1,13 @@
 import pandas as pd
 from pathlib import Path
 from os import cpu_count
+from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import isint, get_local_datasets
 from metrics_as_scores.distribution.distribution import Parametric, Parametric_discrete, DistTransform, Dataset, LocalDataset, Empirical, Empirical_discrete, KDE_approx
 from metrics_as_scores.data.pregenerate import generate_parametric, generate_empirical, generate_empirical_discrete
 from sklearn.model_selection import ParameterGrid
 from joblib import Parallel, delayed
-
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
 class GenerateDensitiesWorkflow(Workflow):
@@ -77,7 +74,7 @@ is a high limit beyond which sampling will be applied).
         self.use_ds = self.askt(
             prompt='Select the local dataset you want to pre-generate densities for:',
             options=list([(f'{ds["name"]} [{ds["id"]}] by {", ".join(ds["author"])}', ds) for ds in datasets]))
-        dataset_dir = datasets_dir.joinpath(f'./{self.use_ds["id"]}')
+        dataset_dir = DATASETS_DIR.joinpath(f'./{self.use_ds["id"]}')
         self.ds = Dataset(ds=self.use_ds, df=pd.read_csv(str(dataset_dir.joinpath('./org-data.csv'))))
         self.fits_dir = dataset_dir.joinpath(f'./fits')
         self.densities_dir = dataset_dir.joinpath(f'./densities')

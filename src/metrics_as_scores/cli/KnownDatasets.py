@@ -1,10 +1,8 @@
 from pathlib import Path
+from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, format_file_size
 from metrics_as_scores.distribution.distribution import KnownDataset
-
-this_dir = Path(__file__).resolve().parent
-datasets_dir = this_dir.parent.parent.parent.joinpath('./datasets')
 
 
 class KnownDatasetsWorkflow(Workflow):
