@@ -11,7 +11,6 @@ Subpackages
    metrics_as_scores.data
    metrics_as_scores.distribution
    metrics_as_scores.tools
-   metrics_as_scores.webapp
 
 Module contents
 ---------------

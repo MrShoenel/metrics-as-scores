@@ -3,11 +3,11 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-from os import getcwd
-from os.path import join
 from sys import path
 from pathlib import Path
-path.append(f'{Path(join(getcwd(), "../src")).resolve()}')
+
+this_dir = Path(__file__).parent
+path.append(str(this_dir.parent.joinpath('./src').resolve()))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

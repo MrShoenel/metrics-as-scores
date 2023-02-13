@@ -4,6 +4,14 @@ metrics\_as\_scores.cli package
 Submodules
 ----------
 
+metrics\_as\_scores.cli.BundleOwn module
+----------------------------------------
+
+.. automodule:: metrics_as_scores.cli.BundleOwn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 metrics\_as\_scores.cli.Cli module
 ----------------------------------
 
@@ -20,6 +28,14 @@ metrics\_as\_scores.cli.CreateDataset module
    :undoc-members:
    :show-inheritance:
 
+metrics\_as\_scores.cli.Download module
+---------------------------------------
+
+.. automodule:: metrics_as_scores.cli.Download
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 metrics\_as\_scores.cli.FitParametric module
 --------------------------------------------
 
@@ -28,10 +44,26 @@ metrics\_as\_scores.cli.FitParametric module
    :undoc-members:
    :show-inheritance:
 
+metrics\_as\_scores.cli.GenerateDensities module
+------------------------------------------------
+
+.. automodule:: metrics_as_scores.cli.GenerateDensities
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 metrics\_as\_scores.cli.KnownDatasets module
 --------------------------------------------
 
 .. automodule:: metrics_as_scores.cli.KnownDatasets
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+metrics\_as\_scores.cli.LocalDatasets module
+--------------------------------------------
+
+.. automodule:: metrics_as_scores.cli.LocalDatasets
    :members:
    :undoc-members:
    :show-inheritance:
