@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metrics-as-scores"
-version = "2.1.0"
+version = "2.1.2"
 description = "Interactive web application, tool- and analysis suite for approximating, exploring, understanding, and sampling from conditional distributions."
 authors = ["Sebastian Hönel <development@hoenel.net>"]
 license = "Dual-licensed under GNU General Public License v3 (GPLv3) and closed-source"
@@ -8,6 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/mrshoenel/metrics-as-scores"
 repository = "https://github.com/mrshoenel/metrics-as-scores/issues"
 packages = [{include = "metrics_as_scores", from = "src"}]
+include = ["datasets/known-datasets.json", "datasets/_default/**/*", "pyproject.toml"]
 keywords = ["distribution fitting", "statistical tests", "context-dependent", "metrics", "quality", "score"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -23,6 +24,10 @@ classifiers = [
 
 [tool.poetry.scripts]
 mas = "metrics_as_scores.cli.Cli:cli"
+
+[tool.poetry.build]
+generate-setup-file = false
+script = "build.py"
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
