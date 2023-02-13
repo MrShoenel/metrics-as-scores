@@ -28,6 +28,7 @@ jobs:
         source venv/bin/activate
         pip install poetry
         poetry install
+        pip install sphinx
     
     - name: Build api-doc
       run: |
