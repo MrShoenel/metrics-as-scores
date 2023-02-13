@@ -71,12 +71,10 @@
              
   <h1>Source code for metrics_as_scores.cli.KnownDatasets</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.__init__</span> <span class="kn">import</span> <span class="n">DATASETS_DIR</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">get_known_datasets</span><span class="p">,</span> <span class="n">format_file_size</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">KnownDataset</span>
-
-<span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">datasets_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./datasets&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="KnownDatasetsWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow">[docs]</a><span class="k">class</span> <span class="nc">KnownDatasetsWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>

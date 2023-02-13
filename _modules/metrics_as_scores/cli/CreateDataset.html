@@ -71,6 +71,7 @@
              
   <h1>Source code for metrics_as_scores.cli.CreateDataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.__init__</span> <span class="kn">import</span> <span class="n">DATASETS_DIR</span><span class="p">,</span> <span class="n">MAS_DIR</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">isint</span><span class="p">,</span> <span class="n">isnumeric</span><span class="p">,</span> <span class="n">get_known_datasets</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">LocalDataset</span>
@@ -80,13 +81,12 @@
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">dump</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">datasets_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./datasets&#39;</span><span class="p">)</span>
-<span class="n">default_ds</span> <span class="o">=</span> <span class="n">datasets_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./_default&#39;</span><span class="p">)</span>
+
+<span class="n">default_ds</span> <span class="o">=</span> <span class="n">MAS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./datasets/_default&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CreateDatasetWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow">[docs]</a><span class="k">class</span> <span class="nc">CreateDatasetWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
@@ -290,7 +290,7 @@
 
         <span class="n">manifest</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_manifest</span><span class="p">()</span>
         <span class="c1"># Let&#39;s create a folder for this dataset (by ID) and out the files there.</span>
-        <span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">datasets_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">fits_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./fits&#39;</span><span class="p">)</span>
         <span class="n">densities_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./densities&#39;</span><span class="p">)</span>
         <span class="n">tests_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./stat-tests&#39;</span><span class="p">)</span>
