@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metrics_as_scores.distribution.fitting_problems &mdash; Metrics As Scores  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Metrics As Scores
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">metrics_as_scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Metrics As Scores</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">metrics_as_scores.distribution.fitting_problems</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for metrics_as_scores.distribution.fitting_problems</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains :code:`pymoo` fitting problems that allow fitting</span>
+<span class="sd">distributions to almost arbitrary discrete data. The discrete random</span>
+<span class="sd">variables in :code:`scipy` do not have a :code:`fit()`-method, as their fitting</span>
+<span class="sd">often requires a global search. Also, many distributions require</span>
+<span class="sd">discrete parameters, or a mixture of real and integer parameters.</span>
+<span class="sd">The problems in this module provide a generalized way for `pymoo` to</span>
+<span class="sd">find parameters for all of :code:`scipy`&#39;s discrete random variables.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">nptyping</span> <span class="kn">import</span> <span class="n">Float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">Shape</span>
+<span class="kn">from</span> <span class="nn">scipy.stats._discrete_distns</span> <span class="kn">import</span> <span class="n">rv_discrete</span><span class="p">,</span> <span class="n">bernoulli_gen</span><span class="p">,</span> <span class="n">betabinom_gen</span><span class="p">,</span> <span class="n">binom_gen</span><span class="p">,</span> <span class="n">boltzmann_gen</span><span class="p">,</span> <span class="n">dlaplace_gen</span><span class="p">,</span> <span class="n">geom_gen</span><span class="p">,</span> <span class="n">hypergeom_gen</span><span class="p">,</span> <span class="n">logser_gen</span><span class="p">,</span> <span class="n">nbinom_gen</span><span class="p">,</span> <span class="n">nchypergeom_fisher_gen</span><span class="p">,</span> <span class="n">nchypergeom_wallenius_gen</span><span class="p">,</span> <span class="n">nhypergeom_gen</span><span class="p">,</span> <span class="n">planck_gen</span><span class="p">,</span> <span class="n">poisson_gen</span><span class="p">,</span> <span class="n">randint_gen</span><span class="p">,</span> <span class="n">skellam_gen</span><span class="p">,</span> <span class="n">yulesimon_gen</span><span class="p">,</span> <span class="n">zipf_gen</span><span class="p">,</span> <span class="n">zipfian_gen</span>
+<span class="kn">from</span> <span class="nn">pymoo.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">pymoo.core.problem</span> <span class="kn">import</span> <span class="n">ElementwiseProblem</span>
+<span class="kn">from</span> <span class="nn">pymoo.core.variable</span> <span class="kn">import</span> <span class="n">Real</span><span class="p">,</span> <span class="n">Integer</span>
+
+
+
+<div class="viewcode-block" id="MixedVariableDistributionFittingProblem"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.MixedVariableDistributionFittingProblem">[docs]</a><span class="k">class</span> <span class="nc">MixedVariableDistributionFittingProblem</span><span class="p">(</span><span class="n">ElementwiseProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the base class for fitting all of ``scipy``&#39;s discrete random variables.</span>
+<span class="sd">    Therefore, it accepts a dictionary of parameters for each distribution to find</span>
+<span class="sd">    optimal values for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MixedVariableDistributionFittingProblem.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.MixedVariableDistributionFittingProblem.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">rv_discrete</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="nb">vars</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="n">n_ieq_constr</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for a fitting any discrete random variable with one or more</span>
+<span class="sd">        parameters that can be of any type as supported by ``pymoo.core.variable.Variable`` (e.g., ``Integer``, ``Real``, etc.).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dist: ``rv_discrete``</span>
+<span class="sd">            An instance of the concrete discrete random variable that should be fit to the data.</span>
+<span class="sd">        </span>
+<span class="sd">        vars: ``dict[str, Variable]``</span>
+<span class="sd">            An ordered dictionary of named variables to optimize. These must correspond</span>
+<span class="sd">            one to one with the variable names of those defined for the random variable.</span>
+
+<span class="sd">        data: ``NDArray[Shape[&#39;*&#39;], Float]``</span>
+<span class="sd">            The data the distribution should be fit to.</span>
+<span class="sd">        </span>
+<span class="sd">        n_ieq_constr: ``int``</span>
+<span class="sd">            Number of inequality constraints. If there are any, then the problem also</span>
+<span class="sd">            overrides :meth:`Problem._evaluate()` and sets values for each constraint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ext</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span>
+        <span class="c1"># All of them have &#39;loc&#39;:</span>
+        <span class="nb">vars</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span> <span class="o">-</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext</span><span class="p">)),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext</span><span class="p">)))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">n_obj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_ieq_constr</span><span class="o">=</span><span class="n">n_ieq_constr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
+    
+<div class="viewcode-block" id="MixedVariableDistributionFittingProblem._evaluate"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.MixedVariableDistributionFittingProblem._evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is an internal method that evaluates the discrete random variable&#39;s</span>
+<span class="sd">        negative log likelihood, given the currently set values for all of its</span>
+<span class="sd">        variables (stored in ``X``). This method is called by ``pymoo``, so be</span>
+<span class="sd">        sure to check out their references, too.</span>
+<span class="sd">        Note that the ``X``-dictionary is used to build :math:`\theta`, the vector</span>
+<span class="sd">        of parameters for the random variable. The order of the parameters in that</span>
+<span class="sd">        vector depends on the order of ``self.vars``.</span>
+<span class="sd">        This method usually does not need to be overridden, except for when, e.g.,</span>
+<span class="sd">        it is required to evaluate (in-)equality constraints (that is, whenever</span>
+<span class="sd">        something else than &#39;F&#39; in the ``out``-dictionary must be accessed).</span>
+
+<span class="sd">        X: ``dict[str, Any]``</span>
+<span class="sd">            The (ordered) dictionary with the variables&#39; names and values.</span>
+<span class="sd">        out: ``dict[str, Any]``</span>
+<span class="sd">            A dictionary used by ``pymoo`` to store results in; e.g., in &#39;F&#39; it</span>
+<span class="sd">            stores the result of the evaluation, and in &#39;G&#39; it stores the inequality</span>
+<span class="sd">            constraints&#39; values.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Returns the ``out``-dictionary. However, the dictionary is accessed</span>
+<span class="sd">            by reference, so this method does not have to return anything.</span>
+
+<span class="sd">        :rtype: ``dict[Any,Any]``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">theta</span> <span class="o">+=</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">vn</span><span class="p">],)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">nnlf</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+
+<div class="viewcode-block" id="Fit_bernoulli_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_bernoulli_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_bernoulli_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Bernoulli distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``bernoulli_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``p``: (``int``) :math:`\left[0,1\right]`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_bernoulli_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_bernoulli_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">bernoulli_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_betabinom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_betabinom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_betabinom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Beta-Binomial distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``betabinom_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``n``: (``int``) :math:`\left(0,1e^{4}\right)`</span>
+<span class="sd">    - ``a``: (``float``) :math:`\left(5e^{-308},1e^3\right)`</span>
+<span class="sd">    - ``b``: (``float``) :math:`\left(5e^{-308},1e^3\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_betabinom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_betabinom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">betabinom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10_000</span><span class="p">)),</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">)),</span>
+            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_binom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_binom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_binom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Binomial distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``binom_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``n``: (``int``) :math:`\left(1,25e^{3}\right)`</span>
+<span class="sd">    - ``p``: (``float``) :math:`\left(0,1\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_binom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_binom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">binom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_boltzmann_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_boltzmann_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_boltzmann_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Boltzman distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``boltzmann_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``lambda`` [:math:`\lambda`]: (``float``) :math:`\left(0,1e^{5}\right)`</span>
+<span class="sd">    - ``N``: (``int``) :math:`\left(1,25e^3\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_boltzmann_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_boltzmann_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">boltzmann_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;lambda&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e5</span><span class="p">)),</span>
+            <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_dlaplace_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_dlaplace_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_dlaplace_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Laplacian distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``dlaplace_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``a``: (``float``) :math:`\left(5e^{-308},1e^4\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_dlaplace_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_dlaplace_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">dlaplace_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_geom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_geom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_geom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Geometric distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``geom_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``p``: (``float``) :math:`\left(0,1\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_geom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_geom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">geom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_hypergeom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_hypergeom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_hypergeom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Hypergeometric distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``hypergeom_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This problem **does** override `_evaluate()` and has four inequality constraints.</span>
+<span class="sd">    These are:</span>
+
+<span class="sd">    - :math:`n\geq0` (or :math:`-n\leq0`)</span>
+<span class="sd">    - :math:`N\geq0` (or :math:`-N\leq0`)</span>
+<span class="sd">    - :math:`n\leq M` (or :math:`n-M\leq0`)</span>
+<span class="sd">    - :math:`N\leq M` (or :math:`N-M\leq0`)</span>
+
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``M``: (``int``) :math:`\left(1,25e^{3}\right)`</span>
+<span class="sd">    - ``n``: (``int``) :math:`\left(0,25e^{3}\right)`</span>
+<span class="sd">    - ``N``: (``int``) :math:`\left(0,25e^{3}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_hypergeom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_hypergeom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">hypergeom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="c1">#M = [1, 25_000],         n = [0, 25_000],        N = [0, 25_000]</span>
+            <span class="s1">&#39;M&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">))</span>
+        <span class="p">},</span> <span class="n">n_ieq_constr</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Fit_hypergeom_gen._evaluate"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_hypergeom_gen._evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to evaluate the inequality constraints, too.</span>
+<span class="sd">        For all other documentaion, check out :meth:`MixedVariableDistributionFittingProblem._evaluate()`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span>
+            <span class="o">-</span><span class="n">n</span><span class="p">,</span> <span class="c1"># n &gt;= 0  -&gt;  -n &lt;= 0</span>
+            <span class="o">-</span><span class="n">N</span><span class="p">,</span> <span class="c1"># N &gt;= 0  -&gt;  -N &lt;= 0</span>
+            <span class="n">n</span> <span class="o">-</span> <span class="n">M</span><span class="p">,</span> <span class="c1"># n &lt;= M  -&gt;  n - M &lt;= 0</span>
+            <span class="n">N</span> <span class="o">-</span> <span class="n">M</span><span class="p">]</span> <span class="c1"># N &lt;= M  -&gt;  N - M &lt;= 0</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_logser_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_logser_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_logser_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Logarithmic Series distribution using a</span>
+<span class="sd">    ``pymoo`` problem. It uses ``scipy``&#39;s ``logser_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``p``: (``float``) :math:`\left(0,1\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_logser_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_logser_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">logser_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_nbinom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nbinom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_nbinom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Negative Binomial Series distribution using</span>
+<span class="sd">    a ``pymoo`` problem. It uses ``scipy``&#39;s ``nbinom_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``n``: (``int``) :math:`\left(0,25e^{3}\right)`</span>
+<span class="sd">    - ``p``: (``float``) :math:`\left[0,1\right]`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_nbinom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nbinom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">nbinom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_nchypergeom_fisher_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nchypergeom_fisher_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_nchypergeom_fisher_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Fisher&#39;s Non-central Hypergeometric</span>
+<span class="sd">    distribution using a ``pymoo`` problem. It uses ``scipy``&#39;s</span>
+<span class="sd">    ``nchypergeom_fisher_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This problem **does** override `_evaluate()` and has four inequality constraints.</span>
+<span class="sd">    These are:</span>
+
+<span class="sd">    - :math:`N\leq M` (or :math:`N-M\leq0`)</span>
+<span class="sd">    - :math:`n\leq M` (or :math:`n-M\leq0`)</span>
+<span class="sd">    - :math:`\max{(\text{data})}\leq N` (or :math:`\max{(\text{data})}-N\leq0`)</span>
+<span class="sd">    - :math:`\max{(\text{data})}\leq n` (or :math:`\max{(\text{data})}-n\leq0`)</span>
+
+<span class="sd">    Calls the super constructor with these variables (in this order; note that :math:`k=` ``data.size``):</span>
+
+<span class="sd">    - ``M``: (``int``) :math:`\left(1,5\times k\right)`</span>
+<span class="sd">    - ``n``: (``int``) :math:`\left(1,5\times k\right)`</span>
+<span class="sd">    - ``N``: (``int``) :math:`\left(1,5\times k\right)`</span>
+<span class="sd">    - ``odds``: (``float``) :math:`\left(5e^{-308},1e^{4}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_nchypergeom_fisher_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nchypergeom_fisher_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">vars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;M&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span>
+            <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span>
+            <span class="s1">&#39;odds&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">))</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">nchypergeom_fisher_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">n_ieq_constr</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Fit_nchypergeom_fisher_gen._evaluate"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nchypergeom_fisher_gen._evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to evaluate the inequality constraints, too.</span>
+<span class="sd">        For all other documentaion, check out :meth:`MixedVariableDistributionFittingProblem._evaluate()`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Let&#39;s add the following inequality constraints to the output:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span>
+            <span class="n">N</span> <span class="o">-</span> <span class="n">M</span><span class="p">,</span> <span class="c1"># N &lt;= M  -&gt;  N - M &lt;= 0</span>
+            <span class="n">n</span> <span class="o">-</span> <span class="n">M</span><span class="p">,</span> <span class="c1"># n &lt;= M  -&gt;  n - M &lt;= 0</span>
+            <span class="n">b</span> <span class="o">-</span> <span class="n">N</span><span class="p">,</span> <span class="c1"># max(data) &lt;= N  -&gt;  max(data) - N &lt;= 0</span>
+            <span class="n">b</span> <span class="o">-</span> <span class="n">n</span><span class="p">]</span> <span class="c1"># max(data) &lt;= n  -&gt;  max(data) - n &lt;= 0</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_nchypergeom_wallenius_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nchypergeom_wallenius_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_nchypergeom_wallenius_gen</span><span class="p">(</span><span class="n">Fit_nchypergeom_fisher_gen</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Wallenius Non-central Hypergeometric</span>
+<span class="sd">    distribution using a ``pymoo`` problem. It uses ``scipy``&#39;s ``nchypergeom_wallenius_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This distribution has the same parameters and constraints as the</span>
+<span class="sd">    nchypergeom_fisher_gen, which is implemented by the problem</span>
+<span class="sd">    ``Fit_nchypergeom_fisher_gen`` (which this problem inherits from directly).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_nchypergeom_wallenius_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nchypergeom_wallenius_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">nchypergeom_wallenius_gen</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_nhypergeom_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nhypergeom_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_nhypergeom_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Negative Hypergeometric distribution</span>
+<span class="sd">    using a ``pymoo`` problem. It uses ``scipy``&#39;s ``nhypergeom_gen`` as base</span>
+<span class="sd">    distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``M``: (``int``) :math:`\left(0,25e^3\right)`</span>
+<span class="sd">    - ``n``: (``int``) :math:`\left(0,25e^3\right)`</span>
+<span class="sd">    - ``r``: (``int``) :math:`\left(0,25e^3\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_nhypergeom_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_nhypergeom_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">nhypergeom_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;M&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_planck_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_planck_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_planck_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Planck distribution</span>
+<span class="sd">    using a ``pymoo`` problem. It uses ``scipy``&#39;s ``planck_gen`` as base</span>
+<span class="sd">    distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``p``: (``float``) :math:`\left(5e^{-308},1e^2\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_planck_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_planck_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">planck_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="c1"># planck takes  as shape parameter. The Planck distribution can be written as a geometric distribution (geom) with p = 1 - exp(-lambda) shifted by loc = -1.</span>
+            <span class="c1"># # exp(-lambda) get small very quickly, so we choose 100 (~3.7e-44)</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_poisson_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_poisson_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_poisson_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Poisson distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``poisson_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``mu`` [:math:`\mu`]: (``float``) :math:`\left(0,1e^{6}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_poisson_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_poisson_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">poisson_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_randint_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_randint_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_randint_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Uniform distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``randint_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``low``: (``int``) :math:`\left(-25e^{3},25e^{3}\right)`</span>
+<span class="sd">    - ``high``: (``int``) :math:`\left(-25e^{3},25e^{3}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_randint_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_randint_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">randint_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;low&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">25_000</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">)),</span>
+            <span class="s1">&#39;high&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">25_000</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_skellam_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_skellam_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_skellam_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Skellam distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``skellam_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``mu1`` [:math:`\mu_1`]: (``float``) :math:`\left(5e^{-308},5e^{3}\right)`</span>
+<span class="sd">    - ``mu2`` [:math:`\mu_2`]: (``float``) :math:`\left(5e^{-308},5e^{3}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_skellam_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_skellam_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">skellam_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;mu1&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">5e3</span><span class="p">)),</span>
+            <span class="s1">&#39;mu2&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">5e3</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_yulesimon_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_yulesimon_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_yulesimon_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Yule--Simon distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``yulesimon_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``alpha`` [:math:`\alpha`]: (``float``) :math:`\left(5e^{-308},2e^{4}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_yulesimon_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_yulesimon_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">yulesimon_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">5e-308</span><span class="p">,</span> <span class="mf">2e4</span><span class="p">))</span> <span class="c1"># Guessed</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_zipf_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_zipf_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_zipf_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Zipf (Zeta) distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``zipf_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``a``: (``float``) :math:`\left(1+1e^{-12},2e^{4}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_zipf_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_zipf_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">zipf_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">,</span> <span class="mf">2e4</span><span class="p">))</span> <span class="c1"># Guessed</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_zipfian_gen"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_zipfian_gen">[docs]</a><span class="k">class</span> <span class="nc">Fit_zipfian_gen</span><span class="p">(</span><span class="n">MixedVariableDistributionFittingProblem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to fit the generalized Zipfian distribution using a ``pymoo``</span>
+<span class="sd">    problem. It uses ``scipy``&#39;s ``zipfian_gen`` as base distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Does not override :meth:`MixedVariableDistributionFittingProblem._evaluate()`</span>
+<span class="sd">    and does not have any (in-)equality constraints.</span>
+<span class="sd">    Calls the super constructor with these variables (in this order):</span>
+
+<span class="sd">    - ``a``: (``float``) :math:`\left(0,2e^{4}\right)`</span>
+<span class="sd">    - ``n``: (``int``) :math:`\left(0,25e^{3}\right)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Fit_zipfian_gen.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting_problems.Fit_zipfian_gen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">zipfian_gen</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">Real</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2e4</span><span class="p">)),</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">Integer</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25_000</span><span class="p">))</span>
+        <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sebastian Hönel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

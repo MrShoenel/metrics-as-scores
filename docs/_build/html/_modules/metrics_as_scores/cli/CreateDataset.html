@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metrics_as_scores.cli.CreateDataset &mdash; Metrics As Scores  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Metrics As Scores
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">metrics_as_scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Metrics As Scores</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">metrics_as_scores.cli.CreateDataset</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for metrics_as_scores.cli.CreateDataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">isint</span><span class="p">,</span> <span class="n">isnumeric</span><span class="p">,</span> <span class="n">get_known_datasets</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">LocalDataset</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.tools.funcs</span> <span class="kn">import</span> <span class="n">natsort</span>
+<span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">match</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">makedirs</span>
+<span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">dump</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">datasets_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./datasets&#39;</span><span class="p">)</span>
+<span class="n">default_ds</span> <span class="o">=</span> <span class="n">datasets_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./_default&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CreateDatasetWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow">[docs]</a><span class="k">class</span> <span class="nc">CreateDatasetWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This workflow creates an own, local dataset from a single data source that can</span>
+<span class="sd">    be read by Pandas from file or URL. The original dataset needs three columns:</span>
+<span class="sd">    For a single sample, one column holds the numeric observation, one holds the</span>
+<span class="sd">    ordinal type, and one holds the context associated with it. A dataset can hold</span>
+<span class="sd">    one or more types, but should hold at least two contexts in order to compare</span>
+<span class="sd">    distributions of a single sample type across contexts.</span>
+<span class="sd">    This workflow creates the entire dataset: The manifest JSON, the parametric fits,</span>
+<span class="sd">    the pre-generated distributions. When done, the dataset is installed, such that it</span>
+<span class="sd">    can be discovered and used by the local Web-Application. If you wish to publish</span>
+<span class="sd">    your dataset so that it can be used by others, start the Bundle-workflow from the</span>
+<span class="sd">    previous menu afterwards.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CreateDatasetWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_id</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^[a-z]+[a-z-_\d]*?[a-z\d]+?$&#39;</span></div>
+    
+
+    <span class="k">def</span> <span class="nf">_set_ideal_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtypes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="n">type_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">qtypes</span><span class="p">:</span>
+            <span class="n">type_dict</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="n">ready</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">ready</span><span class="p">:</span>
+            <span class="n">use_type_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span>
+                <span class="n">rtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Select a type to set a default value for:&#39;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="s2">&quot;None&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">type_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]))</span>
+            <span class="n">ideal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Set the ideal value for </span><span class="si">{</span><span class="n">qtypes</span><span class="p">[</span><span class="n">use_type_idx</span><span class="p">]</span><span class="si">}</span><span class="s1"> (leave blank for None):&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ideal</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">ideal</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">isint</span><span class="p">(</span><span class="n">ideal</span><span class="p">):</span>
+                    <span class="n">ideal</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ideal</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ideal</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ideal</span><span class="p">)</span>
+            <span class="n">type_dict</span><span class="p">[</span><span class="n">qtypes</span><span class="p">[</span><span class="n">use_type_idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ideal</span>
+
+            <span class="n">ready</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Continue setting ideal values?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">type_dict</span>
+    
+
+    <span class="k">def</span> <span class="nf">_read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_like</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;What is the separator used?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="n">dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;What is the decimal point?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="o">=</span><span class="n">path_like</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="n">dec</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_read_excel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_like</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="n">sheet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Which sheet would you like to read?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">isint</span><span class="p">(</span><span class="n">sheet</span><span class="p">):</span>
+            <span class="n">sheet</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Zero-based index of header column?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="n">isint</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="n">path_like</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_is_feature_discrete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col_data</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">col_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span> <span class="o">==</span> <span class="n">use_type</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="n">col_data</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="c1"># Check if all values are integer.</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    
+
+    <span class="k">def</span> <span class="nf">_create_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">LocalDataset</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+        <span class="n">jsd</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;You are now asked some basic info about the dataset.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span>
+            <span class="s1">&#39;CSV&#39;</span><span class="p">,</span> <span class="s1">&#39;Excel&#39;</span>
+        <span class="p">],</span> <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;What kind of file do you want to read?&#39;</span><span class="p">,</span> <span class="n">rtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Absolute file path or URL to original file:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s1">&#39;CSV&#39;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_csv</span><span class="p">(</span><span class="n">path_like</span><span class="o">=</span><span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s1">&#39;Excel&#39;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_excel</span><span class="p">(</span><span class="n">path_like</span><span class="o">=</span><span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">])</span>
+        
+
+        <span class="n">available_cols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span> <span class="n">k</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="p">})</span>
+        <span class="c1">#</span>
+        <span class="n">col_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Which column holds the data?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">rtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;colname_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_data</span>
+        <span class="k">del</span> <span class="n">available_cols</span><span class="p">[</span><span class="n">col_data</span><span class="p">]</span>
+        <span class="n">col_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;What is the name of the type column?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">rtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;colname_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_type</span>
+        <span class="k">del</span> <span class="n">available_cols</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span>
+        <span class="n">col_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;What is the name of the context column?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">rtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;colname_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_ctx</span>
+        <span class="k">del</span> <span class="n">available_cols</span><span class="p">[</span><span class="n">col_ctx</span><span class="p">]</span>
+
+        <span class="c1"># Now we only retain those two columns and all complete rows</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">col_data</span><span class="p">,</span> <span class="n">col_type</span><span class="p">,</span> <span class="n">col_ctx</span><span class="p">]]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="p">:]</span>
+        <span class="c1"># Let&#39;s convert the type and context column to string.</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col_ctx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_ctx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Having an original data frame with &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="si">}</span><span class="s1"> rows.&#39;</span><span class="p">)</span>
+        <span class="n">qtypes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()])</span>
+        <span class="n">qtypes</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natsort</span><span class="p">)</span>
+        <span class="n">contexts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">col_ctx</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()])</span>
+        <span class="n">contexts</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natsort</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;contexts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contexts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;The following quantity types were found: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qtypes</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;The following contexts exist in the data: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">contexts</span><span class="p">))</span>
+
+        <span class="c1"># Let&#39;s ask some descriptions for qtypes and contexts:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">You should now enter a very brief (max. 30 characters) description for each quantity type.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;desc_qtypes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">qtype</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">qtype</span> <span class="ow">in</span> <span class="n">qtypes</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">qtype</span> <span class="ow">in</span> <span class="n">qtypes</span><span class="p">:</span>
+            <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;desc_qtypes&#39;</span><span class="p">][</span><span class="n">qtype</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Enter a description for </span><span class="si">{</span><span class="n">qtype</span><span class="si">}</span><span class="s1">: &#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">You can now enter an optional brief (max. 30 characters) description for each context.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;desc_contexts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">ctx</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ctx</span> <span class="ow">in</span> <span class="n">contexts</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">ctx</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Enter an optional description for </span><span class="si">{</span><span class="n">ctx</span><span class="si">}</span><span class="s1"> (empty for none): &#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;desc_contexts&#39;</span><span class="p">][</span><span class="n">ctx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">temp</span>
+
+        <span class="c1"># Determine if features are discrete or continuous</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;qtypes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">t</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">qtypes</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Checking data for each type, whether it is discrete or continuous..&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">qtypes</span><span class="p">:</span>
+            <span class="c1"># _is_feature_discrete</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Checking type: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">is_disc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_feature_discrete</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">col_data</span><span class="o">=</span><span class="n">col_data</span><span class="p">,</span> <span class="n">col_type</span><span class="o">=</span><span class="n">col_type</span><span class="p">,</span> <span class="n">use_type</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;qtypes&#39;</span><span class="p">][</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span> <span class="k">if</span> <span class="n">is_disc</span> <span class="k">else</span> <span class="s1">&#39;continuous&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; [</span><span class="si">{</span><span class="n">jsd</span><span class="p">[</span><span class="s2">&quot;qtypes&quot;</span><span class="p">][</span><span class="n">t</span><span class="p">]</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Ideal Values:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">You can now define custom ideal values for each type of quantity.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">An ideal (utopian) value for a type of quantity represents the most desirable</span>
+<span class="s1">value for it. Depending on your use case, it is possible that there is no such</span>
+<span class="s1">value for each type of quantity. For example, in software metrics, the lowest</span>
+<span class="s1">possible - and therefore most desirable - value for complexity, is 1. Most other</span>
+<span class="s1">software metrics, however, do not have such an ideal value. For example, there</span>
+<span class="s1">is no best value for lines of code (size) of software.</span>
+<span class="s1">        &#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s1">&#39;Define Ideal Values Now?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">():</span>
+            <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;ideal_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_ideal_values</span><span class="p">(</span><span class="n">qtypes</span><span class="o">=</span><span class="n">qtypes</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;ideal_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">t</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">qtypes</span> <span class="p">}</span>
+
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Name of the Dataset:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Write a short description:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">known_datasets</span> <span class="o">=</span> <span class="p">{</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span> <span class="n">ds</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">get_known_datasets</span><span class="p">()</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Now you need to choose an ID for your dataset. It must NOT be one of these: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_datasets</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">arrow</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;ID (2+ chars, lowercase, start+end must be letter):&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regex_id</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">known_datasets</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">temp</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Author(s) (first and last, separate authors by comma):&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">jsd</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_run_statistical_tests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">tests_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;We will now perform some statistical tests and summarize the results.&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Performing tests: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;Analysis of Variance (ANOVA) ...&#39;</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">anova</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">analyze_ANOVA</span><span class="p">(</span><span class="n">qtypes</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">,</span> <span class="n">contexts</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">contexts</span><span class="p">(</span><span class="n">include_all_contexts</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span> <span class="n">unique_vals</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">file_anova</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tests_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./anova.csv&#39;</span><span class="p">))</span>
+        <span class="n">anova</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_anova</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote result to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">file_anova</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Performing tests: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;Two-Sample Kolmogorov-Smirnov (KS2) ...&#39;</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ks2samp</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">analyze_distr</span><span class="p">(</span><span class="n">qtypes</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">,</span> <span class="n">use_ks_2samp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">file_ks2samp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tests_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./ks2samp.csv&#39;</span><span class="p">))</span>
+        <span class="n">ks2samp</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_ks2samp</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote result to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">file_ks2samp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Performing tests: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s2">&quot;Tukey&#39;s Honest Significance Test (TukeyHSD) ...&quot;</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">tukeyhsd</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">analyze_TukeyHSD</span><span class="p">(</span><span class="n">qtypes</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">)</span>
+        <span class="n">file_tukey</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tests_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./tukeyhsd.csv&#39;</span><span class="p">))</span>
+        <span class="n">tukeyhsd</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_tukey</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote result to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">file_tukey</span><span class="p">)</span>
+        
+
+    
+
+<div class="viewcode-block" id="CreateDatasetWorkflow.create_own"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.create_own">[docs]</a>    <span class="k">def</span> <span class="nf">create_own</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">You are about to create a new Dataset from a resource that can be</span>
+<span class="s1">read by Pandas (e.g., a CSV from file or URL). A Dataset that can</span>
+<span class="s1">be used by Metrics-As-Scores requires a manifest (that will be</span>
+<span class="s1">created as part of this process), optional parametric fits, as well</span>
+<span class="s1">as pre-generated distributions that are used in the Web-Application.</span>
+<span class="s1">The following workflow will take you through all of these steps. It</span>
+<span class="s1">cannot be resumed.</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">manifest</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_manifest</span><span class="p">()</span>
+        <span class="c1"># Let&#39;s create a folder for this dataset (by ID) and out the files there.</span>
+        <span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">datasets_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">fits_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./fits&#39;</span><span class="p">)</span>
+        <span class="n">densities_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./densities&#39;</span><span class="p">)</span>
+        <span class="n">tests_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./stat-tests&#39;</span><span class="p">)</span>
+        <span class="n">web_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./web&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="p">[</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">fits_dir</span><span class="p">,</span> <span class="n">densities_dir</span><span class="p">,</span> <span class="n">tests_dir</span><span class="p">,</span> <span class="n">web_dir</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">makedirs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
+        
+        <span class="c1"># Let&#39;s copy specific files from the default over to the new dataset:</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;./About.qmd&#39;</span><span class="p">,</span> <span class="s1">&#39;./_quarto.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;./refs.bib&#39;</span><span class="p">,</span> <span class="s1">&#39;./web/about.html&#39;</span><span class="p">,</span> <span class="s1">&#39;./web/references.html&#39;</span><span class="p">]:</span>
+            <span class="n">copyfile</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">default_ds</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">file</span><span class="p">)),</span> <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">file</span><span class="p">)))</span>
+        <span class="c1"># We also need to write out variables for Quarto.</span>
+        <span class="c1"># We will write into the _quarto.yaml for better compat.</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./_quarto.yml&#39;</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">title: </span><span class="si">{</span><span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">author:&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  - </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        
+        <span class="n">path_manifest</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./manifest.json&#39;</span><span class="p">))</span>
+        <span class="n">path_data</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./org-data.csv&#39;</span><span class="p">))</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">path_manifest</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">path_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote manifest to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">path_manifest</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote original dataset to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">path_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_statistical_tests</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">tests_dir</span><span class="o">=</span><span class="n">tests_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">Your dataset was created and initialized in: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span><span class="si">}</span>
+
+<span class="s1">In order to use your dataset, you need to pre-generate densities for the Web Application.</span>
+<span class="s1">If you would also like to fit parametric random variables and generate densities for those,</span>
+<span class="s1">you need to do that first, however.</span>
+
+<span class="s1">If you want to publicize your dataset and share it with others, you need to edit the files</span>
+<span class="s1">&#39;about.html&#39; and &#39;references.html&#39; in the /web folder of your newly created dataset. Before</span>
+<span class="s1">bundling, you must create an &#39;About.pdf&#39; file. You may use Quarto to knit the default</span>
+<span class="s1">&#39;About.qmd&#39; that will produce a nice-looking overview and include some qualitative results</span>
+<span class="s1">of the conducted statistical tests (ANOVA and TukeyHSD).&#39;&#39;&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sebastian Hönel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
