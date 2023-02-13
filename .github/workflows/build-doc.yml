@@ -1,5 +1,5 @@
 name: Sphinx Build Documentation
-uses: ammaraskar/sphinx-action@0.4
+
 on:
   push:
     branches:
