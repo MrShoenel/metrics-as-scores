@@ -12,8 +12,13 @@ webapp_dir = this_dir.parent.joinpath('./webapp')
 root_dir = this_dir.parent.parent.parent
 
 class LocalWebserverWorkflow(Workflow):
+    __doc__ = '''
+This workflow allows you to locally run the interactive web application of
+Metrics As Scores, using one of the locally available datasets.
+'''
     def __init__(self) -> None:
         super().__init__()
+        self.preload: bool = None
     
 
     def _port_and_dataset(self) -> tuple[int, LocalDataset]:
@@ -31,20 +36,7 @@ class LocalWebserverWorkflow(Workflow):
     
     def _type_quit_to_exit(self) -> None:
         self.q.text(message='Enter "q" to shut down the application:', validate=lambda q: q.lower().startswith('q')).ask()
-
-
-    def start_server(self) -> None:
-        r = self.ask(prompt='Choose Method of Running the Web-App:', options=[
-            'Use External Process (works usually better)',
-            'Run Internal Application Server'
-        ])
-
-        if r == 0:
-            return self.start_server_process()
-        else:
-            return self.start_server_internally()
     
-
     def start_server_process(self) -> None:
         port, use_dataset = self._port_and_dataset()
 
@@ -54,13 +46,16 @@ class LocalWebserverWorkflow(Workflow):
         proc: Popen = None
         try:
             bokeh = Path(executable).parent.joinpath('./bokeh')
-            proc = Popen(args=[
+            args = [
                 str(bokeh), 'serve',
                 str(webapp_dir),
                 '--port', f'{port}',
                 '--show',
                 '--args', f'dataset={use_dataset["id"]}',
-            ], cwd=str(root_dir.resolve()), stdout=DEVNULL, stderr=DEVNULL)
+            ]
+            if self.preload:
+                args.append('preload')
+            proc = Popen(args=args, cwd=str(root_dir.resolve()), stdout=DEVNULL, stderr=DEVNULL)
         finally:
             self._type_quit_to_exit()
             try:
@@ -84,8 +79,11 @@ class LocalWebserverWorkflow(Workflow):
             'use_index': True
         }
         
+        args = [f'dataset={use_dataset["id"]}']
+        if self.preload:
+            args.append('preload')
         app = build_single_handler_application(
-            path = webapp_dir.resolve(), argv=[f'dataset={use_dataset["id"]}'])
+            path = webapp_dir.resolve(), argv=args)
 
         
         server = Server({'/webapp': app}, **kwargs)
@@ -105,5 +103,22 @@ class LocalWebserverWorkflow(Workflow):
         server.io_loop.add_callback(server.show, '/')
         server.io_loop.start()
         tpe.shutdown(wait=True)
+            
+    def start_server(self) -> None:
+        """Main entry point for this workflow."""
+        self._print_doc()
         
-        
+        r = self.ask(prompt='Choose Method of Running the Web-App:', options=[
+            'Use External Process (works usually better)',
+            'Run Internal Application Server'
+        ])
+
+        self.preload = self.askt(prompt='Would you like to pre-load the entire dataset into memory?', options=[
+            ('No', False),
+            ('Yes (Only recommended if you have enough memory)', True)
+        ])
+
+        if r == 0:
+            return self.start_server_process()
+        else:
+            return self.start_server_internally()
