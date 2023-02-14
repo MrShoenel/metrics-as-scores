@@ -14,6 +14,15 @@ class Workflow:
         self.style_mas = 'bold fg:#8B8000 bg:#000'
         self.style_err = 'bold fg:#8B0000 bg:#000'
     
+    def _print_doc(self) -> None:
+        self.q.print(10*'-' + '\n')
+        self.q.print(type(self).__doc__.strip() + '\n')
+        self.q.print(10*'-' + '\n')
+    
+    def _wait_for(self, what_for: str) -> None:
+        self.q.print(text=f'Press [Enter] {what_for}.', style=self.style_mas, end='')
+        return self.q.text(message='', qmark='').ask()
+    
     def ask(self, options: list[str], prompt: str='You now have the following options:', rtype: T=int) -> T:
         res = self.askt(
             options=list([(options[idx], idx) for idx in range(len(options))]),
