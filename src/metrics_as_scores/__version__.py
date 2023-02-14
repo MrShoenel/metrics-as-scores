@@ -8,7 +8,16 @@ pyproject_root = proj_dir.joinpath('./pyproject.toml')
 
 # If MAS is installed as PyPI package, this is False.
 IS_MAS_LOCAL: bool = False
+"""
+This variable will be equal to :code:`False` if Metrics As Scores was installed
+from PyPI as a package. If it was cloned and the full project structure is
+present locally, this will be :code:`True`.
+"""
 __version__: str = None
+"""
+This variable will reflect the version exactly as it was specified in the `pyproject.toml`.
+"""
+
 if pyproject_root.exists() and load(pyproject_root)['tool']['poetry']['name'] == 'metrics-as-scores':
     IS_MAS_LOCAL = True
     __version__ = load(pyproject_root)['tool']['poetry']['version']
