@@ -1,13 +1,13 @@
 from pathlib import Path
 import pandas as pd
-from typing import Any, Union
+from typing import Union
 from warnings import warn
 from os.path import exists
 from pickle import dump, load
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from metrics_as_scores.tools.funcs import flatten_dict
-from metrics_as_scores.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict
+from metrics_as_scores.data.pregenerate_fit import Continuous_RVs_dict, Discrete_RVs_dict, FitResult
 from metrics_as_scores.distribution.distribution import Dataset, Density, DistTransform, Dataset, Empirical, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from sklearn.model_selection import ParameterGrid
@@ -15,7 +15,42 @@ from sklearn.model_selection import ParameterGrid
 
 
 
-def generate_densities(dataset: Dataset, clazz: type[Density]=Empirical, unique_vals: bool=None, resample_samples=250_000, dist_transform: DistTransform=DistTransform.NONE) -> dict[str, Density]:
+def generate_densities(
+    dataset: Dataset,
+    clazz: type[Density]=Empirical,
+    unique_vals: bool=None,
+    resample_samples=250_000,
+    dist_transform: DistTransform=DistTransform.NONE
+) -> dict[str, Density]:
+    """
+    Generates a set of :py:class:`Density` objects for a certain :py:class:`DistTransform`.
+    For each combination, we will later save one file that is then to be used in the web
+    application, as generating these on-the-fly would take too long.
+
+    dataset: ``Dataset``
+        Required for obtaining quantity types, contexts, and filtered data.
+    
+    clazz: ``type[Density]``
+        A type of empirical density to generate densities for.
+    
+    unique_vals: ``bool``
+        Used to conditionally add some jitter to data to all data points unique. This is
+        automatically set to `True` if the class is :py:class:`Empirical`, because this
+        class is for continuous RVs. If the data is not continuous (real), then setting
+        this to `True` will make it so.
+    
+    resample_samples: ``int``
+        Unsigned integer, passed forward to the type of dict[str, Density].
+    
+    dist_transform: ``DistTransform``
+        The chosen transformation for the data.
+    
+    :rtype: ``dict[str, Density]``
+
+    :return:
+        A dictionary where the key is made of the context and quantity type, and
+        the value is the generated :py:class:`Empirical` density.
+    """
     contexts = list(dataset.contexts(include_all_contexts=True))
     param_grid = { 'context': contexts, 'qtype': dataset.quantity_types }
     expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
@@ -38,7 +73,38 @@ def generate_densities(dataset: Dataset, clazz: type[Density]=Empirical, unique_
     return dict(cdfs)
 
 
-def fits_to_MAS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any]], dist_transform: DistTransform, use_continuous: bool) -> dict[str, Union[Parametric, Parametric_discrete]]:
+def fits_to_MAS_densities(
+    dataset: Dataset,
+    distns_dict: dict[int, FitResult],
+    dist_transform: DistTransform,
+    use_continuous: bool
+) -> dict[str, Union[Parametric, Parametric_discrete]]:
+    """
+    Converts previously produced parametric fits to :py:class:`Density` objects that can
+    be loaded and used in the web application.
+    Similar to :py:meth:`generate_densities()`, this method also returns a dictionary
+    with generated parametric densities.
+
+    dataset: ``Dataset``
+        Required for obtaining quantity types, contexts, and filtered data.
+    
+    distns_dict: ``dict[int, FitResult]``
+        Dictionary with all fit results for a data transform. The `int`-key is just the
+        previously used grid index and not relevant here.
+    
+    dist_transform: ``DistTransform``
+        The chosen transformation for the data.
+    
+    use_continuous: ``bool``
+        Used to select and generate densities based on either continuous (`True`) RVs or
+        discrete RVs.
+    
+    :rtype: ``dict[str, Union[Parametric, Parametric_discrete]]``
+
+    :return:
+        A dictionary where the key is made of the context and quantity type, and
+        the value is the generated :py:class:`Union[Parametric, Parametric_discrete]` density.
+    """
     df = pd.DataFrame([flatten_dict(d) for d in distns_dict.values()])
     data_df = dataset.df
 
@@ -84,7 +150,32 @@ def fits_to_MAS_densities(dataset: Dataset, distns_dict: dict[int, dict[str, Any
 
 
 
-def generate_empirical(dataset: Dataset, densities_dir: Path, clazz: Union[Empirical, KDE_approx], transform: DistTransform):
+def generate_empirical(
+    dataset: Dataset,
+    densities_dir: Path,
+    clazz: Union[Empirical, KDE_approx],
+    transform: DistTransform
+) -> None:
+    """
+    Generates a set of empirical (continuous) densities for a given density type
+    (Empirical or KDE_Approx) and data transform.
+
+    dataset: ``Dataset``
+        Required for obtaining quantity types, contexts, and filtered data.
+    
+    densities_dir: ``Path``
+        The directory to store the generated densities. The resulting file is a key
+        of the used density type and data transform.
+    
+    clazz: ``Union[Empirical, KDE_approx]``
+        The type of density you wish to create.
+    
+    transform: ``DistTransform``
+        The chosen transformation for the data.
+    
+    :return:
+        This method does not return anything but only writes the result to disk.
+    """
     temp = generate_densities(dataset=dataset, clazz=clazz, dist_transform=transform, unique_vals=True, resample_samples=75_000)
     dens_file = str(densities_dir.joinpath(f'./densities_{clazz.__name__}_{transform.name}.pickle'))
     with open(file=dens_file, mode='wb') as fp:
@@ -93,7 +184,33 @@ def generate_empirical(dataset: Dataset, densities_dir: Path, clazz: Union[Empir
 
 
 
-def generate_parametric(dataset: Dataset, densities_dir: Path, fits_dir: Path, clazz: Union[Parametric, Parametric_discrete], transform: DistTransform):
+def generate_parametric(
+    dataset: Dataset,
+    densities_dir: Path,
+    fits_dir: Path,
+    clazz: Union[Parametric, Parametric_discrete],
+    transform: DistTransform
+) -> None:
+    """
+    Generates a set of parametric densities for a given density type
+    (Parametric or Parametric_discrete) and data transform.
+
+    dataset: ``Dataset``
+        Required for obtaining quantity types, contexts, and filtered data.
+    
+    densities_dir: ``Path``
+        The directory to store the generated densities. The resulting file is a key
+        of the used density type and data transform.
+    
+    clazz: ``Union[Parametric, Parametric_discrete]``
+        The type of density you wish to create.
+    
+    transform: ``DistTransform``
+        The chosen transformation for the data.
+    
+    :return:
+        This method does not return anything but only writes the result to disk.
+    """
     fits_file = str(fits_dir.joinpath(f'./pregen_distns_{transform.name}.pickle').resolve())
     if not exists(fits_file):
         warn(f'Cannot generate parametric distribution for {clazz.__name__} and transformation {transform.name}, because the file {fits_file} does not exist. Did you forget to create the fits using the script pregenerate_distns.py?')
@@ -111,7 +228,28 @@ def generate_parametric(dataset: Dataset, densities_dir: Path, fits_dir: Path, c
 
 
 
-def generate_empirical_discrete(dataset: Dataset, densities_dir: Path, transform: DistTransform):
+def generate_empirical_discrete(
+    dataset: Dataset,
+    densities_dir: Path,
+    transform: DistTransform
+) -> None:
+    """
+    Generates discrete empirical densities for a given data transform. Only uses
+    the type :py:class:``Empirical_discrete`` for this.
+
+    dataset: ``Dataset``
+        Required for obtaining quantity types, contexts, and filtered data.
+    
+    densities_dir: ``Path``
+        The directory to store the generated densities. The resulting file is a key
+        of the used density type and data transform.
+    
+    transform: ``DistTransform``
+        The chosen transformation for the data.
+    
+    :return:
+        This method does not return anything but only writes the result to disk.
+    """
     the_dict: dict[str, Empirical_discrete] = {}
 
     for context in dataset.contexts(include_all_contexts=True):
@@ -130,8 +268,3 @@ def generate_empirical_discrete(dataset: Dataset, densities_dir: Path, transform
     with open(file=dens_file, mode='wb') as fp:
         dump(obj=the_dict, file=fp)
     print(f'Finished generating empirical Densities for {Empirical_discrete.__name__} with transform {transform.name}.')
-
-
-
-
-
