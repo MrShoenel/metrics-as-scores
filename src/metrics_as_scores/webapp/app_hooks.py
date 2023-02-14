@@ -1,4 +1,7 @@
-from pathlib import Path
+"""
+This module is called prior to the web application's initialization.
+"""
+
 from sys import argv
 from pickle import load
 from metrics_as_scores.__init__ import DATASETS_DIR
@@ -10,6 +13,7 @@ from metrics_as_scores.webapp import data
 
 
 def unpickle(file: str):
+    """:meta private:"""
     try:
         with open(file=file, mode='rb') as f:
             return load(f)
@@ -18,6 +22,7 @@ def unpickle(file: str):
 
 
 def load_data(dataset_id: str, preload: bool=False):
+    """:meta private:"""
     print(f'Attempting to load dataset with ID: {dataset_id}')
     manifest: LocalDataset = None
     temp = list(get_local_datasets())
@@ -50,6 +55,15 @@ def load_data(dataset_id: str, preload: bool=False):
     pass
 
 def on_server_loaded(server_context):
+    """
+    Called by `bokeh` when the application loads. This is the entry point.
+    Here, we will read the requested dataset from the system's arg-vector.
+    It is expected there exists an argument in the shape ``dataset=<str>``.
+    If there exists another argument (without value) called ``preload``, then
+    all the dataset's densities will be loaded into memory before the web
+    application starts. Only recommended for large datasets and when you
+    have enough memory available.
+    """
     dataset_id: str = None
     for arg in argv:
         if arg.startswith('dataset='):
