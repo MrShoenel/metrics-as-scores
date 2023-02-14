@@ -11,6 +11,10 @@ from metrics_as_scores.cli.LocalDatasets import LocalDatasetsWorkflow
 from metrics_as_scores.__version__ import __version__ as mas_version
 
 class MainWorkflow(Workflow):
+    """
+    The main workflow of the CLI is the main menu of the textual user interface.
+    It provides access to all other workflows.
+    """
     def __init__(self) -> None:
         super().__init__()
         self.stop = False
@@ -23,7 +27,7 @@ class MainWorkflow(Workflow):
     
     def main_menu(self) -> Workflow:
         """
-        Show the main menu of the CLI:
+        Show the main menu of the CLI.
         """
 
         # The main options/Functions for M-a-S:
