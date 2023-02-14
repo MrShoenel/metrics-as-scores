@@ -6,23 +6,74 @@ from numpy.random import default_rng
 from scipy.stats._distn_infrastructure import rv_continuous, rv_discrete
 from joblib import Parallel, delayed
 from metrics_as_scores.distribution.distribution import DistTransform, Dataset
-from metrics_as_scores.data.pregenerate_fit import fit, Fitter
+from metrics_as_scores.data.pregenerate_fit import fit, Fitter, FitResult
 from sklearn.model_selection import ParameterGrid
 
 
 
 
-def generate_parametric_fits(ds: Dataset, num_jobs: int, fitter_type: type[Fitter], dist_transform: DistTransform, selected_rvs_c: list[type[rv_continuous]], selected_rvs_d: list[type[rv_discrete]], data_dict: dict[str, NDArray[Shape["*"], Float]], transform_values_dict: dict[str, float], data_discrete_dict: dict[str, NDArray[Shape["*"], Float]], transform_values_discrete_dict: dict[str, float]) -> list[dict[str, Any]]:
-    # The thinking is this: To each data series we can always fit a continuous distribution,
-    # whether it's discrete or continuous data. The same is not true the other way round, i.e.,
-    # we should not fit a discrete distribution if the data is known to be continuous.
-    # Therefore, we do the following:
-    #
-    # - Regardless of the data, always attempt to fit a continuous RV
-    # - For all discrete data, also attempt to fit a discrete RV
-    #
-    # That means that for discrete data, we will have two kinds of fitted RVs.
-    # Also, when fitting a continuous RV to discrete data, we will add jitter to the data.
+def generate_parametric_fits(
+    ds: Dataset,
+    num_jobs: int,
+    fitter_type: type[Fitter],
+    dist_transform: DistTransform,
+    selected_rvs_c: list[type[rv_continuous]],
+    selected_rvs_d: list[type[rv_discrete]],
+    data_dict: dict[str, NDArray[Shape["*"], Float]],
+    transform_values_dict: dict[str, float],
+    data_discrete_dict: dict[str, NDArray[Shape["*"], Float]],
+    transform_values_discrete_dict: dict[str, float]
+) -> list[FitResult]:
+    """
+    The thinking is this: To each data series we can always fit a continuous distribution,
+    whether it's discrete or continuous data. The same is not true the other way round, i.e.,
+    we must not fit a discrete distribution if the data is known to be continuous.
+    Therefore, we do the following:
+    
+    - Regardless of the data, always attempt to fit a continuous RV
+    - For all discrete data, also attempt to fit a discrete RV
+    
+    That means that for discrete data, we will have two kinds of fitted RVs.
+    Also, when fitting a continuous RV to discrete data, we will add jitter to the data.
+
+
+    ds: ``Dataset``
+        The data, needed for obtaining quantity types and contexts. Also passed forward to
+        :py:meth:`fit()`.
+    
+    num_jobs: ``int``
+        Degree of parallelization used.
+    
+    fitter_type: ``type[Fitter]``
+        The class for the fitter to use, either :py:class:`Fitter` or :py:class:`FitterPymoo`.
+    
+    dist_transform: ``DistTransform``
+        The transform for which to generate parametric fits for. Later, we will save a single
+        file per transform, containing all related fits.
+    
+    selected_rvs_c: ``list[type[rv_continuous]]``
+        Continuous RVs to attempt to fit.
+    
+    selected_rvs_d: ``list[type[rv_discrete]]``
+        Discrete RVs to attempt to fit.
+    
+    data_dict: ``dict[str, NDArray[Shape["*"], Float]]``
+        A dictionary where they key consists of the context and the quantity type.
+        For each entry, it contains a 1-D array of data used for fitting.
+    
+    transform_values_dict: ``dict[str, float]``
+        Similar to ``data_dict``, this dictionary contains the transformation value that
+        was used to transform the data in the 1-D array.
+    
+    data_discrete_dict: ``dict[str, NDArray[Shape["*"], Float]]``
+        Like ``data_dict``, but for discrete RVs fitted to discrete data.
+        
+    transform_values_discrete_dict: ``dict[str, float]``
+        Like ``transform_values_dict``, but for the discrete datas.
+    
+    :return:
+        A list of :py:class:``FitResult`` objects.
+    """
 
     param_grid = {
         'context': list(ds.contexts(include_all_contexts=True)),
