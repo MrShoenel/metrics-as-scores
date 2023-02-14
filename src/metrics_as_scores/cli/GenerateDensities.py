@@ -11,6 +11,29 @@ from joblib import Parallel, delayed
 
 
 class GenerateDensitiesWorkflow(Workflow):
+    __doc__ = '''
+This workflow generates density-related functions that are used by the
+Web Application. While those can be large, generating them on-the-fly is
+usually not possible in acceptable time. Using pre-generated functions
+is a trade-off between space and user experience, where we sacrifice the
+former as it is cheaper.
+
+For each quantity and each context, we pre-generate functions for the
+probability density (PDF), the cumulative distribution (CDF) and its
+complement (CCDF), as well as the quantile (or percent point) function
+(PPF). So for one quantity and one context, we pre-generate one density
+that unites those four functions.
+
+There are 5 primary classes of densities: Parametric, Parametric_discrete,
+Empirical, Empirical_discrete, and KDE_approx. Please refer to the
+documentation for details about these. Generating parametric densities
+uses the computed fits from another workflow, is cheap, fast, and does
+not consume much space. KDE_approx makes excessive use of oversampling
+(by design), which can result in large files. The empirical densities'
+size corresponds to the size of the dataset you are using (although there
+is a high limit beyond which sampling will be applied).
+    '''.strip()
+
     def __init__(self) -> None:
         super().__init__()
         self.use_ds: LocalDataset = None
@@ -44,31 +67,8 @@ class GenerateDensitiesWorkflow(Workflow):
     
 
     def pre_generate(self) -> None:
-        self.q.print('\n' + 10*'-')
-        self.q.print('''
-This workflow generates density-related functions that are used by the
-Web Application. While those can be large, generating them on-the-fly is
-usually not possible in acceptable time. Using pre-generated functions
-is a trade-off between space and user experience, where we sacrifice the
-former as it is cheaper.
-
-For each quantity and each context, we pre-generate functions for the
-probability density (PDF), the cumulative distribution (CDF) and its
-complement (CCDF), as well as the quantile (or percent point) function
-(PPF). So for one quantity and one context, we pre-generate one density
-that unites those four functions.
-
-There are 5 primary classes of densities: Parametric, Parametric_discrete,
-Empirical, Empirical_discrete, and KDE_approx. Please refer to the
-documentation for details about these. Generating parametric densities
-uses the computed fits from another workflow, is cheap, fast, and does
-not consume much space. KDE_approx makes excessive use of oversampling
-(by design), which can result in large files. The empirical densities'
-size corresponds to the size of the dataset you are using (although there
-is a high limit beyond which sampling will be applied).
-'''.strip())
-        self.q.print('')
-        self.q.print(10*'-')
+        """Main entry point for this workflow."""
+        self._print_doc()
 
         datasets = list(get_local_datasets())
         self.use_ds = self.askt(

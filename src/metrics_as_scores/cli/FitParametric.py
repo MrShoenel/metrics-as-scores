@@ -22,6 +22,28 @@ from scipy.stats._discrete_distns import nhypergeom_gen, hypergeom_gen
 
 
 class FitParametricWorkflow(Workflow):
+    __doc__ = '''
+This workflow fits distributions to an existing dataset. For each
+type of quantity, and for each context, a large number of random
+variables are fit, and a number of statistical tests are carried
+out such that the best-fitting distribution may be selected/used.
+Regardless of whether a quantity is continuous or discrete, many
+continuous random variables are attempted to fit. If a quantity
+is discrete, however, an additional set of discrete random variables
+is attempted to fit. Especially the latter might be extraordinarily
+expensive.
+
+Therefore, you may only select a subset of random variables that
+you want to attempt to fit. However, if you intend to share your
+dataset and make it available to others, then you should include
+and attempt to fit all distributions.
+
+The following process, once begun, will save the result of fitting
+a single type of quantity (from within a single context) as a
+separate file. If the file already exists, no new fit is attempted.
+This is so that this process can be interrupted and resumed.
+    '''.strip()
+
     def __init__(self) -> None:
         super().__init__()
         self.use_ds: LocalDataset = None
@@ -44,7 +66,8 @@ because fitting a continuous distribution is comparatively cheap and
 fast.'''.strip())
         recommend_ignore = [norminvgauss_gen, gausshyper_gen, genhyperbolic_gen, geninvgauss_gen, invgauss_gen, studentized_range_gen]
         return self.q.checkbox(message='Select continuous random variables:', choices=[Choice(title=type(rv).__name__, value=type(rv), checked=not type(rv) in recommend_ignore) for rv in Continuous_RVs]).ask()
-    
+
+
     def _select_discrete_rvs(self) -> Iterable[type[rv_discrete]]:
         self.q.print('''
 You can now select the discrete random variables that you want to
@@ -113,27 +136,9 @@ global search has to be performed.'''.strip())
 
 
     def fit_parametric(self) -> None:
-        self.q.print('\n' + 10*'-')
-        self.q.print('''
-This workflow fits distributions to an existing dataset. For each
-type of quantity, and for each context, a large number of random
-variables are fit, and a number of statistical tests are carried
-out such that the best-fitting distribution may be selected/used.
-Regardless of whether a quantity is continuous or discrete, many
-continuous random variables are attempted to fit. If a quantity
-is discrete, however, an additional set of discrete random variables
-is attempted to fit. Especially the latter might be extraordinarily
-expensive.
-Therefore, you may only select a subset of random variables that
-you want to attempt to fit. However, if you intend to share your
-dataset and make it available to others, then you should include
-and attempt to fit all distributions.
-The following process, once begun, will save the result of fitting
-a single type of quantity (from within a single context) as a
-separate file. If the file already exists, no new fit is attempted.
-This is so that this process can be interrupted and resumed.
-'''.strip())
-        self.q.print('')
+        """Main entry point for this workflow."""
+        self._print_doc()
+        
         datasets = list(get_local_datasets())
         self.use_ds = self.askt(
             prompt='Select the local dataset you want to generate fits for:',

@@ -18,19 +18,20 @@ default_ds = MAS_DIR.joinpath('./datasets/_default')
 
 
 class CreateDatasetWorkflow(Workflow):
-    """
-    This workflow creates an own, local dataset from a single data source that can
-    be read by Pandas from file or URL. The original dataset needs three columns:
-    For a single sample, one column holds the numeric observation, one holds the
-    ordinal type, and one holds the context associated with it. A dataset can hold
-    one or more types, but should hold at least two contexts in order to compare
-    distributions of a single sample type across contexts.
-    This workflow creates the entire dataset: The manifest JSON, the parametric fits,
-    the pre-generated distributions. When done, the dataset is installed, such that it
-    can be discovered and used by the local Web-Application. If you wish to publish
-    your dataset so that it can be used by others, start the Bundle-workflow from the
-    previous menu afterwards.
-    """
+    __doc__ = """
+This workflow creates an own, local dataset from a single data source that can
+be read by Pandas from file or URL. The original dataset needs three columns:
+For a single sample, one column holds the numeric observation, one holds the
+ordinal type, and one holds the context associated with it. A dataset can hold
+one or more types, but should hold at least two contexts in order to compare
+distributions of a single sample type across contexts.
+This workflow creates the entire dataset: The manifest JSON, the parametric fits,
+the pre-generated distributions. When done, the dataset is installed, such that it
+can be discovered and used by the local Web-Application. If you wish to publish
+your dataset so that it can be used by others, start the Bundle-workflow from the
+previous menu afterwards.
+    """.strip()
+
     def __init__(self) -> None:
         super().__init__()
         self.regex_id = r'^[a-z]+[a-z-_\d]*?[a-z\d]+?$'
@@ -204,17 +205,19 @@ is no best value for lines of code (size) of software.
     
 
     def create_own(self) -> None:
-        self.q.print('\n' + 10*'-')
-        self.q.print('''
+        """
+        Main entry point for this workflow.
+        """
+        self._print_doc(more='''
+
 You are about to create a new Dataset from a resource that can be
 read by Pandas (e.g., a CSV from file or URL). A Dataset that can
 be used by Metrics-As-Scores requires a manifest (that will be
 created as part of this process), optional parametric fits, as well
 as pre-generated distributions that are used in the Web-Application.
 The following workflow will take you through all of these steps. It
-cannot be resumed.
-'''.strip())
-        self.q.print(10*'-' + '\n')
+cannot be resumed.''')
+        self._wait_for(what_for='to begin')
 
         manifest, df = self._create_manifest()
         # Let's create a folder for this dataset (by ID) and out the files there.

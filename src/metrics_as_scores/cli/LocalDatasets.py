@@ -4,6 +4,11 @@ from metrics_as_scores.distribution.distribution import LocalDataset
 
 
 class LocalDatasetsWorkflow(Workflow):
+    __doc__ = '''
+This workflow lists all locally available datasets. This includes downloaded
+and installed datasets, as well manually created datasets.
+    '''
+
     def __init__(self) -> None:
         super().__init__()
     
@@ -14,6 +19,9 @@ class LocalDatasetsWorkflow(Workflow):
         self.q.print(jsd['id'])
 
     def show_datasets(self) -> None:
+        """Main entry point for this workflow."""
+        self._print_doc()
+
         for jsd in get_local_datasets():
             self.q.print('\nDataset:')
             self.q.print(10*'-')

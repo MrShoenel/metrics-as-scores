@@ -10,6 +10,18 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 
 class BundleDatasetWorkflow(Workflow):
+    __doc__ = '''
+This workflow bundles a manually created dataset into a single Zip file
+that can be uploaded to, e.g., Zenodo, and registered with Metrics As
+Scores in order to make it available to others as a known dataset.
+
+In order for an own dataset to be publishable, it needs to have all
+parametric fits, generated densities, references, about, etc. This
+workflow will check that all requirements are fulfilled.
+
+For an example dataset, check out https://doi.org/10.5281/zenodo.7633950
+'''.strip()
+
     def __init__(self) -> None:
         super().__init__()
         self.use_ds: LocalDataset = None
@@ -47,20 +59,8 @@ class BundleDatasetWorkflow(Workflow):
     
 
     def bundle(self) -> None:
-        self.q.print('\n' + 10*'-')
-        self.q.print('''
-This workflow bundles a manually created dataset into a single Zip file
-that can be uploaded to, e.g., Zenodo, and registered with Metrics As
-Scores in order to make it available to others as a known dataset.
-
-In order for an own dataset to be publishable, it needs to have all
-parametric fits, generated densities, references, about, etc. This
-workflow will check that all requirements are fulfilled.
-
-For an example dataset, check out https://doi.org/10.5281/zenodo.7633950
-'''.strip())
-        self.q.print('')
-        self.q.print(10*'-')
+        """Main entry point for this workflow."""
+        self._print_doc()
         
 
         datasets = list(get_local_datasets())

@@ -3,26 +3,25 @@ from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, get_local_datasets, KNOWN_DATASETS_FILE
 from requests import get
 from shutil import copyfileobj, unpack_archive
-from pathlib import Path
 
 
 class DownloadWorkflow(Workflow):
-    def __init__(self) -> None:
-        super().__init__()
-    
-
-    def download(self) -> None:
-        self.q.print('\n' + 10*'-')
-        self.q.print(f'''
+    __doc__ = f'''
 This workflow access a curated list of known datasets that can be used with
 Metrics As Scores. With this workflow, a known dataset can be downloaded and
 installed as a local dataset. Use the workflow for listing the known datasets
 and then enter the ID here.
 
 Known datasets are loaded from: {KNOWN_DATASETS_FILE}
-'''.strip())
-        self.q.print('')
-        self.q.print(10*'-')
+'''.strip()
+
+    def __init__(self) -> None:
+        super().__init__()
+    
+
+    def download(self) -> None:
+        """Main entry point for this workflow."""
+        self._print_doc()
 
 
         known_ds = { ds['id']: ds for ds in get_known_datasets() }
