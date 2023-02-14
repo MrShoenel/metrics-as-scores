@@ -27,7 +27,12 @@ Note this is a dictionary of types, rather than instances.
 
 
 
-def get_data_tuple(ds: Dataset, qtype: str, dist_transform: DistTransform, continuous_transform: bool=True) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
+def get_data_tuple(
+    ds: Dataset,
+    qtype: str,
+    dist_transform: DistTransform,
+    continuous_transform: bool=True
+) -> list[tuple[str, NDArray[Shape["*"], Float]]]:
     """
     This method is part of the workflow for computing parametric fits.
     For a specific type of quantity and transform, it creates datasets
@@ -62,6 +67,11 @@ def get_data_tuple(ds: Dataset, qtype: str, dist_transform: DistTransform, conti
 
 
 class FitResult(TypedDict):
+    """
+    This class is derived from :py:class:`TypedDict` and holds all properties
+    related to a single fit result, that is, a single specific configuration
+    that was fit to a 1-D array of data.
+    """
     grid_idx: int
     dist_transform: str
     transform_value: Union[float, None]
@@ -76,7 +86,50 @@ class FitResult(TypedDict):
     stat_tests: StatisticalTestJson
 
 
-def fit(ds: Dataset, fitter_type: type[Fitter], grid_idx: int, row, dist_transform: DistTransform, the_data: NDArray[Shape["*"], Float], the_data_unique: NDArray[Shape["*"], Float], transform_value: Union[float, None], write_temporary_results: bool=False) -> dict[str, Any]:
+def fit(
+    ds: Dataset,
+    fitter_type: type[Fitter],
+    grid_idx: int, row,
+    dist_transform: DistTransform,
+    the_data: NDArray[Shape["*"], Float],
+    the_data_unique: NDArray[Shape["*"], Float],
+    transform_value: Union[float, None],
+    write_temporary_results: bool=False
+) -> FitResult:
+    """
+    This is the main stand-alone function that computes a single parametric fit to
+    a single 1-D array of data. This function is used in Parallel contexts and,
+    therefore, lives on module top level so it can be serialized.
+
+    ds: ``Dataset``
+        The data, needed for obtaining quantity types and contexts. Also passed forward to
+        :py:meth:`fit()`.
+    
+    fitter_type: ``type[Fitter]``
+        The class for the fitter to use, either :py:class:`Fitter` or :py:class:`FitterPymoo`.
+    
+    grid_idx: ``int``
+        This is only used so it can be stored in the :py:class:``FitResult``. This method
+        itself does not have access to the grid.
+    
+    dist_transform: ``DistTransform``
+        The transform for which to generate parametric fits for. Later, we will save a single
+        file per transform, containing all related fits.
+    
+    the_data: ``NDArray[Shape["*"], Float]``
+        The 1-D data used for fitting the RV.
+    
+    the_data_unique: ``NDArray[Shape["*"], Float]``
+        1-D Array of data. In case of continuous data, it is the same as ``the_data``. In case
+        of discrete data, the data in this array contains a slight jitter as to make all data
+        points unique. Using this data is relevant for conducting statistical goodness of fit
+        tests.
+    
+    :return:
+        The :py:class:``FitResult``. If the RV could not be fitted, then the parameters in
+        the fitting result will have a value of ``None``. This is so this method does not
+        throw exceptions. In case of a failure, no statistical tests are computed, either.
+    """
     start = timer()
     import sys
     if not sys.warnoptions:
