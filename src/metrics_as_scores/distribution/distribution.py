@@ -23,16 +23,52 @@ from strenum import StrEnum
 
 
 class DistTransform(StrEnum):
+    """
+    This is an enumeration of transforms applicable to distributions of a quantity.
+    A transform first computes the desired ideal (transform) value from the given
+    density (e.g., the expectation) and then transforms the initial distribution of
+    values into a distribution of distances.
+    """
     NONE = '<none>'
+    """Do not apply any transform."""
+
     EXPECTATION = 'E[X] (expectation)'
+    """
+    Compute the expectation of the random variable.
+    This is similar to :math:`\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx` for a
+    continuous random variable.
+    """
+
     MEDIAN = 'Median (50th percentile)'
+    """
+    Compute the median (50th percentile) of the random variable. The median is defined
+    as the value that splits a probability distribution into a lower and higher half.
+    """
+    
     MODE = 'Mode (most likely value)'
+    """
+    The mode of a random variable is the most frequently occurring value, i.e., the
+    value with the highest probability (density).
+    """
+
     INFIMUM = 'Infimum (min. observed value)'
+    """
+    The infimum is the lowest observed value of some empirical random variable.
+    """
+
     SUPREMUM = 'Supremum (max. observed value)'
+    """
+    The supremum is the highest observed value of some empirical random variable.
+    """
 
 
 
 class JsonDataset(TypedDict):
+    """
+    This class is the base class for the :py:class:`LocalDataset` and the
+    :py:class:`KnownDataset`. Each manifest should have a name, id, description,
+    and author.
+    """
     name: str
     desc: str
     id: str
@@ -40,6 +76,10 @@ class JsonDataset(TypedDict):
 
 
 class LocalDataset(JsonDataset):
+    """
+    This dataset extends the :py:class:`JsonDataset` and adds properties that
+    are filled out when locally creating a new dataset.
+    """
     origin: str
     colname_data: str
     colname_type: str
@@ -52,6 +92,10 @@ class LocalDataset(JsonDataset):
 
 
 class KnownDataset(JsonDataset):
+    """
+    This dataset extends the :py:class:`JsonDataset` with properties that are
+    known about datasets that are available to Metrics As Scores online.
+    """
     info_url: str
     download: str
     size: int
@@ -60,7 +104,60 @@ class KnownDataset(JsonDataset):
 
 
 class Density(ABC):
-    def __init__(self, range: tuple[float, float], pdf: Callable[[float], float], cdf: Callable[[float], float], ppf: Callable[[float], float]=None, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
+    """
+    This is the abstract base class for parametric and empirical densities. A
+    :py:class:`Density` represents a concrete instance of some random variable
+    and its PDF, CDF, and PPF. It also stores information about this concrete
+    instance came to be (e.g., by some concrete transform).
+
+    This class provides a set of common getters and setters and also provides
+    some often needed conveniences, such as computing the practical domain.
+    As for the PDF, CDF, and PPF, all known sub-classes have a specific way of
+    obtaining these, and this class' responsibility lies in vectorizing these
+    functions.
+    """
+
+    def __init__(
+        self,
+        range: tuple[float, float],
+        pdf: Callable[[float], float],
+        cdf: Callable[[float], float],
+        ppf: Callable[[float], float]=None,
+        ideal_value: float=None,
+        dist_transform: DistTransform=DistTransform.NONE,
+        transform_value: float=None,
+        qtype: str=None,
+        context: str=None,
+        **kwargs
+    ) -> None:
+        """
+        range: ``tuple[float, float]``
+            The range of the data.
+        
+        pdf: ``Callable[[float], float]``
+            The probability density function.
+        
+        cdf: ``Callable[[float], float]``
+            The cumulative distribution function.
+        
+        ppf: ``Callable[[float], float]``
+            The percent point (quantile) function.
+        
+        ideal_value: ``float``
+            Some quantities have an ideal value. It can be provided here.
+        
+        dist_transform: ``DistTransform``
+            The data transform that was applied while obtaining this density.
+        
+        transform_value: ``float``
+            Optional transform value that was applied during transformation.
+        
+        qtype: ``str``
+            The type of quantity for this density.
+        
+        context: ``str``
+            The context of this quantity.
+        """
         self.range = range
         self._pdf = pdf
         self._cdf = cdf
@@ -85,31 +182,47 @@ class Density(ABC):
 
     @property
     def qtype(self) -> Union[str, None]:
+        """Getter for the quantity type."""
         return self._qtype
     
     @property
     def context(self) -> Union[str, None]:
+        """Getter for the context."""
         return self._context
 
     @property
     def ideal_value(self) -> Union[float, None]:
+        """Getter for the ideal value (if any)."""
         return self._ideal_value
 
     @property
     def dist_transform(self) -> DistTransform:
+        """Getter for the data transformation."""
         return self._dist_transform
 
     @property
     def transform_value(self) -> Union[float, None]:
+        """Getter for the used transformation value (if any)."""
         return self._transform_value
     
     @transform_value.setter
     def transform_value(self, value: Union[float, None]) -> Self:
+        """Setter for the used transformation value."""
         self._transform_value = value
         return self
 
 
     def _min_max(self, x: float) -> float:
+        """
+        Used to safely vectorize a CDF, such that it returns `0.0` for when
+        `x` lies before our range, and `1.0` if `x` lies beyond our range.
+
+        x: ``float``
+            The `x` to obtain the CDF's `y` for.
+        
+        :return:
+            A value in the range :math:`[0,1]`.
+        """
         if x < self.range[0]:
             return 0.0
         elif x > self.range[1]:
@@ -118,6 +231,23 @@ class Density(ABC):
     
 
     def compute_practical_domain(self, cutoff: float=0.995) -> tuple[float, float]:
+        """
+        It is quite common that domains extend into distant regions to accommodate
+        even the farthest outliers. This is often counter-productive, especially in
+        the web application. There, we often want to show most of the distribution,
+        so we compute a practical range that cuts off the most extreme outliers.
+        This is useful to showing some default window.
+
+        cutoff: ``float``
+            The percentage of values to include. The CDF is optimized to find some `x`
+            for which it peaks at the cutoff. For the lower bound, we subtract from
+            CDF the cutoff.
+        
+        :rtype: tuple[float, float]
+
+        :return:
+            The practical domain, cut off for both directions.
+        """
         def obj_lb(x):
             return np.square(self.cdf(x) - (1. - cutoff))
         def obj_ub(x):
@@ -131,12 +261,25 @@ class Density(ABC):
     
     @property
     def practical_domain(self) -> tuple[float, float]:
+        """
+        Getter for the practical domain. This is a lazy getter that only
+        computes the practical domain if it was not done before.
+        """
         if self._practical_domain is None:
             self._practical_domain = self.compute_practical_domain()
         return self._practical_domain
     
 
     def compute_practical_range_pdf(self) -> tuple[float, float]:
+        """
+        Similar to :py:meth:compute_practical_domain(), this method computes a practical
+        range for the PDF. This method determines the location of the PDF's highest mode.
+
+        :return:
+            Returns a tuple where the first element is always `0.0` and the second is
+            the `y` of the highest mode (i.e., returns the `y` of the mode, not `x`, its
+            location).
+        """
         def obj(x):
             return -1. * np.log(1. + self.pdf(x))
 
@@ -146,18 +289,33 @@ class Density(ABC):
 
     @property
     def practical_range_pdf(self) -> tuple[float, float]:
+        """
+        Lazy getter for the practical range of the PDF.
+        """
         if self._practical_range_pdf is None:
             self._practical_range_pdf = self.compute_practical_range_pdf()
         return self._practical_range_pdf
 
     
     def __call__(self, x: Union[float, list[float], NDArray[Shape["*"], Float]]) -> NDArray[Shape["*"], Float]:
+        """
+        Allow objects of type :py:class:`Density` to be callable. Calls the vectorized
+        CDF under the hood.
+        """
         if np.isscalar(x) or isinstance(x, list):
             x = np.asarray(x)
         return self.cdf(x)
 
 
+
 class KDE_integrate(Density):
+    """
+    The purpose of this class is to use an empirical (typically Gaussian) PDF and to
+    also provide a smooth CDF that is obtained by integrating the PDF:
+    :math:`F_X(x)=\int_{-\infty}^{x} f_X(t) dt`.
+    While this kind of CDF is smooth and precise, evaluating it is obviously slow.
+    Therefore, :py:class:`KDE_approx` is used in practice.
+    """
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._kde = gaussian_kde(dataset=np.asarray(data))
         lb, ub = np.min(data), np.max(data)
@@ -178,8 +336,29 @@ class KDE_integrate(Density):
         super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
 
 
+
 class KDE_approx(Density):
+    """
+    This kind of density uses Kernel Density Estimation to obtain a PDF, and an empirical
+    CDF (ECDF) to provide a cumulative distribution function. The advantage is that both,
+    PDF and CDF, are fast.
+    The PPF is the inverted and interpolated CDF, so it is fast, too. The data used for the
+    PDF is limited to 10_000 samples using deterministic sampling without replacement. The
+    used for CDF is obtained by sampling a large number (typically 200_000) of data points
+    from the Gaussian KDE, in order to make it smooth.
+    """
     def __init__(self, data: NDArray[Shape["*"], Float], resample_samples: int=200_000, compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
+        """
+        For the other parameters, please refer to :py:meth:`Density.__init__()`.
+
+        resample_samples: ``int``
+            The amount of samples to take from the Gaussian KDE. These samples are then used
+            to estimate an as-smooth-as-possible CDF (and PPF thereof).
+        
+        compute_ranges: ``bool``
+            Whether or not to compute the practical domain of the data and the practical range
+            of the PDF. Both of these use optimization to find the results.
+        """
         # First, we'll fit an extra KDE for an approximate PDF.
         # It is used to also roughly estimate its mode.
         rng = np.random.default_rng(seed=1)
@@ -208,15 +387,34 @@ class KDE_approx(Density):
     
     @property
     def pval(self) -> float:
+        """
+        Shortcut getter for the jittered, two-sample KS-test's p-value.
+        """
         return self.stat_test.tests['ks_2samp_jittered']['pval']
     
     @property
     def stat(self) -> float:
+        """
+        Shortcut getter for the jittered, two-sample KS-test's test statistic (D-value).
+        """
         return self.stat_test.tests['ks_2samp_jittered']['stat']
 
 
+
 class Empirical(Density):
+    """
+    This kind of density does not apply any smoothing for CDF, but rather uses a
+    straightforward ECDF for the data as given. The PDF is determined using Gaussian
+    KDE.
+    """
     def __init__(self, data: NDArray[Shape["*"], Float], compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
+        """
+        For the other parameters, please refer to :py:meth:`Density.__init__()`.
+
+        compute_ranges: ``bool``
+            Whether or not to compute the practical domain of the data and the practical range
+            of the PDF. Both of these use optimization to find the results.
+        """
         self._ecdf = SMEcdf(data)
         self._ppf_interp = cdf_to_ppf(cdf=np.vectorize(self._ecdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
@@ -229,7 +427,13 @@ class Empirical(Density):
         return self._ppf_interp(q)
 
 
+
 class Empirical_discrete(Empirical):
+    """
+    Inherits from :py:class:`Empirical` and is used when the underlying quantity is
+    discrete and not continuous. As PDF, this function uses a PMF that is determined
+    by the frequencies of each discrete datum.
+    """
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._data_valid = not (data.shape[0] == 1 and np.isnan(data[0]))
         data_int = np.rint(data).astype(int)
@@ -258,6 +462,7 @@ class Empirical_discrete(Empirical):
 
     @property
     def is_fit(self) -> bool:
+        """Returns `True` if the given data is valid."""
         return self._data_valid
     
     def _non_fit_cdf_ppf(self, x) -> NDArray[Shape["*"], Float]:
@@ -274,11 +479,45 @@ class Empirical_discrete(Empirical):
 
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Empirical_discrete':
+        """
+        Used to return an explicit unfit instance of :py:class:`Empirical_discrete`.
+        This is used when, for example, continuous (real) data is given to the
+        constructor. We still need an instance of this density in the web application
+        to show an error (e.g., that there are no discrete empirical densities for
+        continuous data).
+        """
         return Empirical_discrete(data=np.asarray([np.nan]), dist_transform=dist_transform)
 
 
+
 class Parametric(Density):
+    """
+    This density encapsulates a parameterized and previously fitted random variable.
+    Random variables in :py:mod:`scipy.stats` come with PDF/PMF, CDF, PPF, etc. so
+    we just use these and forward calls to them.
+    """
     def __init__(self, dist: rv_generic, dist_params: tuple, range: tuple[float, float], stat_tests: dict[str, float], use_stat_test: StatTest_Types='ks_2samp_jittered', compute_ranges: bool=False, ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
+        """
+        For the other parameters, please refer to :py:meth:`Density.__init__()`.
+
+        dist: ``rv_generic``
+            An instance of the random variable to use.
+        
+        dist_params: ``tuple``
+            A tuple of parameters for the random variable. The order of the parameters
+            is important since it is not a dictionary.
+        
+        stat_tests: ``dict[str, float]``
+            A (flattened) dictionary of previously conducted statistical tests. This is
+            used later to choose some best-fitting parametric density by a specific test.
+        
+        use_stat_test: ``StatTest_Types``
+            The name of the chosen statistical test used to determine the goodnes of fit.
+        
+        compute_ranges: ``bool``
+            Whether or not to compute the practical domain of the data and the practical range
+            of the PDF. Both of these use optimization to find the results.
+        """
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.stat_tests = stat_tests
         self._use_stat_test = use_stat_test
@@ -292,81 +531,131 @@ class Parametric(Density):
     
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric':
+        """
+        Used to return an explicit unfit instance of :py:class:`Parametric`. This is
+        used in case when not a single maximum likelihood fit was successful for a
+        number of random variables. We still need an instance of this density in the
+        web application to show an error (e.g., that it was not possible to fit any
+        random variable to the selected quantity).
+        """
         from scipy.stats._continuous_distns import norm_gen
         return Parametric(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
 
     @property
     def use_stat_test(self) -> StatTest_Types:
+        """Getter for the selected statistical test."""
         return self._use_stat_test
     
     @use_stat_test.setter
     def use_stat_test(self, st: StatTest_Types) -> Self:
+        """Setter for the type of statistical test to use."""
         self._use_stat_test = st
         return self
     
     @property
     def pval(self) -> float:
+        """Shortcut getter for the p-value of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return p-value for non-fitted random variable.')
         return self.stat_tests[f'{self.use_stat_test}_pval']
     
     @property
     def stat(self) -> float:
+        """Shortcut getter for the test statistic of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return statistical test statistic for non-fitted random variable.')
         return self.stat_tests[f'{self.use_stat_test}_stat']
     
     @property
     def is_fit(self) -> bool:
+        """Returns `True` if this instance is not an explicitly unfit instance."""
         return not self.dist_params is None and not np.any(np.isnan(self.dist_params))
     
     @property
     def practical_domain(self) -> tuple[float, float]:
+        """Overridden to return a practical domain of :math:`[0,0]` in case this instance is unfit."""
         if not self.is_fit:
             return (0., 0.)
         return super().practical_domain
     
     @property
     def practical_range_pdf(self) -> tuple[float, float]:
+        """Overridden to return a practical PDF range of :math:`[0,0]` in case this instance is unfit."""
         if not self.is_fit:
             return (0., 0.)
         return super().practical_range_pdf
     
     @property
     def dist_name(self) -> str:
+        """Shortcut getter for the this density's random variable's class' name."""
         return self.dist.__class__.__name__
     
     def pdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        """
+        Overridden to call the encapsulated distribution's PDF. If this density is unfit,
+        always returns an array of zeros of same shape as the input.
+        """
         x = np.asarray(x)
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.pdf(*(x, *self.dist_params)).reshape((x.size,))
     
     def cdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        """
+        Overridden to call the encapsulated distribution's CDF. If this density is unfit,
+        always returns an array of zeros of same shape as the input.
+        """
         x = np.asarray(x)
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.cdf(*(x, *self.dist_params)).reshape((x.size,))
     
     def ppf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        """
+        Overridden to call the encapsulated distribution's PPF. If this density is unfit,
+        always returns an array of zeros of same shape as the input.
+        """
         x = np.asarray(x)
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.ppf(*(x, *self.dist_params)).reshape((x.size,))
 
 
+
 class Parametric_discrete(Parametric):
+    """
+    This type of density inherits from :py:class:`Parametric` and is its counterpart
+    for discrete (integral) data. It adds an explicit function for the probability mass
+    and makes the inherited PDF return the PMF's result.
+    """
+
     def pmf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        """
+        Implemented to call the encapsulated distribution's PMF. If this density is unfit,
+        always returns an array of zeros of same shape as the input.
+        """
         x = np.asarray(x)
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.pmf(*(x, *self.dist_params)).reshape((x.size,))
         
     def pdf(self, x: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
+        """
+        Overridden to return the result of the :py:meth:`pmf()`. Note that in any case,
+        a density's function :py:meth:`pdf()` is called (i.e., the callers never call
+        the PMF). Therefore, it is easier catch these calls and redirect them to the PMF.
+        """
         return self.pmf(x=x)
     
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric_discrete':
+        """
+        Used to return an explicit unfit instance of :py:class:`Parametric`. This is
+        used in case when not a single maximum likelihood fit was successful for a
+        number of random variables. We still need an instance of this density in the
+        web application to show an error (e.g., that it was not possible to fit any
+        random variable to the selected quantity).
+        """
         from scipy.stats._continuous_distns import norm_gen
         return Parametric_discrete(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
 
@@ -383,32 +672,57 @@ class Dataset:
     
     @property
     def quantity_types(self) -> list[str]:
+        """Shortcut getter for the manifest's quantity types."""
         return list(self.ds['qtypes'].keys())
 
     def contexts(self, include_all_contexts: bool=False) -> Iterable[str]:
+        """
+        Returns the manifest's defined contexts as a generator. Sometimes we need to ignore
+        the context and aggregate a quantity type across all defined contexts. Then, a virtual
+        context called `__ALL__` is used.
+
+        include_all_contexts: ``bool``
+            Whether to also yield the virtual `__ALL__`-context.
+        """
         yield from self.ds['contexts']
         if include_all_contexts:
             yield '__ALL__'
     
     @property
     def ideal_values(self) -> dict[str, Union[float, int, None]]:
+        """Shortcut getter for the manifest's ideal values."""
         return self.ds['ideal_values']
     
     def is_qtype_discrete(self, qtype: str) -> bool:
+        """
+        Returns whether a given quantity type is discrete.
+        """
         return self.ds['qtypes'][qtype] == 'discrete'
     
     def qytpe_desc(self, qtype: str) -> str:
+        """
+        Returns the description associated with a quantity type.
+        """
         return self.ds['desc_qtypes'][qtype]
     
     def context_desc(self, context: str) -> Union[str, None]:
+        """
+        Returns the description associated with a context (if any).
+        """
         return self.ds['desc_contexts'][context]
     
     @property
     def quantity_types_continuous(self) -> list[str]:
+        """
+        Returns a list of quantity types that are continuous (real-valued).
+        """
         return list(filter(lambda qtype: not self.is_qtype_discrete(qtype=qtype), self.quantity_types))
 
     @property
     def quantity_types_discrete(self) -> list[str]:
+        """
+        Returns a list of quantity types that are discrete (integer-valued).
+        """
         return list(filter(lambda qtype: self.is_qtype_discrete(qtype=qtype), self.quantity_types))
 
     def data(self, qtype: str, context: Union[str, None, Literal['__ALL__']]=None, unique_vals: bool=True, sub_sample: int=None) -> NDArray[Shape["*"], Float]:
@@ -416,8 +730,20 @@ class Dataset:
         This method is used to select a subset of the data, that is specific to at least
         a type of quantity, and optionally to a context, too.
 
+        qtype: ``str``
+            The name of the quantity type to get data for.
+
         context: ``Union[str, None, Literal['__ALL__']]``
-            You may specify a context
+            You may specify a context to further filter the data by. Data is always specific
+            to a quantity type, and sometimes to a context. If not context-based filtering is
+            desired, pass ``None`` or ``__ALL__``.
+        
+        unique_vals: ``bool``
+            If `True`, some small jitter will be added to the data in order to make it unique.
+        
+        sub_sample: ``int``
+            Optional unsigned integer with number of samples to take in case the dataset is
+            very large. It is only applied if the number is smaller than the data's size.
         """
         new_df = self.df[self.df[self.ds['colname_type']] == qtype]
         if context is not None and context != '__ALL__':
@@ -619,6 +945,25 @@ class Dataset:
     
 
     def analyze_distr(self, qtypes: Iterable[str], use_ks_2samp: bool=True, ks2_max_samples=40_000) -> pd.DataFrame:
+        """
+        Performs the two-sample Kolmogorov--Smirnov test or Welch's t-test for two or
+        more types of quantity. Performs the test for all unique pairs of quantity types.
+
+        qtypes: ``Iterable[str]``
+            An iterable of quantity types to test in a pair-wise manner.
+        
+        use_ks_2samp: ``bool``
+            If `True`, use the two-sample Kolmogorov--Smirnov; Welch's t-test, otherwise.
+        
+        ks2_max_samples: ``int``
+            Unsigned integer used to limit the number of samples used in KS2-test. For larger
+            numbers than the default, it may not be possible to compute it exactly.
+
+        :rtype: ``pd.DataFrame``
+
+        :return:
+            A data frame with columns `qtype`, `stat`, `pval`, `group1`, and `group2`.
+        """
         if len(list(qtypes)) < 1:
             raise Exception('Requires one or metrics.')
         
