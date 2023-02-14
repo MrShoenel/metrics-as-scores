@@ -6,6 +6,23 @@ from typing import Any, Callable, Union
 
 
 def nonlinspace(start: float, stop: float, num: int, func: Callable[[float], float]=lambda x: 1. - .9 * square(x)) -> NDArray:
+    """
+    Used to create a non-linear space. This is useful to sample with greater detail
+    in some place, and with lesser detail in another.
+
+    start: ``float``
+        The start of the space.
+    
+    stop: ``float``
+        The stop (end) of the space.
+    
+    num: ``int``
+        The number of samples.
+    
+    func: ``Callable[[float], float]``
+        A function that, given a linear `x`, creates a non-linear `y`. The default
+        is :code:`lambda x: 1. - .9 * square(x)`.
+    """
     if abs(stop - start) < 1e20:
         return linspace(start=start, stop=stop, num=num)
     func = vectorize(func)
@@ -32,6 +49,9 @@ def flatten_dict(d: dict[str, Any], parent_key: str='', sep: str='_') -> dict[st
 
 
 class Interpolator:
+    """
+    Helper class used for transforming and interpolating a CDF into a PPF.
+    """
     def __init__(self, xp: NDArray[Shape["*"], Float], fp: NDArray[Shape["*"], Float], left: float=None, right: float=None) -> None:
         self.xp = xp
         self.fp = fp
