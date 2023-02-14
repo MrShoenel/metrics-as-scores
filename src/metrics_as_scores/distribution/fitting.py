@@ -71,6 +71,9 @@ class DesignSpaceTerminationFixed(DesignSpaceTermination):
 
 
 class SingleObjectiveTermination(DefaultTermination):
+    """
+    This class is used as termination criterion for the :py:class:`FitterPymoo`.
+    """
     def __init__(self, xtol=1e-8, cvtol=1e-8, ftol=1e-6, period=75, max_time: int=600, **kwargs) -> None:
         x = RobustTermination(DesignSpaceTerminationFixed(xtol), period=period)
         cv = RobustTermination(ConstraintViolationTermination(cvtol, terminate_when_feasible=False), period=period)
@@ -83,6 +86,11 @@ class SingleObjectiveTermination(DefaultTermination):
 
 
 class Fitter:
+    """
+    This class is used as a generic approach to fit any random variable to any kind
+    of data. However, it is recommended to use the more stable :py:class:`FitterPymoo`.
+    """
+
     # All have 'loc' which is an integer, and we will derive it from the data (i.e., use int([min/max](data)))
     Practical_Ranges = dict(
         bernoulli_gen = dict(
@@ -176,6 +184,10 @@ class Fitter:
     """
 
     def __init__(self, dist: type[Union[rv_continuous, rv_discrete]]) -> None:
+        """
+        dist: ``type[Union[rv_continuous, rv_discrete]]``
+            Specify the class of the random variable you want to fit.
+        """
         if not issubclass(dist, rv_continuous) and not issubclass(dist, rv_discrete):
             raise Exception('The distribution given is not continuous or discrete random variable.')
         self.dist = dist
@@ -189,13 +201,26 @@ class Fitter:
 
     @property
     def is_discrete(self) -> bool:
+        """Shortcut getter to return whether the used random variable is discrete."""
         return issubclass(self.dist, rv_discrete)
 
     @property
     def is_continuous(self) -> bool:
+        """Shortcut getter to return whether the used random variable is continuous."""
         return issubclass(self.dist, rv_continuous)
 
-    def fit(self, data) -> dict[str, Union[float, int]]:
+    def fit(self, data: NDArray[Shape["*"], Float]) -> dict[str, Union[float, int]]:
+        """
+        Convenience method to fit the random variable. If it is continuous, calls
+        :py:meth:`rv_continuous.fit()`, which uses maximum likelihood estimation.
+        If it is discrete, uses differential evolution to find an estimate.
+
+        data: ``NDArray[Shape["*"], Float]``
+            The data to fit to.
+        
+        :return:
+            A dictionary with named parameters and their values.
+        """
         params: tuple[float] = None
         if self.is_continuous:
             dist: type[rv_continuous] = self.dist
@@ -213,6 +238,11 @@ class Fitter:
 
 
 class FitterPymoo(Fitter):
+    """
+    This class inherits from :py:class:`Fitter` and is the modern successor to it.
+    This is because it uses :py:mod:`pymoo` to fit discrete random variables, together
+    with a set of specially defined fitting problems.
+    """
     def __init__(self, dist: type[Union[rv_continuous, rv_discrete]]) -> None:
         if not isclass(dist):
             raise Exception(f'The given object {dist} is not a subclass of rv_generic.')
@@ -227,6 +257,37 @@ class FitterPymoo(Fitter):
         super().__init__(dist=dist)
 
     def fit(self, data: NDArray[Shape["*"], Float], max_samples = 10_000, minimize_seeds = [1_337, 0xdeadbeef, 45640321], verbose: bool=True, stop_after_first_res: bool=True) -> dict[str, Union[float, int]]:
+        """
+        Fits the random variable to the given data. For continuous data, calls :py:meth:`Fitter.fit()`.
+        For discrete random variables, however, it solves a mixed-variable problem using a genetic
+        algorithm. The documentation below apply to fitting a discrete random variable.
+
+        data: ``NDArray[Shape["*"], Float]``
+            The 1-D data to fit the random variable to.
+        
+        max_samples: ``int``
+            Used to deterministically sub-sample the data, should it be longer than this.
+        
+        minimize_seeds: ``list[int]``
+            A list of integer seeds. For each, the optimization is run once, and the result
+            with smallest solution is returned.
+        
+        verbose: ``bool``
+            Passed to :py:meth:`minimize()`.
+        
+        stop_after_first_res: ``bool``
+            Whether to stop after the first successful minimization. If `True`, then no further
+            fits for the remaining seeds are computed. This is the default as optimization usually
+            succeeds and subsequent successful runs are rarely or only insignificantly better.
+        
+        :raises: Exception:
+            If the optimization does not find a single solution.
+        
+        :rtype: ``dict[str, Union[float, int]]``
+
+        :return:
+            A dictionary with parameter names and values of the best found solution.
+        """
         if data.shape[0] > max_samples:
             # Then we will sub-sample to speed up the process.
             rng = default_rng(seed=1)
@@ -271,18 +332,67 @@ StatTest_Types = Literal[
 
 
 class TestJson(TypedDict):
+    """
+    Used for serializing a :py:class:`StatisticalTest` to JSON.
+    This class represents the result of a single test.
+    """
     pval: float
     stat: float
 
 class StatisticalTestJson(TypedDict):
+    """
+    Used for serializing a :py:class:`StatisticalTest` to JSON.
+    This class represents a set of tests and their results.
+    """
     tests: dict[str, TestJson]
     discrete_data1: bool
     discrete_data2: bool
 
 
 class StatisticalTest:
-    def __init__(self, data1: NDArray[Shape["*"], Float], cdf: Callable[[Union[float, int]], float], ppf_or_data2: Union[NDArray[Shape["*"], Float], Callable[[Union[float, int]], float]], data2_num_samples: int=None, method = 'auto', stat_tests=[cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp], max_samples: int=10_000) -> None:
+    """
+    This class is used to conduct various statistical goodness-of-fit tests. Since not
+    every test is always applicable (e.g., the Kolmogorov--Smirnov test is not applicable
+    to continuous data), a variety of tests are conducted and the most suitable test (and
+    its results) are then typically selected at runtime.
+    """
+    def __init__(
+        self,
+        data1: NDArray[Shape["*"], Float],
+        cdf: Callable[[Union[float, int]], float],
+        ppf_or_data2: Union[NDArray[Shape["*"], Float], Callable[[Union[float, int]], float]],
+        data2_num_samples: int=None,
+        method = 'auto',
+        stat_tests=[cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp],
+        max_samples: int=10_000
+    ) -> None:
+        """
+        Initializes a new StatisticalTest. Works with real- and integer-valued data. For the
+        latter, additional tests including a deterministic jitter are performed, as these are
+        often more representative.
 
+        data1: ``NDArray[Shape["*"], Float]``
+            A 1-D array of the data, the first sample.
+        
+        cdf: ``Callable[[Union[float, int]], float]``
+            A CDF used to determine if `data1` comes from it. Used in the one-sample tests.
+        
+        ppf_or_data2: ``Union[NDArray[Shape["*"], Float], Callable[[Union[float, int]], float]]``
+            Either a second 1-D array of the second sample, or a PPF that can be used to
+            generate a second sample by inverse sampling.
+        
+        data2_num_samples: ``int``
+            The number of samples to draw for the second sample if `ppf_or_data2` is a PPF.
+        
+        method: ``str``
+            Passed to the statistical tests that support a `method`-parameter.
+        
+        stat_tests: ``[cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp, epps_singleton_2samp]``
+            List of statistical tests to conduct.
+        
+        max_samples: ``int``
+            The maximum amount of data points in either sample. Also limits `data2_num_samples`.
+        """
         data2: NDArray[Shape["*"], Float] = None
         if isinstance(ppf_or_data2, np.ndarray):
             data2 = ppf_or_data2
@@ -351,6 +461,10 @@ class StatisticalTest:
                 self.tests[f'{test.__name__}_{tt}'] = dict(pval = pval, stat = stat)
     
     def __iter__(self) -> Sequence[tuple[str, Any]]:
+        """
+        Implemented so that this instance can be transformed into a dictionary and
+        then subsequently serialized to JSON.
+        """
         # We can call dict(obj) to get this class as a dictionary
         yield ('tests', self.tests)
         yield ('discrete_data1', self.discrete_data1)
@@ -358,6 +472,9 @@ class StatisticalTest:
     
     @staticmethod
     def from_dict(d: MutableMapping[str, Any], key_prefix: str='stat_tests_tests') -> dict[str, float]:
+        """
+        Re-creates an instance from a previously to-JSON serialized object.
+        """
         res: dict[str, float] = {}
         for k in d.keys():
             if k.startswith(key_prefix):
