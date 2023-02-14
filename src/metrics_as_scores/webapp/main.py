@@ -1,17 +1,16 @@
-''' Present an interactive explorer for Metrics As Scores.
+"""
+This is the Web Application of Metrics As Scores. It should be run by
+using the command line interface and selecting a dataset. It is an
+interactive explorer for the selected dataset.
 
-Use the ``bokeh serve`` command to run the example by executing:
+During development, this may also be run using the following commands:
 
-    ``bokeh serve src/metrics_as_scores/webapp/ dataset=qcc``
+    ``bokeh serve src/metrics_as_scores/webapp/ --port 5678 --allow-websocket-origin * --args dataset=qcc``
 
-at your command prompt. Then navigate to the URL
-
-    http://localhost:5678/webapp
-
-in your browser (the port might be different).
-
-'''
-
+This command should be run from the project's root. It will start a
+web server on port `5678` using the dataset `qcc` (use the ID of the
+dataset, it is shown by listing all locally available datasets in the CLI).
+"""
 from os import environ
 
 if 'BOKEH_VS_DEBUG' in environ and environ['BOKEH_VS_DEBUG'] == 'true':
@@ -28,7 +27,7 @@ from pathlib import Path
 from typing import Union
 from metrics_as_scores.webapp.exception import PlotException
 from metrics_as_scores.tools.funcs import nonlinspace, natsort
-from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset
+from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset, LocalDataset
 from bokeh.events import MenuItemClick
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -43,16 +42,26 @@ from numbers import Integral
 # Import the data; Note this is process-static!
 from metrics_as_scores.webapp import data
 ds: Dataset = data.ds
+if ds is None:
+    dummy_manifest: LocalDataset = dict(
+        name = '', desc = '', author = '',
+        qtypes = dict(QTY1 = 'continuous'), contexts = [],
+        desc_qtypes = dict(QTY1 = ''))
+    ds = Dataset(ds=dummy_manifest, df=pd.DataFrame())
 cdfs = data.cdfs
 contexts = list(ds.contexts(include_all_contexts=False))
 contexts.sort(key=natsort)
 contexts = contexts + ['__ALL__']
 
 this_dir = Path(__file__).resolve().parent
-web_dir = data.dataset_dir.joinpath('./web')
+dataset_dir: Path = data.dataset_dir
+if dataset_dir is None:
+    dataset_dir = Path(__file__)
+web_dir = dataset_dir.joinpath('./web')
 
 
 def cap(s: str) -> str:
+    """ :meta private: """
     return s[:1].upper() + s[1:]
 
 
@@ -73,7 +82,9 @@ if len(ds.quantity_types_continuous) > 0:
     dd_scores_items += list([(f'[{qtype}] {ds.qytpe_desc(qtype=qtype)}', qtype) for qtype in qtypes_continuous])
 
 selected_score = dd_scores_items[1]
-"""Has the currently selected quantity type."""
+"""
+:meta private:
+"""
 dd_scores = Dropdown(label=selected_score[0], menu=dd_scores_items)
 
 
@@ -122,6 +133,7 @@ for idx, ctx in enumerate(contexts):
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
 line_own = plot.line('x', 'y', source=line_own_source, line_alpha=1., color='black', line_width=1.5)
 def update_own_line():
+    """ :meta private: """
     val = input_own.value
     if (selected_transf[1] == 'NONE' or (selected_transf[1] != 'NONE' and not selected_autotransf)) and (isinstance(val, int) or isinstance(val, float) or isinstance(val, Integral)):
         line_own_source.data = dict(x=[val, val], y=[plot.y_range.start, plot.y_range.end])
@@ -149,6 +161,7 @@ tbl_transf = DataTable(source=tbl_transf_src, columns=tbl_transf_cols, index_pos
 
 
 def update_discrete_cont_mismatch():
+    """ :meta private: """
     discrete = ds.is_qtype_discrete(qtype=selected_score[1])
     sd = selected_denstype[1]
     if not discrete and 'discrete' in sd:
@@ -156,6 +169,7 @@ def update_discrete_cont_mismatch():
 
 
 def update_labels():
+    """ :meta private: """
     global selected_denstype, selected_transf, selected_autotransf
     sd = selected_denstype[1]
     st = selected_transf[1]
@@ -227,6 +241,7 @@ throbber.visible = False
 status = Div(text='Ready.', sizing_mode='stretch_width')
 
 def update_plot(contain_plot: bool=False):
+    """ :meta private: """
     throbber.visible = True
     status.text = 'Loading ...'
     status.css_classes = []
@@ -247,6 +262,7 @@ def update_plot(contain_plot: bool=False):
 
 
 def update_plot_internal(contain_plot: bool=False):
+    """ :meta private: """
     global selected_cutoff, selected_autotransf
     sd = selected_denstype[1]
     is_empirical = sd.startswith('E')
@@ -453,18 +469,21 @@ def update_plot_internal(contain_plot: bool=False):
 
 
 def cbg_cutoff_click(active: list[int]):
+    """ :meta private: """
     global selected_cutoff
     selected_cutoff = len(active) > 0
     update_plot()
 
 
 def cbg_autotrans_click(active: list[int]):
+    """ :meta private: """
     global selected_autotransf
     selected_autotransf = len(active) > 0
     update_plot()
 
 
 def dd_denstype_click(evt: MenuItemClick):
+    """ :meta private: """
     global selected_denstype
     if evt.item == '-':
         return # Ignore, this is just a separator
@@ -481,6 +500,7 @@ def dd_denstype_click(evt: MenuItemClick):
 
 
 def dd_transf_click(evt: MenuItemClick):
+    """ :meta private: """
     global selected_transf
     transf_before = selected_transf[1]
     transf_after = evt.item
@@ -493,6 +513,7 @@ def dd_transf_click(evt: MenuItemClick):
 
 
 def dd_scores_click(evt: MenuItemClick):
+    """ :meta private: """
     global selected_score
     if evt.item == '-':
         return # Ignore, this is just a separator
@@ -507,18 +528,22 @@ def dd_scores_click(evt: MenuItemClick):
 
 
 def btn_contain_click(*args):
+    """ :meta private: """
     update_plot(contain_plot=True)
 
 
 def btn_toggle_legend_click(*args):
+    """ :meta private: """
     plot.legend.visible = not plot.legend.visible
 
 
 def input_own_change(attr, old, new):
+    """ :meta private: """
     update_plot()
 
 
 def read_text(file: str) -> str:
+    """ :meta private: """
     with open(file=file, mode='r', encoding='utf-8') as f:
         return f.read().strip()
 
@@ -533,6 +558,8 @@ input_own.on_change('value', input_own_change)
 btn_toggle_legend.on_click(btn_toggle_legend_click)
 
 
+html_about = web_dir.joinpath('./about.html')
+html_refs = web_dir.joinpath('./references.html')
 header = Div(text=f'''
     {read_text(this_dir.joinpath('header.html'))}
     <h2>Loaded Dataset: <b>{ds.ds["name"]}</b></h2>
@@ -540,14 +567,14 @@ header = Div(text=f'''
         <p><b>Author(s)</b>: {', '.join(ds.ds["author"])}</p>
         <div>
             <p><b>Description</b>: {ds.ds["desc"]}</p>
-            {read_text(web_dir.joinpath('./about.html'))}
+            {read_text(html_about) if html_about.exists() else ""}
         </div>
     </div>
     <hr/>''')
 
 footer = Div(text=f'''
     {read_text(this_dir.joinpath('footer.html'))}
-    {read_text(web_dir.joinpath('./references.html'))}
+    {read_text(html_refs) if html_refs.exists() else ""}
 </ol>''')
 
 
