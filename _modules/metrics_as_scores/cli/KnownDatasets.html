@@ -71,17 +71,26 @@
              
   <h1>Source code for metrics_as_scores.cli.KnownDatasets</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.__init__</span> <span class="kn">import</span> <span class="n">DATASETS_DIR</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">get_known_datasets</span><span class="p">,</span> <span class="n">format_file_size</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">get_known_datasets</span><span class="p">,</span> <span class="n">format_file_size</span><span class="p">,</span> <span class="n">KNOWN_DATASETS_FILE</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">KnownDataset</span>
 
 
 <div class="viewcode-block" id="KnownDatasetsWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow">[docs]</a><span class="k">class</span> <span class="nc">KnownDatasetsWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">This workflow access a curated online list of known datasets that were</span>
+<span class="s1">designed to work with Metrics As Scores. The list accessed is at:</span>
+
+<span class="si">{</span><span class="n">KNOWN_DATASETS_FILE</span><span class="si">}</span>
+
+<span class="s1">If you would like to have your own dataset added to this list, open an</span>
+<span class="s1">issue in the Github repository of Metrics As Scores (also, check out the</span>
+<span class="s1">contributing guidelines).</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 <div class="viewcode-block" id="KnownDatasetsWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Fetching available datasets ...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">known_datasets</span> <span class="o">=</span> <span class="n">get_known_datasets</span><span class="p">(</span><span class="n">use_local_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">KnownDataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
     
     <span class="k">def</span> <span class="nf">_print_json_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jsd</span><span class="p">:</span> <span class="n">KnownDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;     Name: &#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -98,6 +107,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">format_file_size</span><span class="p">(</span><span class="n">jsd</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">])</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">format_file_size</span><span class="p">(</span><span class="n">jsd</span><span class="p">[</span><span class="s2">&quot;size_extracted&quot;</span><span class="p">])</span><span class="si">}</span><span class="s1"> extracted)&#39;</span><span class="p">)</span>
     
 <div class="viewcode-block" id="KnownDatasetsWorkflow.show_datasets"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.show_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">show_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main entry point for this workflow.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_doc</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for</span><span class="p">(</span><span class="n">what_for</span><span class="o">=</span><span class="s1">&#39;to fetch and list available datasets&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_datasets</span> <span class="o">=</span> <span class="n">get_known_datasets</span><span class="p">(</span><span class="n">use_local_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">jsd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_datasets</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Dataset:&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>

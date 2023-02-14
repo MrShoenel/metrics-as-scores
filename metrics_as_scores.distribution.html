@@ -53,6 +53,7 @@
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.data.html">metrics_as_scores.data package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">metrics_as_scores.distribution package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html">metrics_as_scores.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.webapp.html">metrics_as_scores.webapp package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.html#module-metrics_as_scores">Module contents</a></li>
@@ -99,36 +100,49 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">DistTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#DistTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StrEnum</span></code></p>
-<p>An enumeration.</p>
+<p>This is an enumeration of transforms applicable to distributions of a quantity.
+A transform first computes the desired ideal (transform) value from the given
+density (e.g., the expectation) and then transforms the initial distribution of
+values into a distribution of distances.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.NONE">
 <span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;none&gt;'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.NONE" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Do not apply any transform.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.EXPECTATION">
 <span class="sig-name descname"><span class="pre">EXPECTATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'E[X]</span> <span class="pre">(expectation)'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.EXPECTATION" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute the expectation of the random variable.
+This is similar to <span class="math notranslate nohighlight">\(\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx\)</span> for a
+continuous random variable.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.MEDIAN">
 <span class="sig-name descname"><span class="pre">MEDIAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Median</span> <span class="pre">(50th</span> <span class="pre">percentile)'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.MEDIAN" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute the median (50th percentile) of the random variable. The median is defined
+as the value that splits a probability distribution into a lower and higher half.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.MODE">
 <span class="sig-name descname"><span class="pre">MODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Mode</span> <span class="pre">(most</span> <span class="pre">likely</span> <span class="pre">value)'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.MODE" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The mode of a random variable is the most frequently occurring value, i.e., the
+value with the highest probability (density).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.INFIMUM">
 <span class="sig-name descname"><span class="pre">INFIMUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Infimum</span> <span class="pre">(min.</span> <span class="pre">observed</span> <span class="pre">value)'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.INFIMUM" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The infimum is the lowest observed value of some empirical random variable.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.DistTransform.SUPREMUM">
 <span class="sig-name descname"><span class="pre">SUPREMUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Supremum</span> <span class="pre">(max.</span> <span class="pre">observed</span> <span class="pre">value)'</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.DistTransform.SUPREMUM" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The supremum is the highest observed value of some empirical random variable.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -136,6 +150,9 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.JsonDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">JsonDataset</span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#JsonDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.JsonDataset" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>This class is the base class for the <a class="reference internal" href="#metrics_as_scores.distribution.distribution.LocalDataset" title="metrics_as_scores.distribution.distribution.LocalDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalDataset</span></code></a> and the
+<a class="reference internal" href="#metrics_as_scores.distribution.distribution.KnownDataset" title="metrics_as_scores.distribution.distribution.KnownDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">KnownDataset</span></code></a>. Each manifest should have a name, id, description,
+and author.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.JsonDataset.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.JsonDataset.name" title="Permalink to this definition"></a></dt>
@@ -162,6 +179,8 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.LocalDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">LocalDataset</span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#LocalDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.LocalDataset" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>This dataset extends the <a class="reference internal" href="#metrics_as_scores.distribution.distribution.JsonDataset" title="metrics_as_scores.distribution.distribution.JsonDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">JsonDataset</span></code></a> and adds properties that
+are filled out when locally creating a new dataset.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.LocalDataset.origin">
 <span class="sig-name descname"><span class="pre">origin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.LocalDataset.origin" title="Permalink to this definition"></a></dt>
@@ -233,6 +252,8 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KnownDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">KnownDataset</span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KnownDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KnownDataset" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>This dataset extends the <a class="reference internal" href="#metrics_as_scores.distribution.distribution.JsonDataset" title="metrics_as_scores.distribution.distribution.JsonDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">JsonDataset</span></code></a> with properties that are
+known about datasets that are available to Metrics As Scores online.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KnownDataset.info_url">
 <span class="sig-name descname"><span class="pre">info_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KnownDataset.info_url" title="Permalink to this definition"></a></dt>
@@ -279,70 +300,143 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">Density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">DistTransform.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>This is the abstract base class for parametric and empirical densities. A
+<a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a> represents a concrete instance of some random variable
+and its PDF, CDF, and PPF. It also stores information about this concrete
+instance came to be (e.g., by some concrete transform).</p>
+<p>This class provides a set of common getters and setters and also provides
+some often needed conveniences, such as computing the practical domain.
+As for the PDF, CDF, and PPF, all known sub-classes have a specific way of
+obtaining these, and this class’ responsibility lies in vectorizing these
+functions.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">DistTransform.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>range: <code class="docutils literal notranslate"><span class="pre">tuple[float,</span> <span class="pre">float]</span></code></dt><dd><p>The range of the data.</p>
+</dd>
+<dt>pdf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The probability density function.</p>
+</dd>
+<dt>cdf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The cumulative distribution function.</p>
+</dd>
+<dt>ppf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The percent point (quantile) function.</p>
+</dd>
+<dt>ideal_value: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>Some quantities have an ideal value. It can be provided here.</p>
+</dd>
+<dt>dist_transform: <code class="docutils literal notranslate"><span class="pre">DistTransform</span></code></dt><dd><p>The data transform that was applied while obtaining this density.</p>
+</dd>
+<dt>transform_value: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>Optional transform value that was applied during transformation.</p>
+</dd>
+<dt>qtype: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The type of quantity for this density.</p>
+</dd>
+<dt>context: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The context of this quantity.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.qtype">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qtype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.qtype" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the quantity type.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.context">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.context" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the context.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.ideal_value">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ideal_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.ideal_value" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.is_quality_score">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_quality_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.is_quality_score" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the ideal value (if any).</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.dist_transform">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dist_transform</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.dist_transform" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the data transformation.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.transform_value">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.transform_value" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the used transformation value (if any).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density._min_max">
+<span class="sig-name descname"><span class="pre">_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density._min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density._min_max" title="Permalink to this definition"></a></dt>
+<dd><p>Used to safely vectorize a CDF, such that it returns <cite>0.0</cite> for when
+<cite>x</cite> lies before our range, and <cite>1.0</cite> if <cite>x</cite> lies beyond our range.</p>
+<dl class="simple">
+<dt>x: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The <cite>x</cite> to obtain the CDF’s <cite>y</cite> for.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A value in the range <span class="math notranslate nohighlight">\([0,1]\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.compute_practical_domain">
 <span class="sig-name descname"><span class="pre">compute_practical_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.compute_practical_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.compute_practical_domain" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>It is quite common that domains extend into distant regions to accommodate
+even the farthest outliers. This is often counter-productive, especially in
+the web application. There, we often want to show most of the distribution,
+so we compute a practical range that cuts off the most extreme outliers.
+This is useful to showing some default window.</p>
+<dl class="simple">
+<dt>cutoff: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The percentage of values to include. The CDF is optimized to find some <cite>x</cite>
+for which it peaks at the cutoff. For the lower bound, we subtract from
+CDF the cutoff.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, float]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The practical domain, cut off for both directions.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.practical_domain">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">practical_domain</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.practical_domain" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the practical domain. This is a lazy getter that only
+computes the practical domain if it was not done before.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.compute_practical_range_pdf">
 <span class="sig-name descname"><span class="pre">compute_practical_range_pdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.compute_practical_range_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.compute_practical_range_pdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Similar to :py:meth:compute_practical_domain(), this method computes a practical
+range for the PDF. This method determines the location of the PDF’s highest mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns a tuple where the first element is always <cite>0.0</cite> and the second is
+the <cite>y</cite> of the highest mode (i.e., returns the <cite>y</cite> of the mode, not <cite>x</cite>, its
+location).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.practical_range_pdf">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">practical_range_pdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.practical_range_pdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Lazy getter for the practical range of the PDF.</p>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.save_to_file">
-<span class="sig-name descname"><span class="pre">save_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.save_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.save_to_file" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.load_from_file">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><span class="pre">Density</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.load_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.load_from_file" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Density.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~typing.Union[float,</span> <span class="pre">list[float],</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Density.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Density.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Allow objects of type <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a> to be callable. Calls the vectorized
+CDF under the hood.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -350,10 +444,35 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_integrate">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">KDE_integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KDE_integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_integrate" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a></p>
+<p>The purpose of this class is to use an empirical (typically Gaussian) PDF and to
+also provide a smooth CDF that is obtained by integrating the PDF:
+<span class="math notranslate nohighlight">\(F_X(x)=\int_{-\infty}^{x} f_X(t) dt\)</span>.
+While this kind of CDF is smooth and precise, evaluating it is obviously slow.
+Therefore, <a class="reference internal" href="#metrics_as_scores.distribution.distribution.KDE_approx" title="metrics_as_scores.distribution.distribution.KDE_approx"><code class="xref py py-class docutils literal notranslate"><span class="pre">KDE_approx</span></code></a> is used in practice.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_integrate.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KDE_integrate.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_integrate.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>range: <code class="docutils literal notranslate"><span class="pre">tuple[float,</span> <span class="pre">float]</span></code></dt><dd><p>The range of the data.</p>
+</dd>
+<dt>pdf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The probability density function.</p>
+</dd>
+<dt>cdf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The cumulative distribution function.</p>
+</dd>
+<dt>ppf: <code class="docutils literal notranslate"><span class="pre">Callable[[float],</span> <span class="pre">float]</span></code></dt><dd><p>The percent point (quantile) function.</p>
+</dd>
+<dt>ideal_value: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>Some quantities have an ideal value. It can be provided here.</p>
+</dd>
+<dt>dist_transform: <code class="docutils literal notranslate"><span class="pre">DistTransform</span></code></dt><dd><p>The data transform that was applied while obtaining this density.</p>
+</dd>
+<dt>transform_value: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>Optional transform value that was applied during transformation.</p>
+</dd>
+<dt>qtype: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The type of quantity for this density.</p>
+</dd>
+<dt>context: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The context of this quantity.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -361,20 +480,38 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_approx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">KDE_approx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">resample_samples:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">200000,</span> <span class="pre">compute_ranges:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KDE_approx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_approx" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a></p>
+<p>This kind of density uses Kernel Density Estimation to obtain a PDF, and an empirical
+CDF (ECDF) to provide a cumulative distribution function. The advantage is that both,
+PDF and CDF, are fast.
+The PPF is the inverted and interpolated CDF, so it is fast, too. The data used for the
+PDF is limited to 10_000 samples using deterministic sampling without replacement. The
+used for CDF is obtained by sampling a large number (typically 200_000) of data points
+from the Gaussian KDE, in order to make it smooth.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_approx.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">resample_samples:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">200000,</span> <span class="pre">compute_ranges:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KDE_approx.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_approx.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>For the other parameters, please refer to <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density.__init__" title="metrics_as_scores.distribution.distribution.Density.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Density.__init__()</span></code></a>.</p>
+<dl class="simple">
+<dt>resample_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>The amount of samples to take from the Gaussian KDE. These samples are then used
+to estimate an as-smooth-as-possible CDF (and PPF thereof).</p>
+</dd>
+<dt>compute_ranges: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether or not to compute the practical domain of the data and the practical range
+of the PDF. Both of these use optimization to find the results.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_approx.pval">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_approx.pval" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the jittered, two-sample KS-test’s p-value.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_approx.stat">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_approx.stat" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the jittered, two-sample KS-test’s test statistic (D-value).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -382,10 +519,19 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">Empirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">compute_ranges:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Empirical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a></p>
+<p>This kind of density does not apply any smoothing for CDF, but rather uses a
+straightforward ECDF for the data as given. The PDF is determined using Gaussian
+KDE.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">compute_ranges:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Empirical.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>For the other parameters, please refer to <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density.__init__" title="metrics_as_scores.distribution.distribution.Density.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Density.__init__()</span></code></a>.</p>
+<dl class="simple">
+<dt>compute_ranges: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether or not to compute the practical domain of the data and the practical range
+of the PDF. Both of these use optimization to find the results.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -393,20 +539,35 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical_discrete">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">Empirical_discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Empirical_discrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical_discrete" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Empirical" title="metrics_as_scores.distribution.distribution.Empirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">Empirical</span></code></a></p>
+<p>Inherits from <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Empirical" title="metrics_as_scores.distribution.distribution.Empirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">Empirical</span></code></a> and is used when the underlying quantity is
+discrete and not continuous. As PDF, this function uses a PMF that is determined
+by the frequencies of each discrete datum.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical_discrete.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">ideal_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">transform_value:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qtype:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">context:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Empirical_discrete.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical_discrete.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>For the other parameters, please refer to <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density.__init__" title="metrics_as_scores.distribution.distribution.Density.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Density.__init__()</span></code></a>.</p>
+<dl class="simple">
+<dt>compute_ranges: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether or not to compute the practical domain of the data and the practical range
+of the PDF. Both of these use optimization to find the results.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical_discrete.is_fit">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_fit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical_discrete.is_fit" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns <cite>True</cite> if the given data is valid.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Empirical_discrete.unfitted">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unfitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.Empirical_discrete" title="metrics_as_scores.distribution.distribution.Empirical_discrete"><span class="pre">Empirical_discrete</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Empirical_discrete.unfitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Empirical_discrete.unfitted" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Used to return an explicit unfit instance of <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Empirical_discrete" title="metrics_as_scores.distribution.distribution.Empirical_discrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">Empirical_discrete</span></code></a>.
+This is used when, for example, continuous (real) data is given to the
+constructor. We still need an instance of this density in the web application
+to show an error (e.g., that there are no discrete empirical densities for
+continuous data).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -414,65 +575,102 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">Parametric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rv_generic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stat_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'cramervonmises_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_ordinary'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ks_2samp_jittered'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_ranges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">DistTransform.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density" title="metrics_as_scores.distribution.distribution.Density"><code class="xref py py-class docutils literal notranslate"><span class="pre">Density</span></code></a></p>
+<p>This density encapsulates a parameterized and previously fitted random variable.
+Random variables in <code class="xref py py-mod docutils literal notranslate"><span class="pre">scipy.stats</span></code> come with PDF/PMF, CDF, PPF, etc. so
+we just use these and forward calls to them.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rv_generic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stat_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'cramervonmises_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_ordinary'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ks_2samp_jittered'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_ranges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">DistTransform.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>For the other parameters, please refer to <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Density.__init__" title="metrics_as_scores.distribution.distribution.Density.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Density.__init__()</span></code></a>.</p>
+<dl class="simple">
+<dt>dist: <code class="docutils literal notranslate"><span class="pre">rv_generic</span></code></dt><dd><p>An instance of the random variable to use.</p>
+</dd>
+<dt>dist_params: <code class="docutils literal notranslate"><span class="pre">tuple</span></code></dt><dd><p>A tuple of parameters for the random variable. The order of the parameters
+is important since it is not a dictionary.</p>
+</dd>
+<dt>stat_tests: <code class="docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">float]</span></code></dt><dd><p>A (flattened) dictionary of previously conducted statistical tests. This is
+used later to choose some best-fitting parametric density by a specific test.</p>
+</dd>
+<dt>use_stat_test: <code class="docutils literal notranslate"><span class="pre">StatTest_Types</span></code></dt><dd><p>The name of the chosen statistical test used to determine the goodnes of fit.</p>
+</dd>
+<dt>compute_ranges: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether or not to compute the practical domain of the data and the practical range
+of the PDF. Both of these use optimization to find the results.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.unfitted">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unfitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric" title="metrics_as_scores.distribution.distribution.Parametric"><span class="pre">Parametric</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric.unfitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.unfitted" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Used to return an explicit unfit instance of <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric" title="metrics_as_scores.distribution.distribution.Parametric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parametric</span></code></a>. This is
+used in case when not a single maximum likelihood fit was successful for a
+number of random variables. We still need an instance of this density in the
+web application to show an error (e.g., that it was not possible to fit any
+random variable to the selected quantity).</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.use_stat_test">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_stat_test</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'cramervonmises_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_ordinary'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.use_stat_test" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Getter for the selected statistical test.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.pval">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.pval" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the p-value of the selected statistical test.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.stat">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.stat" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the test statistic of the selected statistical test.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.is_fit">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_fit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.is_fit" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns <cite>True</cite> if this instance is not an explicitly unfit instance.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.practical_domain">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">practical_domain</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.practical_domain" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to return a practical domain of <span class="math notranslate nohighlight">\([0,0]\)</span> in case this instance is unfit.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.practical_range_pdf">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">practical_range_pdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.practical_range_pdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to return a practical PDF range of <span class="math notranslate nohighlight">\([0,0]\)</span> in case this instance is unfit.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.dist_name">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dist_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.dist_name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the this density’s random variable’s class’ name.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.pdf">
 <span class="sig-name descname"><span class="pre">pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric.pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.pdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to call the encapsulated distribution’s PDF. If this density is unfit,
+always returns an array of zeros of same shape as the input.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.cdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to call the encapsulated distribution’s CDF. If this density is unfit,
+always returns an array of zeros of same shape as the input.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric.ppf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to call the encapsulated distribution’s PPF. If this density is unfit,
+always returns an array of zeros of same shape as the input.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -480,20 +678,33 @@
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric_discrete">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.distribution.</span></span><span class="sig-name descname"><span class="pre">Parametric_discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rv_generic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stat_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'cramervonmises_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cramervonmises_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'epps_singleton_2samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_1samp_ordinary'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_jittered'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ks_2samp_ordinary'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ks_2samp_jittered'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_ranges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">DistTransform.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric_discrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric_discrete" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric" title="metrics_as_scores.distribution.distribution.Parametric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parametric</span></code></a></p>
+<p>This type of density inherits from <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric" title="metrics_as_scores.distribution.distribution.Parametric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parametric</span></code></a> and is its counterpart
+for discrete (integral) data. It adds an explicit function for the probability mass
+and makes the inherited PDF return the PMF’s result.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric_discrete.pmf">
 <span class="sig-name descname"><span class="pre">pmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric_discrete.pmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric_discrete.pmf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Implemented to call the encapsulated distribution’s PMF. If this density is unfit,
+always returns an array of zeros of same shape as the input.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric_discrete.pdf">
 <span class="sig-name descname"><span class="pre">pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64]</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric_discrete.pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric_discrete.pdf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Overridden to return the result of the <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric_discrete.pmf" title="metrics_as_scores.distribution.distribution.Parametric_discrete.pmf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pmf()</span></code></a>. Note that in any case,
+a density’s function <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric_discrete.pdf" title="metrics_as_scores.distribution.distribution.Parametric_discrete.pdf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pdf()</span></code></a> is called (i.e., the callers never call
+the PMF). Therefore, it is easier catch these calls and redirect them to the PMF.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric_discrete.unfitted">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unfitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.DistTransform" title="metrics_as_scores.distribution.distribution.DistTransform"><span class="pre">DistTransform</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric_discrete" title="metrics_as_scores.distribution.distribution.Parametric_discrete"><span class="pre">Parametric_discrete</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric_discrete.unfitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric_discrete.unfitted" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Used to return an explicit unfit instance of <a class="reference internal" href="#metrics_as_scores.distribution.distribution.Parametric" title="metrics_as_scores.distribution.distribution.Parametric"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parametric</span></code></a>. This is
+used in case when not a single maximum likelihood fit was successful for a
+number of random variables. We still need an instance of this density in the
+web application to show an error (e.g., that it was not possible to fit any
+random variable to the selected quantity).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -511,42 +722,56 @@ it, as well as giving some convenience getters.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.quantity_types">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">quantity_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.quantity_types" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the manifest’s quantity types.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.contexts">
 <span class="sig-name descname"><span class="pre">contexts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_all_contexts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.contexts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.contexts" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the manifest’s defined contexts as a generator. Sometimes we need to ignore
+the context and aggregate a quantity type across all defined contexts. Then, a virtual
+context called <cite>__ALL__</cite> is used.</p>
+<dl class="simple">
+<dt>include_all_contexts: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether to also yield the virtual <cite>__ALL__</cite>-context.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.ideal_values">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ideal_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">NoneType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.ideal_values" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter for the manifest’s ideal values.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.is_qtype_discrete">
 <span class="sig-name descname"><span class="pre">is_qtype_discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.is_qtype_discrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.is_qtype_discrete" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns whether a given quantity type is discrete.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.qytpe_desc">
 <span class="sig-name descname"><span class="pre">qytpe_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.qytpe_desc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.qytpe_desc" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the description associated with a quantity type.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.context_desc">
 <span class="sig-name descname"><span class="pre">context_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.context_desc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.context_desc" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the description associated with a context (if any).</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.quantity_types_continuous">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">quantity_types_continuous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.quantity_types_continuous" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of quantity types that are continuous (real-valued).</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.quantity_types_discrete">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">quantity_types_discrete</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.quantity_types_discrete" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of quantity types that are discrete (integer-valued).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.data">
@@ -554,7 +779,16 @@ it, as well as giving some convenience getters.</p>
 <dd><p>This method is used to select a subset of the data, that is specific to at least
 a type of quantity, and optionally to a context, too.</p>
 <dl class="simple">
-<dt>context: <code class="docutils literal notranslate"><span class="pre">Union[str,</span> <span class="pre">None,</span> <span class="pre">Literal['__ALL__']]</span></code></dt><dd><p>You may specify a context</p>
+<dt>qtype: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The name of the quantity type to get data for.</p>
+</dd>
+<dt>context: <code class="docutils literal notranslate"><span class="pre">Union[str,</span> <span class="pre">None,</span> <span class="pre">Literal['__ALL__']]</span></code></dt><dd><p>You may specify a context to further filter the data by. Data is always specific
+to a quantity type, and sometimes to a context. If not context-based filtering is
+desired, pass <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">__ALL__</span></code>.</p>
+</dd>
+<dt>unique_vals: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>If <cite>True</cite>, some small jitter will be added to the data in order to make it unique.</p>
+</dd>
+<dt>sub_sample: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>Optional unsigned integer with number of samples to take in case the dataset is
+very large. It is only applied if the number is smaller than the data’s size.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -665,7 +899,26 @@ returned data frame.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.analyze_distr">
 <span class="sig-name descname"><span class="pre">analyze_distr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qtypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ks_2samp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks2_max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.analyze_distr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.analyze_distr" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs the two-sample Kolmogorov–Smirnov test or Welch’s t-test for two or
+more types of quantity. Performs the test for all unique pairs of quantity types.</p>
+<dl class="simple">
+<dt>qtypes: <code class="docutils literal notranslate"><span class="pre">Iterable[str]</span></code></dt><dd><p>An iterable of quantity types to test in a pair-wise manner.</p>
+</dd>
+<dt>use_ks_2samp: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>If <cite>True</cite>, use the two-sample Kolmogorov–Smirnov; Welch’s t-test, otherwise.</p>
+</dd>
+<dt>ks2_max_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>Unsigned integer used to limit the number of samples used in KS2-test. For larger
+numbers than the default, it may not be possible to compute it exactly.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data frame with columns <cite>qtype</cite>, <cite>stat</cite>, <cite>pval</cite>, <cite>group1</cite>, and <cite>group2</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -709,6 +962,7 @@ ordinary fitter can be used (which uses differential evolution).</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.SingleObjectiveTermination">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">SingleObjectiveTermination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#SingleObjectiveTermination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.SingleObjectiveTermination" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultTermination</span></code></p>
+<p>This class is used as termination criterion for the <a class="reference internal" href="#metrics_as_scores.distribution.fitting.FitterPymoo" title="metrics_as_scores.distribution.fitting.FitterPymoo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitterPymoo</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.SingleObjectiveTermination.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#SingleObjectiveTermination.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.SingleObjectiveTermination.__init__" title="Permalink to this definition"></a></dt>
@@ -720,6 +974,8 @@ ordinary fitter can be used (which uses differential evolution).</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">Fitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">scipy.stats._distn_infrastructure.rv_continuous</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">scipy.stats._distn_infrastructure.rv_discrete</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is used as a generic approach to fit any random variable to any kind
+of data. However, it is recommended to use the more stable <a class="reference internal" href="#metrics_as_scores.distribution.fitting.FitterPymoo" title="metrics_as_scores.distribution.fitting.FitterPymoo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitterPymoo</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.Practical_Ranges">
 <span class="sig-name descname"><span class="pre">Practical_Ranges</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'bernoulli_gen':</span> <span class="pre">{'p':</span> <span class="pre">[0.0,</span> <span class="pre">1.0]},</span> <span class="pre">'betabinom_gen':</span> <span class="pre">{'a':</span> <span class="pre">[5e-308,</span> <span class="pre">1000.0],</span> <span class="pre">'b':</span> <span class="pre">[5e-308,</span> <span class="pre">1000.0],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">5000]},</span> <span class="pre">'binom_gen':</span> <span class="pre">{'n':</span> <span class="pre">[1,</span> <span class="pre">25000],</span> <span class="pre">'p':</span> <span class="pre">[0.0,</span> <span class="pre">1.0]},</span> <span class="pre">'boltzmann_gen':</span> <span class="pre">{'N':</span> <span class="pre">[1,</span> <span class="pre">25000],</span> <span class="pre">'lambda':</span> <span class="pre">[0.0,</span> <span class="pre">100000.0]},</span> <span class="pre">'dlaplace_gen':</span> <span class="pre">{'a':</span> <span class="pre">[5e-308,</span> <span class="pre">10000.0]},</span> <span class="pre">'geom_gen':</span> <span class="pre">{'p':</span> <span class="pre">[0.0,</span> <span class="pre">1.0]},</span> <span class="pre">'hypergeom_gen':</span> <span class="pre">{'M':</span> <span class="pre">[1,</span> <span class="pre">25000],</span> <span class="pre">'N':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">25000]},</span> <span class="pre">'logser_gen':</span> <span class="pre">{'p':</span> <span class="pre">[0.0,</span> <span class="pre">1.0]},</span> <span class="pre">'nbinom_gen':</span> <span class="pre">{'n':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'p':</span> <span class="pre">[0.0,</span> <span class="pre">1.0]},</span> <span class="pre">'nchypergeom_fisher_gen':</span> <span class="pre">{'M':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'N':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'odds':</span> <span class="pre">[5e-308,</span> <span class="pre">10000.0]},</span> <span class="pre">'nchypergeom_wallenius_gen':</span> <span class="pre">{'M':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'N':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'odds':</span> <span class="pre">[5e-308,</span> <span class="pre">10000.0]},</span> <span class="pre">'nhypergeom_gen':</span> <span class="pre">{'M':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">25000],</span> <span class="pre">'r':</span> <span class="pre">[0,</span> <span class="pre">25000]},</span> <span class="pre">'planck_gen':</span> <span class="pre">{'lambda':</span> <span class="pre">[5e-308,</span> <span class="pre">100.0]},</span> <span class="pre">'poisson_gen':</span> <span class="pre">{'mu':</span> <span class="pre">[0.0,</span> <span class="pre">1000000.0]},</span> <span class="pre">'randint_gen':</span> <span class="pre">{'high':</span> <span class="pre">[-25000,</span> <span class="pre">25000],</span> <span class="pre">'low':</span> <span class="pre">[-25000,</span> <span class="pre">25000]},</span> <span class="pre">'skellam_gen':</span> <span class="pre">{'mu1':</span> <span class="pre">[5e-308,</span> <span class="pre">5000.0],</span> <span class="pre">'mu2':</span> <span class="pre">[5e-308,</span> <span class="pre">5000.0]},</span> <span class="pre">'yulesimon_gen':</span> <span class="pre">{'alpha':</span> <span class="pre">[5e-308,</span> <span class="pre">20000.0]},</span> <span class="pre">'zipf_gen':</span> <span class="pre">{'a':</span> <span class="pre">[1.000000000001,</span> <span class="pre">20000.0]},</span> <span class="pre">'zipfian_gen':</span> <span class="pre">{'a':</span> <span class="pre">[0.0,</span> <span class="pre">20000.0],</span> <span class="pre">'n':</span> <span class="pre">[0,</span> <span class="pre">25000]}}</span></em><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.Practical_Ranges" title="Permalink to this definition"></a></dt>
@@ -733,22 +989,40 @@ problems that are defined for each discrete random variable.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">scipy.stats._distn_infrastructure.rv_continuous</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">scipy.stats._distn_infrastructure.rv_discrete</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>dist: <code class="docutils literal notranslate"><span class="pre">type[Union[rv_continuous,</span> <span class="pre">rv_discrete]]</span></code></dt><dd><p>Specify the class of the random variable you want to fit.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.is_discrete">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_discrete</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.is_discrete" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter to return whether the used random variable is discrete.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.is_continuous">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_continuous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.is_continuous" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut getter to return whether the used random variable is continuous.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.fit" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience method to fit the random variable. If it is continuous, calls
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">rv_continuous.fit()</span></code>, which uses maximum likelihood estimation.
+If it is discrete, uses differential evolution to find an estimate.</p>
+<dl class="simple">
+<dt>data: <code class="docutils literal notranslate"><span class="pre">NDArray[Shape[&quot;*&quot;],</span> <span class="pre">Float]</span></code></dt><dd><p>The data to fit to.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with named parameters and their values.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -756,15 +1030,52 @@ problems that are defined for each discrete random variable.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.FitterPymoo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">FitterPymoo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">scipy.stats._distn_infrastructure.rv_continuous</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">scipy.stats._distn_infrastructure.rv_discrete</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#FitterPymoo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.FitterPymoo" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.distribution.fitting.Fitter" title="metrics_as_scores.distribution.fitting.Fitter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fitter</span></code></a></p>
+<p>This class inherits from <a class="reference internal" href="#metrics_as_scores.distribution.fitting.Fitter" title="metrics_as_scores.distribution.fitting.Fitter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fitter</span></code></a> and is the modern successor to it.
+This is because it uses <code class="xref py py-mod docutils literal notranslate"><span class="pre">pymoo</span></code> to fit discrete random variables, together
+with a set of specially defined fitting problems.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.FitterPymoo.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">scipy.stats._distn_infrastructure.rv_continuous</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">scipy.stats._distn_infrastructure.rv_discrete</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#FitterPymoo.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.FitterPymoo.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>dist: <code class="docutils literal notranslate"><span class="pre">type[Union[rv_continuous,</span> <span class="pre">rv_discrete]]</span></code></dt><dd><p>Specify the class of the random variable you want to fit.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.FitterPymoo.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">max_samples=10000,</span> <span class="pre">minimize_seeds=[1337,</span> <span class="pre">3735928559,</span> <span class="pre">45640321],</span> <span class="pre">verbose:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">stop_after_first_res:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#FitterPymoo.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.FitterPymoo.fit" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Fits the random variable to the given data. For continuous data, calls <a class="reference internal" href="#metrics_as_scores.distribution.fitting.Fitter.fit" title="metrics_as_scores.distribution.fitting.Fitter.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Fitter.fit()</span></code></a>.
+For discrete random variables, however, it solves a mixed-variable problem using a genetic
+algorithm. The documentation below apply to fitting a discrete random variable.</p>
+<dl class="simple">
+<dt>data: <code class="docutils literal notranslate"><span class="pre">NDArray[Shape[&quot;*&quot;],</span> <span class="pre">Float]</span></code></dt><dd><p>The 1-D data to fit the random variable to.</p>
+</dd>
+<dt>max_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>Used to deterministically sub-sample the data, should it be longer than this.</p>
+</dd>
+<dt>minimize_seeds: <code class="docutils literal notranslate"><span class="pre">list[int]</span></code></dt><dd><p>A list of integer seeds. For each, the optimization is run once, and the result
+with smallest solution is returned.</p>
+</dd>
+<dt>verbose: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">minimize()</span></code>.</p>
+</dd>
+<dt>stop_after_first_res: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether to stop after the first successful minimization. If <cite>True</cite>, then no further
+fits for the remaining seeds are computed. This is the default as optimization usually
+succeeds and subsequent successful runs are rarely or only insignificantly better.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exception:
+If the optimization does not find a single solution.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Union[float,</span> <span class="pre">int]]</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with parameter names and values of the best found solution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -772,6 +1083,8 @@ problems that are defined for each discrete random variable.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.TestJson">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">TestJson</span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#TestJson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.TestJson" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Used for serializing a <a class="reference internal" href="#metrics_as_scores.distribution.fitting.StatisticalTest" title="metrics_as_scores.distribution.fitting.StatisticalTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatisticalTest</span></code></a> to JSON.
+This class represents the result of a single test.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.TestJson.pval">
 <span class="sig-name descname"><span class="pre">pval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#metrics_as_scores.distribution.fitting.TestJson.pval" title="Permalink to this definition"></a></dt>
@@ -788,6 +1101,8 @@ problems that are defined for each discrete random variable.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTestJson">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">StatisticalTestJson</span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#StatisticalTestJson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTestJson" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Used for serializing a <a class="reference internal" href="#metrics_as_scores.distribution.fitting.StatisticalTest" title="metrics_as_scores.distribution.fitting.StatisticalTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatisticalTest</span></code></a> to JSON.
+This class represents a set of tests and their results.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTestJson.tests">
 <span class="sig-name descname"><span class="pre">tests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#metrics_as_scores.distribution.fitting.TestJson" title="metrics_as_scores.distribution.fitting.TestJson"><span class="pre">metrics_as_scores.distribution.fitting.TestJson</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTestJson.tests" title="Permalink to this definition"></a></dt>
@@ -809,15 +1124,47 @@ problems that are defined for each discrete random variable.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTest">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.distribution.fitting.</span></span><span class="sig-name descname"><span class="pre">StatisticalTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data1:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">cdf:</span> <span class="pre">~typing.Callable[[~typing.Union[float,</span> <span class="pre">int]],</span> <span class="pre">float],</span> <span class="pre">ppf_or_data2:</span> <span class="pre">~typing.Union[~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">~typing.Callable[[~typing.Union[float,</span> <span class="pre">int]],</span> <span class="pre">float]],</span> <span class="pre">data2_num_samples:</span> <span class="pre">~typing.Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">method='auto',</span> <span class="pre">stat_tests=[&lt;function</span> <span class="pre">cramervonmises&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">cramervonmises_2samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">ks_1samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">ks_2samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">epps_singleton_2samp&gt;],</span> <span class="pre">max_samples:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">10000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#StatisticalTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTest" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is used to conduct various statistical goodness-of-fit tests. Since not
+every test is always applicable (e.g., the Kolmogorov–Smirnov test is not applicable
+to continuous data), a variety of tests are conducted and the most suitable test (and
+its results) are then typically selected at runtime.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTest.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data1:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">cdf:</span> <span class="pre">~typing.Callable[[~typing.Union[float,</span> <span class="pre">int]],</span> <span class="pre">float],</span> <span class="pre">ppf_or_data2:</span> <span class="pre">~typing.Union[~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">~typing.Callable[[~typing.Union[float,</span> <span class="pre">int]],</span> <span class="pre">float]],</span> <span class="pre">data2_num_samples:</span> <span class="pre">~typing.Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">method='auto',</span> <span class="pre">stat_tests=[&lt;function</span> <span class="pre">cramervonmises&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">cramervonmises_2samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">ks_1samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">ks_2samp&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">epps_singleton_2samp&gt;],</span> <span class="pre">max_samples:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">10000</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#StatisticalTest.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTest.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initializes a new StatisticalTest. Works with real- and integer-valued data. For the
+latter, additional tests including a deterministic jitter are performed, as these are
+often more representative.</p>
+<dl class="simple">
+<dt>data1: <code class="docutils literal notranslate"><span class="pre">NDArray[Shape[&quot;*&quot;],</span> <span class="pre">Float]</span></code></dt><dd><p>A 1-D array of the data, the first sample.</p>
+</dd>
+<dt>cdf: <code class="docutils literal notranslate"><span class="pre">Callable[[Union[float,</span> <span class="pre">int]],</span> <span class="pre">float]</span></code></dt><dd><p>A CDF used to determine if <cite>data1</cite> comes from it. Used in the one-sample tests.</p>
+</dd>
+<dt>ppf_or_data2: <code class="docutils literal notranslate"><span class="pre">Union[NDArray[Shape[&quot;*&quot;],</span> <span class="pre">Float],</span> <span class="pre">Callable[[Union[float,</span> <span class="pre">int]],</span> <span class="pre">float]]</span></code></dt><dd><p>Either a second 1-D array of the second sample, or a PPF that can be used to
+generate a second sample by inverse sampling.</p>
+</dd>
+<dt>data2_num_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>The number of samples to draw for the second sample if <cite>ppf_or_data2</cite> is a PPF.</p>
+</dd>
+<dt>method: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>Passed to the statistical tests that support a <cite>method</cite>-parameter.</p>
+</dd>
+<dt>stat_tests: <code class="docutils literal notranslate"><span class="pre">[cramervonmises,</span> <span class="pre">cramervonmises_2samp,</span> <span class="pre">ks_1samp,</span> <span class="pre">ks_2samp,</span> <span class="pre">epps_singleton_2samp]</span></code></dt><dd><p>List of statistical tests to conduct.</p>
+</dd>
+<dt>max_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>The maximum amount of data points in either sample. Also limits <cite>data2_num_samples</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTest.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#StatisticalTest.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTest.__iter__" title="Permalink to this definition"></a></dt>
+<dd><p>Implemented so that this instance can be transformed into a dictionary and
+then subsequently serialized to JSON.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.StatisticalTest.from_dict">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'stat_tests_tests'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#StatisticalTest.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.StatisticalTest.from_dict" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Re-creates an instance from a previously to-JSON serialized object.</p>
+</dd></dl>
 
 </dd></dl>
 

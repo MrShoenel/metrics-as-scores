@@ -99,7 +99,12 @@
 
 
 
-<div class="viewcode-block" id="get_data_tuple"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_fit.get_data_tuple">[docs]</a><span class="k">def</span> <span class="nf">get_data_tuple</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">continuous_transform</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]]]:</span>
+<div class="viewcode-block" id="get_data_tuple"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_fit.get_data_tuple">[docs]</a><span class="k">def</span> <span class="nf">get_data_tuple</span><span class="p">(</span>
+    <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span>
+    <span class="n">continuous_transform</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This method is part of the workflow for computing parametric fits.</span>
 <span class="sd">    For a specific type of quantity and transform, it creates datasets</span>
@@ -134,6 +139,11 @@
 
 
 <div class="viewcode-block" id="FitResult"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_fit.FitResult">[docs]</a><span class="k">class</span> <span class="nc">FitResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is derived from :py:class:`TypedDict` and holds all properties</span>
+<span class="sd">    related to a single fit result, that is, a single specific configuration</span>
+<span class="sd">    that was fit to a 1-D array of data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grid_idx</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">dist_transform</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">transform_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
@@ -148,7 +158,50 @@
     <span class="n">stat_tests</span><span class="p">:</span> <span class="n">StatisticalTestJson</span></div>
 
 
-<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_fit.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">fitter_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Fitter</span><span class="p">],</span> <span class="n">grid_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">the_data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">the_data_unique</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">transform_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">write_temporary_results</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_fit.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
+    <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">fitter_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Fitter</span><span class="p">],</span>
+    <span class="n">grid_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span>
+    <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span>
+    <span class="n">the_data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span>
+    <span class="n">the_data_unique</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span>
+    <span class="n">transform_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">write_temporary_results</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FitResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the main stand-alone function that computes a single parametric fit to</span>
+<span class="sd">    a single 1-D array of data. This function is used in Parallel contexts and,</span>
+<span class="sd">    therefore, lives on module top level so it can be serialized.</span>
+
+<span class="sd">    ds: ``Dataset``</span>
+<span class="sd">        The data, needed for obtaining quantity types and contexts. Also passed forward to</span>
+<span class="sd">        :py:meth:`fit()`.</span>
+<span class="sd">    </span>
+<span class="sd">    fitter_type: ``type[Fitter]``</span>
+<span class="sd">        The class for the fitter to use, either :py:class:`Fitter` or :py:class:`FitterPymoo`.</span>
+<span class="sd">    </span>
+<span class="sd">    grid_idx: ``int``</span>
+<span class="sd">        This is only used so it can be stored in the :py:class:``FitResult``. This method</span>
+<span class="sd">        itself does not have access to the grid.</span>
+<span class="sd">    </span>
+<span class="sd">    dist_transform: ``DistTransform``</span>
+<span class="sd">        The transform for which to generate parametric fits for. Later, we will save a single</span>
+<span class="sd">        file per transform, containing all related fits.</span>
+<span class="sd">    </span>
+<span class="sd">    the_data: ``NDArray[Shape[&quot;*&quot;], Float]``</span>
+<span class="sd">        The 1-D data used for fitting the RV.</span>
+<span class="sd">    </span>
+<span class="sd">    the_data_unique: ``NDArray[Shape[&quot;*&quot;], Float]``</span>
+<span class="sd">        1-D Array of data. In case of continuous data, it is the same as ``the_data``. In case</span>
+<span class="sd">        of discrete data, the data in this array contains a slight jitter as to make all data</span>
+<span class="sd">        points unique. Using this data is relevant for conducting statistical goodness of fit</span>
+<span class="sd">        tests.</span>
+<span class="sd">    </span>
+<span class="sd">    :return:</span>
+<span class="sd">        The :py:class:``FitResult``. If the RV could not be fitted, then the parameters in</span>
+<span class="sd">        the fitting result will have a value of ``None``. This is so this method does not</span>
+<span class="sd">        throw exceptions. In case of a failure, no statistical tests are computed, either.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">warnoptions</span><span class="p">:</span>

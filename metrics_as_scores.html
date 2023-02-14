@@ -52,9 +52,13 @@
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.data.html">metrics_as_scores.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html">metrics_as_scores.distribution package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html">metrics_as_scores.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.webapp.html">metrics_as_scores.webapp package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-metrics_as_scores">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-metrics_as_scores">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metrics_as_scores.DATASETS_DIR"><code class="docutils literal notranslate"><span class="pre">DATASETS_DIR</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -157,9 +161,9 @@
 <li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.cli.html#module-metrics_as_scores.cli.LocalWebserver">metrics_as_scores.cli.LocalWebserver module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.__init__"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow.start_server()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_process"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow.start_server_process()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_internally"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow.start_server_internally()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server"><code class="docutils literal notranslate"><span class="pre">LocalWebserverWorkflow.start_server()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -184,6 +188,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.cli.html#module-metrics_as_scores.cli.helpers">metrics_as_scores.cli.helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.KNOWN_DATASETS_FILE"><code class="docutils literal notranslate"><span class="pre">KNOWN_DATASETS_FILE</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isint"><code class="docutils literal notranslate"><span class="pre">isint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isnumeric"><code class="docutils literal notranslate"><span class="pre">isnumeric()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_local_datasets"><code class="docutils literal notranslate"><span class="pre">get_local_datasets()</span></code></a></li>
@@ -281,15 +286,14 @@
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.qtype"><code class="docutils literal notranslate"><span class="pre">Density.qtype</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.context"><code class="docutils literal notranslate"><span class="pre">Density.context</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.ideal_value"><code class="docutils literal notranslate"><span class="pre">Density.ideal_value</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.is_quality_score"><code class="docutils literal notranslate"><span class="pre">Density.is_quality_score</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.dist_transform"><code class="docutils literal notranslate"><span class="pre">Density.dist_transform</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.transform_value"><code class="docutils literal notranslate"><span class="pre">Density.transform_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density._min_max"><code class="docutils literal notranslate"><span class="pre">Density._min_max()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.compute_practical_domain"><code class="docutils literal notranslate"><span class="pre">Density.compute_practical_domain()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.practical_domain"><code class="docutils literal notranslate"><span class="pre">Density.practical_domain</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.compute_practical_range_pdf"><code class="docutils literal notranslate"><span class="pre">Density.compute_practical_range_pdf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.practical_range_pdf"><code class="docutils literal notranslate"><span class="pre">Density.practical_range_pdf</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.save_to_file"><code class="docutils literal notranslate"><span class="pre">Density.save_to_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.load_from_file"><code class="docutils literal notranslate"><span class="pre">Density.load_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.__call__"><code class="docutils literal notranslate"><span class="pre">Density.__call__()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate"><code class="docutils literal notranslate"><span class="pre">KDE_integrate</span></code></a><ul>
@@ -387,6 +391,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.StatisticalTest"><code class="docutils literal notranslate"><span class="pre">StatisticalTest</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.StatisticalTest.__init__"><code class="docutils literal notranslate"><span class="pre">StatisticalTest.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.StatisticalTest.__iter__"><code class="docutils literal notranslate"><span class="pre">StatisticalTest.__iter__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.StatisticalTest.from_dict"><code class="docutils literal notranslate"><span class="pre">StatisticalTest.from_dict()</span></code></a></li>
 </ul>
 </li>
@@ -488,6 +493,7 @@
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.flatten_dict"><code class="docutils literal notranslate"><span class="pre">flatten_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.Interpolator"><code class="docutils literal notranslate"><span class="pre">Interpolator</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.Interpolator.__init__"><code class="docutils literal notranslate"><span class="pre">Interpolator.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.Interpolator.__call__"><code class="docutils literal notranslate"><span class="pre">Interpolator.__call__()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.cdf_to_ppf"><code class="docutils literal notranslate"><span class="pre">cdf_to_ppf()</span></code></a></li>
@@ -521,11 +527,47 @@
 <li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.tools.html#module-metrics_as_scores.tools">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="metrics_as_scores.webapp.html">metrics_as_scores.webapp package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#module-metrics_as_scores.webapp.app_hooks">metrics_as_scores.webapp.app_hooks module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.app_hooks.on_server_loaded"><code class="docutils literal notranslate"><span class="pre">on_server_loaded()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#module-metrics_as_scores.webapp.data">metrics_as_scores.webapp.data module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.data.cdfs"><code class="docutils literal notranslate"><span class="pre">cdfs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.data.ds"><code class="docutils literal notranslate"><span class="pre">ds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.data.dataset_dir"><code class="docutils literal notranslate"><span class="pre">dataset_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#module-metrics_as_scores.webapp.exception">metrics_as_scores.webapp.exception module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.exception.PlotException"><code class="docutils literal notranslate"><span class="pre">PlotException</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.webapp.html#metrics_as_scores.webapp.exception.PlotException.__init__"><code class="docutils literal notranslate"><span class="pre">PlotException.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#module-metrics_as_scores.webapp.main">metrics_as_scores.webapp.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.webapp.html#module-metrics_as_scores.webapp">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
 <section id="module-metrics_as_scores">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-metrics_as_scores" title="Permalink to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="metrics_as_scores.DATASETS_DIR">
+<span class="sig-prename descclassname"><span class="pre">metrics_as_scores.</span></span><span class="sig-name descname"><span class="pre">DATASETS_DIR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.DATASETS_DIR" title="Permalink to this definition"></a></dt>
+<dd><p>This is the directory that holds the downloaded and manually created datasets.
+This directory is in the project’s root if Metrics As Scores was cloned and
+the full project is present.
+Otherwise, when the Metrics As Scores is installed from PyPI as a package, we
+store downloaded and own datasets in the datasets-folder within the source.
+Have a look at <code class="xref py py-const docutils literal notranslate"><span class="pre">IS_MAS_LOCAL</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
 </section>
 </section>
 

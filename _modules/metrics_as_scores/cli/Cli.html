@@ -80,11 +80,21 @@
 
 
 <div class="viewcode-block" id="cli"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.Cli.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main routine for the command line interface. It runs the main menu in</span>
+<span class="sd">    a never-terminating loop (except for when the user presses Ctr+c).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">wf</span> <span class="o">=</span> <span class="n">MainWorkflow</span><span class="p">()</span>
     <span class="n">wf</span><span class="o">.</span><span class="n">print_welcome</span><span class="p">()</span>
 
     <span class="k">while</span> <span class="ow">not</span> <span class="n">wf</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
-        <span class="n">wf</span><span class="o">.</span><span class="n">main_menu</span><span class="p">()</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">main_menu</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;An error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">) has occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">wf</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Restarting main menu.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">wf</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>

@@ -83,6 +83,29 @@
 
 
 <div class="viewcode-block" id="GenerateDensitiesWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow">[docs]</a><span class="k">class</span> <span class="nc">GenerateDensitiesWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">This workflow generates density-related functions that are used by the</span>
+<span class="s1">Web Application. While those can be large, generating them on-the-fly is</span>
+<span class="s1">usually not possible in acceptable time. Using pre-generated functions</span>
+<span class="s1">is a trade-off between space and user experience, where we sacrifice the</span>
+<span class="s1">former as it is cheaper.</span>
+
+<span class="s1">For each quantity and each context, we pre-generate functions for the</span>
+<span class="s1">probability density (PDF), the cumulative distribution (CDF) and its</span>
+<span class="s1">complement (CCDF), as well as the quantile (or percent point) function</span>
+<span class="s1">(PPF). So for one quantity and one context, we pre-generate one density</span>
+<span class="s1">that unites those four functions.</span>
+
+<span class="s1">There are 5 primary classes of densities: Parametric, Parametric_discrete,</span>
+<span class="s1">Empirical, Empirical_discrete, and KDE_approx. Please refer to the</span>
+<span class="s1">documentation for details about these. Generating parametric densities</span>
+<span class="s1">uses the computed fits from another workflow, is cheap, fast, and does</span>
+<span class="s1">not consume much space. KDE_approx makes excessive use of oversampling</span>
+<span class="s1">(by design), which can result in large files. The empirical densities&#39;</span>
+<span class="s1">size corresponds to the size of the dataset you are using (although there</span>
+<span class="s1">is a high limit beyond which sampling will be applied).</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
 <div class="viewcode-block" id="GenerateDensitiesWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="kc">None</span>
@@ -116,31 +139,8 @@
     
 
 <div class="viewcode-block" id="GenerateDensitiesWorkflow.pre_generate"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.pre_generate">[docs]</a>    <span class="k">def</span> <span class="nf">pre_generate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">This workflow generates density-related functions that are used by the</span>
-<span class="s1">Web Application. While those can be large, generating them on-the-fly is</span>
-<span class="s1">usually not possible in acceptable time. Using pre-generated functions</span>
-<span class="s1">is a trade-off between space and user experience, where we sacrifice the</span>
-<span class="s1">former as it is cheaper.</span>
-
-<span class="s1">For each quantity and each context, we pre-generate functions for the</span>
-<span class="s1">probability density (PDF), the cumulative distribution (CDF) and its</span>
-<span class="s1">complement (CCDF), as well as the quantile (or percent point) function</span>
-<span class="s1">(PPF). So for one quantity and one context, we pre-generate one density</span>
-<span class="s1">that unites those four functions.</span>
-
-<span class="s1">There are 5 primary classes of densities: Parametric, Parametric_discrete,</span>
-<span class="s1">Empirical, Empirical_discrete, and KDE_approx. Please refer to the</span>
-<span class="s1">documentation for details about these. Generating parametric densities</span>
-<span class="s1">uses the computed fits from another workflow, is cheap, fast, and does</span>
-<span class="s1">not consume much space. KDE_approx makes excessive use of oversampling</span>
-<span class="s1">(by design), which can result in large files. The empirical densities&#39;</span>
-<span class="s1">size corresponds to the size of the dataset you are using (although there</span>
-<span class="s1">is a high limit beyond which sampling will be applied).</span>
-<span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main entry point for this workflow.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_doc</span><span class="p">()</span>
 
         <span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_local_datasets</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span>

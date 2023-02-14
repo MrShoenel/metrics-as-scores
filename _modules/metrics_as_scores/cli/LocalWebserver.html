@@ -84,8 +84,13 @@
 <span class="n">root_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
 
 <div class="viewcode-block" id="LocalWebserverWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow">[docs]</a><span class="k">class</span> <span class="nc">LocalWebserverWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">This workflow allows you to locally run the interactive web application of</span>
+<span class="s1">Metrics As Scores, using one of the locally available datasets.</span>
+<span class="s1">&#39;&#39;&#39;</span>
 <div class="viewcode-block" id="LocalWebserverWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span></div>
     
 
     <span class="k">def</span> <span class="nf">_port_and_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">LocalDataset</span><span class="p">]:</span>
@@ -103,20 +108,7 @@
     
     <span class="k">def</span> <span class="nf">_type_quit_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Enter &quot;q&quot; to shut down the application:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="LocalWebserverWorkflow.start_server"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server">[docs]</a>    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Choose Method of Running the Web-App:&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
-            <span class="s1">&#39;Use External Process (works usually better)&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Run Internal Application Server&#39;</span>
-        <span class="p">])</span>
-
-        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_process</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_internally</span><span class="p">()</span></div>
     
-
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server_process"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_process">[docs]</a>    <span class="k">def</span> <span class="nf">start_server_process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">port</span><span class="p">,</span> <span class="n">use_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port_and_dataset</span><span class="p">()</span>
 
@@ -126,13 +118,16 @@
         <span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">bokeh</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./bokeh&#39;</span><span class="p">)</span>
-            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">bokeh</span><span class="p">),</span> <span class="s1">&#39;serve&#39;</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">webapp_dir</span><span class="p">),</span>
                 <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--show&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--args&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="n">use_dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-            <span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;preload&#39;</span><span class="p">)</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
@@ -156,8 +151,11 @@
             <span class="s1">&#39;use_index&#39;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">}</span>
         
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="n">use_dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;preload&#39;</span><span class="p">)</span>
         <span class="n">app</span> <span class="o">=</span> <span class="n">build_single_handler_application</span><span class="p">(</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">webapp_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span> <span class="n">argv</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="n">use_dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">webapp_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span> <span class="n">argv</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
 
         
         <span class="n">server</span> <span class="o">=</span> <span class="n">Server</span><span class="p">({</span><span class="s1">&#39;/webapp&#39;</span><span class="p">:</span> <span class="n">app</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -176,9 +174,26 @@
         <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">show</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="n">tpe</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+        <span class="n">tpe</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="LocalWebserverWorkflow.start_server"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server">[docs]</a>    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main entry point for this workflow.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_doc</span><span class="p">()</span>
         
-        
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Choose Method of Running the Web-App:&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
+            <span class="s1">&#39;Use External Process (works usually better)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Run Internal Application Server&#39;</span>
+        <span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">preload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Would you like to pre-load the entire dataset into memory?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;Yes (Only recommended if you have enough memory)&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_process</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_internally</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

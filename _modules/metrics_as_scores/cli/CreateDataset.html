@@ -87,22 +87,26 @@
 
 
 <span class="n">default_ds</span> <span class="o">=</span> <span class="n">MAS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./datasets/_default&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:meta private:</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="CreateDatasetWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow">[docs]</a><span class="k">class</span> <span class="nc">CreateDatasetWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This workflow creates an own, local dataset from a single data source that can</span>
-<span class="sd">    be read by Pandas from file or URL. The original dataset needs three columns:</span>
-<span class="sd">    For a single sample, one column holds the numeric observation, one holds the</span>
-<span class="sd">    ordinal type, and one holds the context associated with it. A dataset can hold</span>
-<span class="sd">    one or more types, but should hold at least two contexts in order to compare</span>
-<span class="sd">    distributions of a single sample type across contexts.</span>
-<span class="sd">    This workflow creates the entire dataset: The manifest JSON, the parametric fits,</span>
-<span class="sd">    the pre-generated distributions. When done, the dataset is installed, such that it</span>
-<span class="sd">    can be discovered and used by the local Web-Application. If you wish to publish</span>
-<span class="sd">    your dataset so that it can be used by others, start the Bundle-workflow from the</span>
-<span class="sd">    previous menu afterwards.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">This workflow creates an own, local dataset from a single data source that can</span>
+<span class="s2">be read by Pandas from file or URL. The original dataset needs three columns:</span>
+<span class="s2">For a single sample, one column holds the numeric observation, one holds the</span>
+<span class="s2">ordinal type, and one holds the context associated with it. A dataset can hold</span>
+<span class="s2">one or more types, but should hold at least two contexts in order to compare</span>
+<span class="s2">distributions of a single sample type across contexts.</span>
+<span class="s2">This workflow creates the entire dataset: The manifest JSON, the parametric fits,</span>
+<span class="s2">the pre-generated distributions. When done, the dataset is installed, such that it</span>
+<span class="s2">can be discovered and used by the local Web-Application. If you wish to publish</span>
+<span class="s2">your dataset so that it can be used by others, start the Bundle-workflow from the</span>
+<span class="s2">previous menu afterwards.</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
 <div class="viewcode-block" id="CreateDatasetWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regex_id</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^[a-z]+[a-z-_\d]*?[a-z\d]+?$&#39;</span></div>
@@ -132,7 +136,6 @@
             <span class="n">ready</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Continue setting ideal values?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
         
         <span class="k">return</span> <span class="n">type_dict</span>
-    
 
     <span class="k">def</span> <span class="nf">_read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_like</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">sep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;What is the separator used?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
@@ -145,15 +148,12 @@
             <span class="n">sheet</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
         <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Zero-based index of header column?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="n">isint</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="n">path_like</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
-    
 
     <span class="k">def</span> <span class="nf">_is_feature_discrete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col_data</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">col_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">temp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col_type</span><span class="p">]</span> <span class="o">==</span> <span class="n">use_type</span><span class="p">,</span> <span class="p">:]</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="n">col_data</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="c1"># Check if all values are integer.</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-
-    
 
     <span class="k">def</span> <span class="nf">_create_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">LocalDataset</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
         <span class="n">jsd</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="p">{}</span>
@@ -249,7 +249,6 @@
         <span class="n">jsd</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">jsd</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
-    
 
     <span class="k">def</span> <span class="nf">_run_statistical_tests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">tests_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;We will now perform some statistical tests and summarize the results.&#39;</span><span class="p">)</span>
@@ -271,22 +270,22 @@
         <span class="n">file_tukey</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tests_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./tukeyhsd.csv&#39;</span><span class="p">))</span>
         <span class="n">tukeyhsd</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_tukey</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;Wrote result to: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="n">file_tukey</span><span class="p">)</span>
-        
 
-    
 
 <div class="viewcode-block" id="CreateDatasetWorkflow.create_own"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.create_own">[docs]</a>    <span class="k">def</span> <span class="nf">create_own</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main entry point for this workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_doc</span><span class="p">(</span><span class="n">more</span><span class="o">=</span><span class="s1">&#39;&#39;&#39;</span>
+
 <span class="s1">You are about to create a new Dataset from a resource that can be</span>
 <span class="s1">read by Pandas (e.g., a CSV from file or URL). A Dataset that can</span>
 <span class="s1">be used by Metrics-As-Scores requires a manifest (that will be</span>
 <span class="s1">created as part of this process), optional parametric fits, as well</span>
 <span class="s1">as pre-generated distributions that are used in the Web-Application.</span>
 <span class="s1">The following workflow will take you through all of these steps. It</span>
-<span class="s1">cannot be resumed.</span>
-<span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="s1">cannot be resumed.&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for</span><span class="p">(</span><span class="n">what_for</span><span class="o">=</span><span class="s1">&#39;to begin&#39;</span><span class="p">)</span>
 
         <span class="n">manifest</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_manifest</span><span class="p">()</span>
         <span class="c1"># Let&#39;s create a folder for this dataset (by ID) and out the files there.</span>

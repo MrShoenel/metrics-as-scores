@@ -79,14 +79,46 @@
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span><span class="p">,</span> <span class="n">KnownDataset</span>
 
 
+<span class="n">KNOWN_DATASETS_FILE</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This is the URL to the curated list of available datasets to be used</span>
+<span class="sd">with Metrics As Scores.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="isint"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isint">[docs]</a><span class="k">def</span> <span class="nf">isint</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempts to convert the string to an integer.</span>
+
+<span class="sd">    s: ``str``</span>
+<span class="sd">        The string to check.</span>
+
+<span class="sd">    :rtype: ``bool``</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        `True` if the string can be converted to an `int`; `False`, otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
+
 <div class="viewcode-block" id="isnumeric"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isnumeric">[docs]</a><span class="k">def</span> <span class="nf">isnumeric</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempts to convert a string to a float to check whether it is numeric.</span>
+<span class="sd">    This is not the same as :py:meth:`str::isnumeric()`, as this method</span>
+<span class="sd">    essentially checks whether ``s`` contains something that looks like a</span>
+<span class="sd">    number (int, float, scientific notation, etc).</span>
+
+<span class="sd">    s: ``str``</span>
+<span class="sd">        The string to check.</span>
+
+<span class="sd">    :rtype: ``bool``</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        `True` if the string is numeric; `False`, otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -95,6 +127,13 @@
 
 
 <div class="viewcode-block" id="get_local_datasets"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_local_datasets">[docs]</a><span class="k">def</span> <span class="nf">get_local_datasets</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LocalDataset</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Opens the dataset directory and looks for locally available datasets.</span>
+<span class="sd">    Locally available means datasets that were installed or created manually.</span>
+<span class="sd">    A dataset is only considered to be locally available if it has a `manifest.json`.</span>
+
+<span class="sd">    :rtype: ``Iterable[LocalDataset]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">scandir</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">resolve</span><span class="p">())):</span>
         <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;_default&#39;</span><span class="p">:</span>
@@ -109,9 +148,17 @@
                 <span class="k">pass</span></div>
 
 
-<span class="n">KNOWN_DATASETS_FILE</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json&#39;</span>
 
 <div class="viewcode-block" id="get_known_datasets"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_known_datasets">[docs]</a><span class="k">def</span> <span class="nf">get_known_datasets</span><span class="p">(</span><span class="n">use_local_file</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">KnownDataset</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads the file :py:data:`KNOWN_DATASETS_FILE` to obtain a list of known datasets.</span>
+
+<span class="sd">    use_local_file: ``bool``</span>
+<span class="sd">        If true, will attempt to read the known datasets from a local file, instead</span>
+<span class="sd">        of the online file. This is only used during development.</span>
+
+<span class="sd">    :rtype: ``list[KnownDataset]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">use_local_file</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./known-datasets.json&#39;</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
@@ -119,6 +166,18 @@
 
 
 <div class="viewcode-block" id="format_file_size"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.format_file_size">[docs]</a><span class="k">def</span> <span class="nf">format_file_size</span><span class="p">(</span><span class="n">num_bytes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats bytes into a string with a suffix for bytes, kilobite, etc.</span>
+<span class="sd">    The number of bytes in the prefix is less than 1000 and may be rounded</span>
+<span class="sd">    to two decimals. For example: 780 B, 1.22 KB, 43 GB, etc. Does NOT use</span>
+<span class="sd">    SI-2 suffixes as that would be non-sensical (e.g., what is 1.27 GiB?).</span>
+
+<span class="sd">    num_bytes: ``int``</span>
+<span class="sd">        Unsigned integer with amount of bytes.</span>
+<span class="sd">    </span>
+<span class="sd">    :returns:</span>
+<span class="sd">        The size in bytes, formatted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;KB&#39;</span><span class="p">,</span> <span class="s1">&#39;MB&#39;</span><span class="p">,</span> <span class="s1">&#39;GB&#39;</span><span class="p">,</span> <span class="s1">&#39;TB&#39;</span><span class="p">]</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_bytes</span><span class="p">)</span>
 

@@ -52,6 +52,7 @@
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.data.html">metrics_as_scores.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html">metrics_as_scores.distribution package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html">metrics_as_scores.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.webapp.html">metrics_as_scores.webapp package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.html#module-metrics_as_scores">Module contents</a></li>
@@ -98,6 +99,13 @@
 <dt class="sig sig-object py" id="metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.BundleOwn.</span></span><span class="sig-name descname"><span class="pre">BundleDatasetWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/BundleOwn.html#BundleDatasetWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow bundles a manually created dataset into a single Zip file
+that can be uploaded to, e.g., Zenodo, and registered with Metrics As
+Scores in order to make it available to others as a known dataset.</p>
+<p>In order for an own dataset to be publishable, it needs to have all
+parametric fits, generated densities, references, about, etc. This
+workflow will check that all requirements are fulfilled.</p>
+<p>For an example dataset, check out <a class="reference external" href="https://doi.org/10.5281/zenodo.7633950">https://doi.org/10.5281/zenodo.7633950</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/BundleOwn.html#BundleDatasetWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -106,7 +114,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow.bundle">
 <span class="sig-name descname"><span class="pre">bundle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/BundleOwn.html#BundleDatasetWorkflow.bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.BundleOwn.BundleDatasetWorkflow.bundle" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -119,7 +128,9 @@ of workflows for handling data and running the Web Application.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Cli.cli">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.Cli.</span></span><span class="sig-name descname"><span class="pre">cli</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/cli/Cli.html#cli"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Cli.cli" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main routine for the command line interface. It runs the main menu in
+a never-terminating loop (except for when the user presses Ctr+c).</p>
+</dd></dl>
 
 </section>
 <section id="module-metrics_as_scores.cli.CreateDataset">
@@ -147,7 +158,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.create_own">
 <span class="sig-name descname"><span class="pre">create_own</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/CreateDataset.html#CreateDatasetWorkflow.create_own"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.create_own" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -158,6 +170,11 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Download.DownloadWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.Download.</span></span><span class="sig-name descname"><span class="pre">DownloadWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Download.html#DownloadWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Download.DownloadWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow access a curated list of known datasets that can be used with
+Metrics As Scores. With this workflow, a known dataset can be downloaded and
+installed as a local dataset. Use the workflow for listing the known datasets
+and then enter the ID here.</p>
+<p>Known datasets are loaded from: <a class="reference external" href="https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json">https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Download.DownloadWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Download.html#DownloadWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Download.DownloadWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -166,7 +183,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Download.DownloadWorkflow.download">
 <span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Download.html#DownloadWorkflow.download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Download.DownloadWorkflow.download" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -177,6 +195,23 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.FitParametric.FitParametricWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.FitParametric.</span></span><span class="sig-name descname"><span class="pre">FitParametricWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/FitParametric.html#FitParametricWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.FitParametric.FitParametricWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow fits distributions to an existing dataset. For each
+type of quantity, and for each context, a large number of random
+variables are fit, and a number of statistical tests are carried
+out such that the best-fitting distribution may be selected/used.
+Regardless of whether a quantity is continuous or discrete, many
+continuous random variables are attempted to fit. If a quantity
+is discrete, however, an additional set of discrete random variables
+is attempted to fit. Especially the latter might be extraordinarily
+expensive.</p>
+<p>Therefore, you may only select a subset of random variables that
+you want to attempt to fit. However, if you intend to share your
+dataset and make it available to others, then you should include
+and attempt to fit all distributions.</p>
+<p>The following process, once begun, will save the result of fitting
+a single type of quantity (from within a single context) as a
+separate file. If the file already exists, no new fit is attempted.
+This is so that this process can be interrupted and resumed.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.FitParametric.FitParametricWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/FitParametric.html#FitParametricWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.FitParametric.FitParametricWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -185,7 +220,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.FitParametric.FitParametricWorkflow.fit_parametric">
 <span class="sig-name descname"><span class="pre">fit_parametric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/FitParametric.html#FitParametricWorkflow.fit_parametric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.FitParametric.FitParametricWorkflow.fit_parametric" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -196,6 +232,24 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.GenerateDensities.</span></span><span class="sig-name descname"><span class="pre">GenerateDensitiesWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/GenerateDensities.html#GenerateDensitiesWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow generates density-related functions that are used by the
+Web Application. While those can be large, generating them on-the-fly is
+usually not possible in acceptable time. Using pre-generated functions
+is a trade-off between space and user experience, where we sacrifice the
+former as it is cheaper.</p>
+<p>For each quantity and each context, we pre-generate functions for the
+probability density (PDF), the cumulative distribution (CDF) and its
+complement (CCDF), as well as the quantile (or percent point) function
+(PPF). So for one quantity and one context, we pre-generate one density
+that unites those four functions.</p>
+<p>There are 5 primary classes of densities: Parametric, Parametric_discrete,
+Empirical, Empirical_discrete, and KDE_approx. Please refer to the
+documentation for details about these. Generating parametric densities
+uses the computed fits from another workflow, is cheap, fast, and does
+not consume much space. KDE_approx makes excessive use of oversampling
+(by design), which can result in large files. The empirical densities’
+size corresponds to the size of the dataset you are using (although there
+is a high limit beyond which sampling will be applied).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/GenerateDensities.html#GenerateDensitiesWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -204,7 +258,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.pre_generate">
 <span class="sig-name descname"><span class="pre">pre_generate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/GenerateDensities.html#GenerateDensitiesWorkflow.pre_generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.GenerateDensities.GenerateDensitiesWorkflow.pre_generate" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -215,6 +270,12 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.KnownDatasets.</span></span><span class="sig-name descname"><span class="pre">KnownDatasetsWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/KnownDatasets.html#KnownDatasetsWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow access a curated online list of known datasets that were
+designed to work with Metrics As Scores. The list accessed is at:</p>
+<p><a class="reference external" href="https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json">https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json</a></p>
+<p>If you would like to have your own dataset added to this list, open an
+issue in the Github repository of Metrics As Scores (also, check out the
+contributing guidelines).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/KnownDatasets.html#KnownDatasetsWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -223,7 +284,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.show_datasets">
 <span class="sig-name descname"><span class="pre">show_datasets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/KnownDatasets.html#KnownDatasetsWorkflow.show_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.KnownDatasets.KnownDatasetsWorkflow.show_datasets" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -234,6 +296,8 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.LocalDatasets.</span></span><span class="sig-name descname"><span class="pre">LocalDatasetsWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalDatasets.html#LocalDatasetsWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow lists all locally available datasets. This includes downloaded
+and installed datasets, as well manually created datasets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalDatasets.html#LocalDatasetsWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -242,7 +306,8 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.show_datasets">
 <span class="sig-name descname"><span class="pre">show_datasets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalDatasets.html#LocalDatasetsWorkflow.show_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.show_datasets" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -253,14 +318,11 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.LocalWebserver.</span></span><span class="sig-name descname"><span class="pre">LocalWebserverWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalWebserver.html#LocalWebserverWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>This workflow allows you to locally run the interactive web application of
+Metrics As Scores, using one of the locally available datasets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalWebserver.html#LocalWebserverWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server">
-<span class="sig-name descname"><span class="pre">start_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalWebserver.html#LocalWebserverWorkflow.start_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -273,6 +335,12 @@ previous menu afterwards.</p>
 <span class="sig-name descname"><span class="pre">start_server_internally</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalWebserver.html#LocalWebserverWorkflow.start_server_internally"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_internally" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server">
+<span class="sig-name descname"><span class="pre">start_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalWebserver.html#LocalWebserverWorkflow.start_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server" title="Permalink to this definition"></a></dt>
+<dd><p>Main entry point for this workflow.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -282,6 +350,8 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.MainWorkflow.MainWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.MainWorkflow.</span></span><span class="sig-name descname"><span class="pre">MainWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/MainWorkflow.html#MainWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.MainWorkflow.MainWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
+<p>The main workflow of the CLI is the main menu of the textual user interface.
+It provides access to all other workflows.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.MainWorkflow.MainWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/MainWorkflow.html#MainWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.MainWorkflow.MainWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -295,7 +365,7 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.MainWorkflow.MainWorkflow.main_menu">
 <span class="sig-name descname"><span class="pre">main_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><span class="pre">Workflow</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/MainWorkflow.html#MainWorkflow.main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.MainWorkflow.MainWorkflow.main_menu" title="Permalink to this definition"></a></dt>
-<dd><p>Show the main menu of the CLI:</p>
+<dd><p>Show the main menu of the CLI.</p>
 </dd></dl>
 
 </dd></dl>
@@ -307,6 +377,8 @@ previous menu afterwards.</p>
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Workflow.Workflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.Workflow.</span></span><span class="sig-name descname"><span class="pre">Workflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Workflow.html#Workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Workflow.Workflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the base class for all workflows. It features a few common methods
+that we use in the derived workflows.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Workflow.Workflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Workflow.html#Workflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Workflow.Workflow.__init__" title="Permalink to this definition"></a></dt>
@@ -315,47 +387,161 @@ previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Workflow.Workflow.ask">
 <span class="sig-name descname"><span class="pre">ask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options:</span> <span class="pre">list[str],</span> <span class="pre">prompt:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'You</span> <span class="pre">now</span> <span class="pre">have</span> <span class="pre">the</span> <span class="pre">following</span> <span class="pre">options:',</span> <span class="pre">rtype:</span> <span class="pre">~metrics_as_scores.cli.Workflow.T</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Workflow.html#Workflow.ask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Workflow.Workflow.ask" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Common method to ask for a selection of options among a list of choices.
+Options are indexed starting from <cite>0</cite>. If the chosen return type is int,
+the index is returned; the option as a string, otherwise.</p>
+<dl class="simple">
+<dt>options: <code class="docutils literal notranslate"><span class="pre">list[str]</span></code></dt><dd><p>A list of options to choose (select) from.</p>
+</dd>
+<dt>prompt: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The prompt shown to the user.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">T</span></code>
+Returns either int (the index) or the option itself (of any type)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the chosen option or the chosen option itself.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Workflow.Workflow.askt">
 <span class="sig-name descname"><span class="pre">askt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'You</span> <span class="pre">now</span> <span class="pre">have</span> <span class="pre">the</span> <span class="pre">following</span> <span class="pre">options:'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Workflow.html#Workflow.askt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Workflow.Workflow.askt" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Wrapper around <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow.ask" title="metrics_as_scores.cli.Workflow.Workflow.ask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ask()</span></code></a> that can use any type associated with
+an option.</p>
+<dl class="simple">
+<dt>options: <code class="docutils literal notranslate"><span class="pre">list[tuple[str,</span> <span class="pre">T]]</span></code></dt><dd><p>The options, the text to show and the associated value for each</p>
+</dd>
+<dt>prompt: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The prompt shown to the user.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">T</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the selected option’s associated value.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.Workflow.Workflow.print_info">
 <span class="sig-name descname"><span class="pre">print_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_normal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_vital</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'</span> <span class="pre">-&gt;</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/Workflow.html#Workflow.print_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.Workflow.Workflow.print_info" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Used to print an info that consists of a normal text (without extra styles)
+and a vital text that has some extra styling applied to emphasize it.</p>
+<dl class="simple">
+<dt>text_normal: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The text that does not have extra styling</p>
+</dd>
+<dt>text_vital: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The text with extra styling for emphasis.</p>
+</dd>
+<dt>end: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The string to print at the end of the info.</p>
+</dd>
+<dt>arrow: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The string to print at the beginning of the info.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-metrics_as_scores.cli.helpers">
 <span id="metrics-as-scores-cli-helpers-module"></span><h2>metrics_as_scores.cli.helpers module<a class="headerlink" href="#module-metrics_as_scores.cli.helpers" title="Permalink to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.KNOWN_DATASETS_FILE">
+<span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">KNOWN_DATASETS_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json'</span></em><a class="headerlink" href="#metrics_as_scores.cli.helpers.KNOWN_DATASETS_FILE" title="Permalink to this definition"></a></dt>
+<dd><p>This is the URL to the curated list of available datasets to be used
+with Metrics As Scores.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.isint">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">isint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/helpers.html#isint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.helpers.isint" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Attempts to convert the string to an integer.</p>
+<dl class="simple">
+<dt>s: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The string to check.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>True</cite> if the string can be converted to an <cite>int</cite>; <cite>False</cite>, otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.isnumeric">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">isnumeric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/helpers.html#isnumeric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.helpers.isnumeric" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Attempts to convert a string to a float to check whether it is numeric.
+This is not the same as <code class="xref py py-meth docutils literal notranslate"><span class="pre">str::isnumeric()</span></code>, as this method
+essentially checks whether <code class="docutils literal notranslate"><span class="pre">s</span></code> contains something that looks like a
+number (int, float, scientific notation, etc).</p>
+<dl class="simple">
+<dt>s: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The string to check.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>True</cite> if the string is numeric; <cite>False</cite>, otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.get_local_datasets">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">get_local_datasets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.LocalDataset" title="metrics_as_scores.distribution.distribution.LocalDataset"><span class="pre">LocalDataset</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/helpers.html#get_local_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.helpers.get_local_datasets" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Opens the dataset directory and looks for locally available datasets.
+Locally available means datasets that were installed or created manually.
+A dataset is only considered to be locally available if it has a <cite>manifest.json</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Iterable[LocalDataset]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.get_known_datasets">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">get_known_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_local_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KnownDataset" title="metrics_as_scores.distribution.distribution.KnownDataset"><span class="pre">metrics_as_scores.distribution.distribution.KnownDataset</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/helpers.html#get_known_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.helpers.get_known_datasets" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Reads the file <a class="reference internal" href="#metrics_as_scores.cli.helpers.KNOWN_DATASETS_FILE" title="metrics_as_scores.cli.helpers.KNOWN_DATASETS_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">KNOWN_DATASETS_FILE</span></code></a> to obtain a list of known datasets.</p>
+<dl class="simple">
+<dt>use_local_file: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>If true, will attempt to read the known datasets from a local file, instead
+of the online file. This is only used during development.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">list[KnownDataset]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.helpers.format_file_size">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.helpers.</span></span><span class="sig-name descname"><span class="pre">format_file_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/helpers.html#format_file_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.helpers.format_file_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Formats bytes into a string with a suffix for bytes, kilobite, etc.
+The number of bytes in the prefix is less than 1000 and may be rounded
+to two decimals. For example: 780 B, 1.22 KB, 43 GB, etc. Does NOT use
+SI-2 suffixes as that would be non-sensical (e.g., what is 1.27 GiB?).</p>
+<dl class="simple">
+<dt>num_bytes: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>Unsigned integer with amount of bytes.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The size in bytes, formatted.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-metrics_as_scores.cli">

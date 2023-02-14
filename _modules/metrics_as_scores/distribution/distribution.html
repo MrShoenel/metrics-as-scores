@@ -95,16 +95,52 @@
 
 
 <div class="viewcode-block" id="DistTransform"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.DistTransform">[docs]</a><span class="k">class</span> <span class="nc">DistTransform</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an enumeration of transforms applicable to distributions of a quantity.</span>
+<span class="sd">    A transform first computes the desired ideal (transform) value from the given</span>
+<span class="sd">    density (e.g., the expectation) and then transforms the initial distribution of</span>
+<span class="sd">    values into a distribution of distances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">NONE</span> <span class="o">=</span> <span class="s1">&#39;&lt;none&gt;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Do not apply any transform.&quot;&quot;&quot;</span>
+
     <span class="n">EXPECTATION</span> <span class="o">=</span> <span class="s1">&#39;E[X] (expectation)&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the expectation of the random variable.</span>
+<span class="sd">    This is similar to :math:`\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx` for a</span>
+<span class="sd">    continuous random variable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">MEDIAN</span> <span class="o">=</span> <span class="s1">&#39;Median (50th percentile)&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the median (50th percentile) of the random variable. The median is defined</span>
+<span class="sd">    as the value that splits a probability distribution into a lower and higher half.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="n">MODE</span> <span class="o">=</span> <span class="s1">&#39;Mode (most likely value)&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The mode of a random variable is the most frequently occurring value, i.e., the</span>
+<span class="sd">    value with the highest probability (density).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">INFIMUM</span> <span class="o">=</span> <span class="s1">&#39;Infimum (min. observed value)&#39;</span>
-    <span class="n">SUPREMUM</span> <span class="o">=</span> <span class="s1">&#39;Supremum (max. observed value)&#39;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The infimum is the lowest observed value of some empirical random variable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SUPREMUM</span> <span class="o">=</span> <span class="s1">&#39;Supremum (max. observed value)&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The supremum is the highest observed value of some empirical random variable.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="JsonDataset"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.JsonDataset">[docs]</a><span class="k">class</span> <span class="nc">JsonDataset</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for the :py:class:`LocalDataset` and the</span>
+<span class="sd">    :py:class:`KnownDataset`. Each manifest should have a name, id, description,</span>
+<span class="sd">    and author.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
@@ -112,6 +148,10 @@
 
 
 <div class="viewcode-block" id="LocalDataset"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.LocalDataset">[docs]</a><span class="k">class</span> <span class="nc">LocalDataset</span><span class="p">(</span><span class="n">JsonDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This dataset extends the :py:class:`JsonDataset` and adds properties that</span>
+<span class="sd">    are filled out when locally creating a new dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">origin</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">colname_data</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">colname_type</span><span class="p">:</span> <span class="nb">str</span>
@@ -124,6 +164,10 @@
 
 
 <div class="viewcode-block" id="KnownDataset"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KnownDataset">[docs]</a><span class="k">class</span> <span class="nc">KnownDataset</span><span class="p">(</span><span class="n">JsonDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This dataset extends the :py:class:`JsonDataset` with properties that are</span>
+<span class="sd">    known about datasets that are available to Metrics As Scores online.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">info_url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">download</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>
@@ -132,7 +176,60 @@
 
 
 <div class="viewcode-block" id="Density"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density">[docs]</a><span class="k">class</span> <span class="nc">Density</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<div class="viewcode-block" id="Density.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">pdf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">cdf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">ppf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the abstract base class for parametric and empirical densities. A</span>
+<span class="sd">    :py:class:`Density` represents a concrete instance of some random variable</span>
+<span class="sd">    and its PDF, CDF, and PPF. It also stores information about this concrete</span>
+<span class="sd">    instance came to be (e.g., by some concrete transform).</span>
+
+<span class="sd">    This class provides a set of common getters and setters and also provides</span>
+<span class="sd">    some often needed conveniences, such as computing the practical domain.</span>
+<span class="sd">    As for the PDF, CDF, and PPF, all known sub-classes have a specific way of</span>
+<span class="sd">    obtaining these, and this class&#39; responsibility lies in vectorizing these</span>
+<span class="sd">    functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Density.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">pdf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">cdf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">ppf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
+        <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        range: ``tuple[float, float]``</span>
+<span class="sd">            The range of the data.</span>
+<span class="sd">        </span>
+<span class="sd">        pdf: ``Callable[[float], float]``</span>
+<span class="sd">            The probability density function.</span>
+<span class="sd">        </span>
+<span class="sd">        cdf: ``Callable[[float], float]``</span>
+<span class="sd">            The cumulative distribution function.</span>
+<span class="sd">        </span>
+<span class="sd">        ppf: ``Callable[[float], float]``</span>
+<span class="sd">            The percent point (quantile) function.</span>
+<span class="sd">        </span>
+<span class="sd">        ideal_value: ``float``</span>
+<span class="sd">            Some quantities have an ideal value. It can be provided here.</span>
+<span class="sd">        </span>
+<span class="sd">        dist_transform: ``DistTransform``</span>
+<span class="sd">            The data transform that was applied while obtaining this density.</span>
+<span class="sd">        </span>
+<span class="sd">        transform_value: ``float``</span>
+<span class="sd">            Optional transform value that was applied during transformation.</span>
+<span class="sd">        </span>
+<span class="sd">        qtype: ``str``</span>
+<span class="sd">            The type of quantity for this density.</span>
+<span class="sd">        </span>
+<span class="sd">        context: ``str``</span>
+<span class="sd">            The context of this quantity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">range</span> <span class="o">=</span> <span class="nb">range</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pdf</span> <span class="o">=</span> <span class="n">pdf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cdf</span> <span class="o">=</span> <span class="n">cdf</span>
@@ -157,43 +254,72 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">qtype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the quantity type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qtype</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the context.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ideal_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the ideal value (if any).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ideal_value</span>
-    
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_quality_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ideal_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dist_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DistTransform</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the data transformation.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist_transform</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">transform_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the used transformation value (if any).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_value</span>
     
     <span class="nd">@transform_value</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">transform_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setter for the used transformation value.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_transform_value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">return</span> <span class="bp">self</span>
 
 
-    <span class="k">def</span> <span class="nf">_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="Density._min_max"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density._min_max">[docs]</a>    <span class="k">def</span> <span class="nf">_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used to safely vectorize a CDF, such that it returns `0.0` for when</span>
+<span class="sd">        `x` lies before our range, and `1.0` if `x` lies beyond our range.</span>
+
+<span class="sd">        x: ``float``</span>
+<span class="sd">            The `x` to obtain the CDF&#39;s `y` for.</span>
+<span class="sd">        </span>
+<span class="sd">        :return:</span>
+<span class="sd">            A value in the range :math:`[0,1]`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">return</span> <span class="mf">0.0</span>
         <span class="k">elif</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">return</span> <span class="mf">1.0</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
     
 
 <div class="viewcode-block" id="Density.compute_practical_domain"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.compute_practical_domain">[docs]</a>    <span class="k">def</span> <span class="nf">compute_practical_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.995</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It is quite common that domains extend into distant regions to accommodate</span>
+<span class="sd">        even the farthest outliers. This is often counter-productive, especially in</span>
+<span class="sd">        the web application. There, we often want to show most of the distribution,</span>
+<span class="sd">        so we compute a practical range that cuts off the most extreme outliers.</span>
+<span class="sd">        This is useful to showing some default window.</span>
+
+<span class="sd">        cutoff: ``float``</span>
+<span class="sd">            The percentage of values to include. The CDF is optimized to find some `x`</span>
+<span class="sd">            for which it peaks at the cutoff. For the lower bound, we subtract from</span>
+<span class="sd">            CDF the cutoff.</span>
+<span class="sd">        </span>
+<span class="sd">        :rtype: tuple[float, float]</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">            The practical domain, cut off for both directions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">obj_lb</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">cutoff</span><span class="p">))</span>
         <span class="k">def</span> <span class="nf">obj_ub</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -207,12 +333,25 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">practical_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for the practical domain. This is a lazy getter that only</span>
+<span class="sd">        computes the practical domain if it was not done before.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_practical_domain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_practical_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_practical_domain</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_practical_domain</span>
     
 
 <div class="viewcode-block" id="Density.compute_practical_range_pdf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.compute_practical_range_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">compute_practical_range_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Similar to :py:meth:compute_practical_domain(), this method computes a practical</span>
+<span class="sd">        range for the PDF. This method determines the location of the PDF&#39;s highest mode.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">            Returns a tuple where the first element is always `0.0` and the second is</span>
+<span class="sd">            the `y` of the highest mode (i.e., returns the `y` of the mode, not `x`, its</span>
+<span class="sd">            location).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="k">return</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
@@ -222,27 +361,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">practical_range_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy getter for the practical range of the PDF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_practical_range_pdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_practical_range_pdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_practical_range_pdf</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_practical_range_pdf</span>
 
     
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<div class="viewcode-block" id="Density.__call__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allow objects of type :py:class:`Density` to be callable. Calls the vectorized</span>
+<span class="sd">        CDF under the hood.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    
-<div class="viewcode-block" id="Density.save_to_file"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.save_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">save_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="Density.load_from_file"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density.load_from_file">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Density&#39;</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
 
 
 <div class="viewcode-block" id="KDE_integrate"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate">[docs]</a><span class="k">class</span> <span class="nc">KDE_integrate</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this class is to use an empirical (typically Gaussian) PDF and to</span>
+<span class="sd">    also provide a smooth CDF that is obtained by integrating the PDF:</span>
+<span class="sd">    :math:`F_X(x)=\int_{-\infty}^{x} f_X(t) dt`.</span>
+<span class="sd">    While this kind of CDF is smooth and precise, evaluating it is obviously slow.</span>
+<span class="sd">    Therefore, :py:class:`KDE_approx` is used in practice.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="KDE_integrate.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kde</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -263,8 +408,29 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">m_lb</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">m_ub</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="n">pdf</span><span class="o">=</span><span class="n">pdf</span><span class="p">,</span> <span class="n">cdf</span><span class="o">=</span><span class="n">cdf</span><span class="p">,</span> <span class="n">ppf</span><span class="o">=</span><span class="n">ppf</span><span class="p">,</span> <span class="n">ideal_value</span><span class="o">=</span><span class="n">ideal_value</span><span class="p">,</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">,</span> <span class="n">transform_value</span><span class="o">=</span><span class="n">transform_value</span><span class="p">,</span> <span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
+
 <div class="viewcode-block" id="KDE_approx"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_approx">[docs]</a><span class="k">class</span> <span class="nc">KDE_approx</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This kind of density uses Kernel Density Estimation to obtain a PDF, and an empirical</span>
+<span class="sd">    CDF (ECDF) to provide a cumulative distribution function. The advantage is that both,</span>
+<span class="sd">    PDF and CDF, are fast.</span>
+<span class="sd">    The PPF is the inverted and interpolated CDF, so it is fast, too. The data used for the</span>
+<span class="sd">    PDF is limited to 10_000 samples using deterministic sampling without replacement. The</span>
+<span class="sd">    used for CDF is obtained by sampling a large number (typically 200_000) of data points</span>
+<span class="sd">    from the Gaussian KDE, in order to make it smooth.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="KDE_approx.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_approx.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">resample_samples</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span> <span class="n">compute_ranges</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For the other parameters, please refer to :py:meth:`Density.__init__()`.</span>
+
+<span class="sd">        resample_samples: ``int``</span>
+<span class="sd">            The amount of samples to take from the Gaussian KDE. These samples are then used</span>
+<span class="sd">            to estimate an as-smooth-as-possible CDF (and PPF thereof).</span>
+<span class="sd">        </span>
+<span class="sd">        compute_ranges: ``bool``</span>
+<span class="sd">            Whether or not to compute the practical domain of the data and the practical range</span>
+<span class="sd">            of the PDF. Both of these use optimization to find the results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># First, we&#39;ll fit an extra KDE for an approximate PDF.</span>
         <span class="c1"># It is used to also roughly estimate its mode.</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -293,15 +459,34 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut getter for the jittered, two-sample KS-test&#39;s p-value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_test</span><span class="o">.</span><span class="n">tests</span><span class="p">[</span><span class="s1">&#39;ks_2samp_jittered&#39;</span><span class="p">][</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut getter for the jittered, two-sample KS-test&#39;s test statistic (D-value).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_test</span><span class="o">.</span><span class="n">tests</span><span class="p">[</span><span class="s1">&#39;ks_2samp_jittered&#39;</span><span class="p">][</span><span class="s1">&#39;stat&#39;</span><span class="p">]</span></div>
 
 
+
 <div class="viewcode-block" id="Empirical"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical">[docs]</a><span class="k">class</span> <span class="nc">Empirical</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This kind of density does not apply any smoothing for CDF, but rather uses a</span>
+<span class="sd">    straightforward ECDF for the data as given. The PDF is determined using Gaussian</span>
+<span class="sd">    KDE.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Empirical.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">compute_ranges</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For the other parameters, please refer to :py:meth:`Density.__init__()`.</span>
+
+<span class="sd">        compute_ranges: ``bool``</span>
+<span class="sd">            Whether or not to compute the practical domain of the data and the practical range</span>
+<span class="sd">            of the PDF. Both of these use optimization to find the results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ecdf</span> <span class="o">=</span> <span class="n">SMEcdf</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ppf_interp</span> <span class="o">=</span> <span class="n">cdf_to_ppf</span><span class="p">(</span><span class="n">cdf</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ecdf</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">y_left</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">y_right</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 
@@ -314,7 +499,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppf_interp</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="Empirical_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical_discrete">[docs]</a><span class="k">class</span> <span class="nc">Empirical_discrete</span><span class="p">(</span><span class="n">Empirical</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inherits from :py:class:`Empirical` and is used when the underlying quantity is</span>
+<span class="sd">    discrete and not continuous. As PDF, this function uses a PMF that is determined</span>
+<span class="sd">    by the frequencies of each discrete datum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Empirical_discrete.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical_discrete.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_valid</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">data_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
@@ -343,6 +534,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns `True` if the given data is valid.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_valid</span>
     
     <span class="k">def</span> <span class="nf">_non_fit_cdf_ppf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
@@ -359,11 +551,45 @@
 
 <div class="viewcode-block" id="Empirical_discrete.unfitted"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical_discrete.unfitted">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Empirical_discrete&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used to return an explicit unfit instance of :py:class:`Empirical_discrete`.</span>
+<span class="sd">        This is used when, for example, continuous (real) data is given to the</span>
+<span class="sd">        constructor. We still need an instance of this density in the web application</span>
+<span class="sd">        to show an error (e.g., that there are no discrete empirical densities for</span>
+<span class="sd">        continuous data).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Empirical_discrete</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span></div></div>
 
 
+
 <div class="viewcode-block" id="Parametric"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric">[docs]</a><span class="k">class</span> <span class="nc">Parametric</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This density encapsulates a parameterized and previously fitted random variable.</span>
+<span class="sd">    Random variables in :py:mod:`scipy.stats` come with PDF/PMF, CDF, PPF, etc. so</span>
+<span class="sd">    we just use these and forward calls to them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Parametric.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">rv_generic</span><span class="p">,</span> <span class="n">dist_params</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">stat_tests</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">use_stat_test</span><span class="p">:</span> <span class="n">StatTest_Types</span><span class="o">=</span><span class="s1">&#39;ks_2samp_jittered&#39;</span><span class="p">,</span> <span class="n">compute_ranges</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ideal_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">transform_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For the other parameters, please refer to :py:meth:`Density.__init__()`.</span>
+
+<span class="sd">        dist: ``rv_generic``</span>
+<span class="sd">            An instance of the random variable to use.</span>
+<span class="sd">        </span>
+<span class="sd">        dist_params: ``tuple``</span>
+<span class="sd">            A tuple of parameters for the random variable. The order of the parameters</span>
+<span class="sd">            is important since it is not a dictionary.</span>
+<span class="sd">        </span>
+<span class="sd">        stat_tests: ``dict[str, float]``</span>
+<span class="sd">            A (flattened) dictionary of previously conducted statistical tests. This is</span>
+<span class="sd">            used later to choose some best-fitting parametric density by a specific test.</span>
+<span class="sd">        </span>
+<span class="sd">        use_stat_test: ``StatTest_Types``</span>
+<span class="sd">            The name of the chosen statistical test used to determine the goodnes of fit.</span>
+<span class="sd">        </span>
+<span class="sd">        compute_ranges: ``bool``</span>
+<span class="sd">            Whether or not to compute the practical domain of the data and the practical range</span>
+<span class="sd">            of the PDF. Both of these use optimization to find the results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">rv_generic</span><span class="p">,</span> <span class="n">rv_continuous</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span> <span class="o">=</span> <span class="n">stat_tests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_use_stat_test</span> <span class="o">=</span> <span class="n">use_stat_test</span>
@@ -377,81 +603,131 @@
     
 <div class="viewcode-block" id="Parametric.unfitted"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.unfitted">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Parametric&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used to return an explicit unfit instance of :py:class:`Parametric`. This is</span>
+<span class="sd">        used in case when not a single maximum likelihood fit was successful for a</span>
+<span class="sd">        number of random variables. We still need an instance of this density in the</span>
+<span class="sd">        web application to show an error (e.g., that it was not possible to fit any</span>
+<span class="sd">        random variable to the selected quantity).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">scipy.stats._continuous_distns</span> <span class="kn">import</span> <span class="n">norm_gen</span>
         <span class="k">return</span> <span class="n">Parametric</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">norm_gen</span><span class="p">(),</span> <span class="n">dist_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">stat_tests</span><span class="o">=</span><span class="p">{},</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">use_stat_test</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatTest_Types</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter for the selected statistical test.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_stat_test</span>
     
     <span class="nd">@use_stat_test</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">use_stat_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">st</span><span class="p">:</span> <span class="n">StatTest_Types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setter for the type of statistical test to use.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_use_stat_test</span> <span class="o">=</span> <span class="n">st</span>
         <span class="k">return</span> <span class="bp">self</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the p-value of the selected statistical test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot return p-value for non-fitted random variable.&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="si">}</span><span class="s1">_pval&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the test statistic of the selected statistical test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot return statistical test statistic for non-fitted random variable.&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="si">}</span><span class="s1">_stat&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns `True` if this instance is not an explicitly unfit instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">practical_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overridden to return a practical domain of :math:`[0,0]` in case this instance is unfit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">practical_domain</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">practical_range_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overridden to return a practical PDF range of :math:`[0,0]` in case this instance is unfit.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">practical_range_pdf</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dist_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the this density&#39;s random variable&#39;s class&#39; name.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     
 <div class="viewcode-block" id="Parametric.pdf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.pdf">[docs]</a>    <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to call the encapsulated distribution&#39;s PDF. If this density is unfit,</span>
+<span class="sd">        always returns an array of zeros of same shape as the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span></div>
     
 <div class="viewcode-block" id="Parametric.cdf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.cdf">[docs]</a>    <span class="k">def</span> <span class="nf">cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to call the encapsulated distribution&#39;s CDF. If this density is unfit,</span>
+<span class="sd">        always returns an array of zeros of same shape as the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span></div>
     
 <div class="viewcode-block" id="Parametric.ppf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.ppf">[docs]</a>    <span class="k">def</span> <span class="nf">ppf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to call the encapsulated distribution&#39;s PPF. If this density is unfit,</span>
+<span class="sd">        always returns an array of zeros of same shape as the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span></div></div>
 
 
+
 <div class="viewcode-block" id="Parametric_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric_discrete">[docs]</a><span class="k">class</span> <span class="nc">Parametric_discrete</span><span class="p">(</span><span class="n">Parametric</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This type of density inherits from :py:class:`Parametric` and is its counterpart</span>
+<span class="sd">    for discrete (integral) data. It adds an explicit function for the probability mass</span>
+<span class="sd">    and makes the inherited PDF return the PMF&#39;s result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="Parametric_discrete.pmf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric_discrete.pmf">[docs]</a>    <span class="k">def</span> <span class="nf">pmf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implemented to call the encapsulated distribution&#39;s PMF. If this density is unfit,</span>
+<span class="sd">        always returns an array of zeros of same shape as the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span></div>
         
 <div class="viewcode-block" id="Parametric_discrete.pdf"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric_discrete.pdf">[docs]</a>    <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to return the result of the :py:meth:`pmf()`. Note that in any case,</span>
+<span class="sd">        a density&#39;s function :py:meth:`pdf()` is called (i.e., the callers never call</span>
+<span class="sd">        the PMF). Therefore, it is easier catch these calls and redirect them to the PMF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="Parametric_discrete.unfitted"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric_discrete.unfitted">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Parametric_discrete&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used to return an explicit unfit instance of :py:class:`Parametric`. This is</span>
+<span class="sd">        used in case when not a single maximum likelihood fit was successful for a</span>
+<span class="sd">        number of random variables. We still need an instance of this density in the</span>
+<span class="sd">        web application to show an error (e.g., that it was not possible to fit any</span>
+<span class="sd">        random variable to the selected quantity).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">scipy.stats._continuous_distns</span> <span class="kn">import</span> <span class="n">norm_gen</span>
         <span class="k">return</span> <span class="n">Parametric_discrete</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">norm_gen</span><span class="p">(),</span> <span class="n">dist_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">stat_tests</span><span class="o">=</span><span class="p">{},</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span></div></div>
 
@@ -468,32 +744,57 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quantity_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the manifest&#39;s quantity types.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;qtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <div class="viewcode-block" id="Dataset.contexts"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.contexts">[docs]</a>    <span class="k">def</span> <span class="nf">contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_all_contexts</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the manifest&#39;s defined contexts as a generator. Sometimes we need to ignore</span>
+<span class="sd">        the context and aggregate a quantity type across all defined contexts. Then, a virtual</span>
+<span class="sd">        context called `__ALL__` is used.</span>
+
+<span class="sd">        include_all_contexts: ``bool``</span>
+<span class="sd">            Whether to also yield the virtual `__ALL__`-context.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;contexts&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">include_all_contexts</span><span class="p">:</span>
             <span class="k">yield</span> <span class="s1">&#39;__ALL__&#39;</span></div>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ideal_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the manifest&#39;s ideal values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;ideal_values&#39;</span><span class="p">]</span>
     
 <div class="viewcode-block" id="Dataset.is_qtype_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.is_qtype_discrete">[docs]</a>    <span class="k">def</span> <span class="nf">is_qtype_discrete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns whether a given quantity type is discrete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;qtypes&#39;</span><span class="p">][</span><span class="n">qtype</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;discrete&#39;</span></div>
     
 <div class="viewcode-block" id="Dataset.qytpe_desc"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.qytpe_desc">[docs]</a>    <span class="k">def</span> <span class="nf">qytpe_desc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the description associated with a quantity type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;desc_qtypes&#39;</span><span class="p">][</span><span class="n">qtype</span><span class="p">]</span></div>
     
 <div class="viewcode-block" id="Dataset.context_desc"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.context_desc">[docs]</a>    <span class="k">def</span> <span class="nf">context_desc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the description associated with a context (if any).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;desc_contexts&#39;</span><span class="p">][</span><span class="n">context</span><span class="p">]</span></div>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quantity_types_continuous</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of quantity types that are continuous (real-valued).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">qtype</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_qtype_discrete</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quantity_types_discrete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of quantity types that are discrete (integer-valued).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">qtype</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_qtype_discrete</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Dataset.data"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;__ALL__&#39;</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unique_vals</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sub_sample</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
@@ -501,8 +802,20 @@
 <span class="sd">        This method is used to select a subset of the data, that is specific to at least</span>
 <span class="sd">        a type of quantity, and optionally to a context, too.</span>
 
+<span class="sd">        qtype: ``str``</span>
+<span class="sd">            The name of the quantity type to get data for.</span>
+
 <span class="sd">        context: ``Union[str, None, Literal[&#39;__ALL__&#39;]]``</span>
-<span class="sd">            You may specify a context</span>
+<span class="sd">            You may specify a context to further filter the data by. Data is always specific</span>
+<span class="sd">            to a quantity type, and sometimes to a context. If not context-based filtering is</span>
+<span class="sd">            desired, pass ``None`` or ``__ALL__``.</span>
+<span class="sd">        </span>
+<span class="sd">        unique_vals: ``bool``</span>
+<span class="sd">            If `True`, some small jitter will be added to the data in order to make it unique.</span>
+<span class="sd">        </span>
+<span class="sd">        sub_sample: ``int``</span>
+<span class="sd">            Optional unsigned integer with number of samples to take in case the dataset is</span>
+<span class="sd">            very large. It is only applied if the number is smaller than the data&#39;s size.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;colname_type&#39;</span><span class="p">]]</span> <span class="o">==</span> <span class="n">qtype</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">context</span> <span class="o">!=</span> <span class="s1">&#39;__ALL__&#39;</span><span class="p">:</span>
@@ -704,6 +1017,25 @@
     
 
 <div class="viewcode-block" id="Dataset.analyze_distr"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.analyze_distr">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_distr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtypes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">use_ks_2samp</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ks2_max_samples</span><span class="o">=</span><span class="mi">40_000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the two-sample Kolmogorov--Smirnov test or Welch&#39;s t-test for two or</span>
+<span class="sd">        more types of quantity. Performs the test for all unique pairs of quantity types.</span>
+
+<span class="sd">        qtypes: ``Iterable[str]``</span>
+<span class="sd">            An iterable of quantity types to test in a pair-wise manner.</span>
+<span class="sd">        </span>
+<span class="sd">        use_ks_2samp: ``bool``</span>
+<span class="sd">            If `True`, use the two-sample Kolmogorov--Smirnov; Welch&#39;s t-test, otherwise.</span>
+<span class="sd">        </span>
+<span class="sd">        ks2_max_samples: ``int``</span>
+<span class="sd">            Unsigned integer used to limit the number of samples used in KS2-test. For larger</span>
+<span class="sd">            numbers than the default, it may not be possible to compute it exactly.</span>
+
+<span class="sd">        :rtype: ``pd.DataFrame``</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">            A data frame with columns `qtype`, `stat`, `pval`, `group1`, and `group2`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">qtypes</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Requires one or metrics.&#39;</span><span class="p">)</span>
         

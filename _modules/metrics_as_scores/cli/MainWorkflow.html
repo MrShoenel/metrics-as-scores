@@ -83,6 +83,10 @@
 <span class="kn">from</span> <span class="nn">metrics_as_scores.__version__</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">mas_version</span>
 
 <div class="viewcode-block" id="MainWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.MainWorkflow.MainWorkflow">[docs]</a><span class="k">class</span> <span class="nc">MainWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main workflow of the CLI is the main menu of the textual user interface.</span>
+<span class="sd">    It provides access to all other workflows.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="MainWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.MainWorkflow.MainWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="kc">False</span></div>
@@ -95,7 +99,7 @@
     
 <div class="viewcode-block" id="MainWorkflow.main_menu"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.MainWorkflow.MainWorkflow.main_menu">[docs]</a>    <span class="k">def</span> <span class="nf">main_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Workflow</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Show the main menu of the CLI:</span>
+<span class="sd">        Show the main menu of the CLI.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># The main options/Functions for M-a-S:</span>

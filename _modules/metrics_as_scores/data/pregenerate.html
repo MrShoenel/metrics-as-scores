@@ -72,14 +72,14 @@
   <h1>Source code for metrics_as_scores.data.pregenerate</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span>
 <span class="kn">from</span> <span class="nn">pickle</span> <span class="kn">import</span> <span class="n">dump</span><span class="p">,</span> <span class="n">load</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.tools.funcs</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.data.pregenerate_fit</span> <span class="kn">import</span> <span class="n">Continuous_RVs_dict</span><span class="p">,</span> <span class="n">Discrete_RVs_dict</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.data.pregenerate_fit</span> <span class="kn">import</span> <span class="n">Continuous_RVs_dict</span><span class="p">,</span> <span class="n">Discrete_RVs_dict</span><span class="p">,</span> <span class="n">FitResult</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Density</span><span class="p">,</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Empirical</span><span class="p">,</span> <span class="n">Empirical_discrete</span><span class="p">,</span> <span class="n">KDE_approx</span><span class="p">,</span> <span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.fitting</span> <span class="kn">import</span> <span class="n">StatisticalTest</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
@@ -87,7 +87,42 @@
 
 
 
-<div class="viewcode-block" id="generate_densities"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_densities">[docs]</a><span class="k">def</span> <span class="nf">generate_densities</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">clazz</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Density</span><span class="p">]</span><span class="o">=</span><span class="n">Empirical</span><span class="p">,</span> <span class="n">unique_vals</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample_samples</span><span class="o">=</span><span class="mi">250_000</span><span class="p">,</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Density</span><span class="p">]:</span>
+<div class="viewcode-block" id="generate_densities"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_densities">[docs]</a><span class="k">def</span> <span class="nf">generate_densities</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">clazz</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Density</span><span class="p">]</span><span class="o">=</span><span class="n">Empirical</span><span class="p">,</span>
+    <span class="n">unique_vals</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">resample_samples</span><span class="o">=</span><span class="mi">250_000</span><span class="p">,</span>
+    <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Density</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a set of :py:class:`Density` objects for a certain :py:class:`DistTransform`.</span>
+<span class="sd">    For each combination, we will later save one file that is then to be used in the web</span>
+<span class="sd">    application, as generating these on-the-fly would take too long.</span>
+
+<span class="sd">    dataset: ``Dataset``</span>
+<span class="sd">        Required for obtaining quantity types, contexts, and filtered data.</span>
+<span class="sd">    </span>
+<span class="sd">    clazz: ``type[Density]``</span>
+<span class="sd">        A type of empirical density to generate densities for.</span>
+<span class="sd">    </span>
+<span class="sd">    unique_vals: ``bool``</span>
+<span class="sd">        Used to conditionally add some jitter to data to all data points unique. This is</span>
+<span class="sd">        automatically set to `True` if the class is :py:class:`Empirical`, because this</span>
+<span class="sd">        class is for continuous RVs. If the data is not continuous (real), then setting</span>
+<span class="sd">        this to `True` will make it so.</span>
+<span class="sd">    </span>
+<span class="sd">    resample_samples: ``int``</span>
+<span class="sd">        Unsigned integer, passed forward to the type of dict[str, Density].</span>
+<span class="sd">    </span>
+<span class="sd">    dist_transform: ``DistTransform``</span>
+<span class="sd">        The chosen transformation for the data.</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: ``dict[str, Density]``</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        A dictionary where the key is made of the context and quantity type, and</span>
+<span class="sd">        the value is the generated :py:class:`Empirical` density.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">contexts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">contexts</span><span class="p">(</span><span class="n">include_all_contexts</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
     <span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;context&#39;</span><span class="p">:</span> <span class="n">contexts</span><span class="p">,</span> <span class="s1">&#39;qtype&#39;</span><span class="p">:</span> <span class="n">dataset</span><span class="o">.</span><span class="n">quantity_types</span> <span class="p">}</span>
     <span class="n">expanded_grid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">param_grid</span><span class="o">=</span><span class="n">param_grid</span><span class="p">))</span>
@@ -110,7 +145,38 @@
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cdfs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="fits_to_MAS_densities"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.fits_to_MAS_densities">[docs]</a><span class="k">def</span> <span class="nf">fits_to_MAS_densities</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">distns_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">use_continuous</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">]]:</span>
+<div class="viewcode-block" id="fits_to_MAS_densities"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.fits_to_MAS_densities">[docs]</a><span class="k">def</span> <span class="nf">fits_to_MAS_densities</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">distns_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">FitResult</span><span class="p">],</span>
+    <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span>
+    <span class="n">use_continuous</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts previously produced parametric fits to :py:class:`Density` objects that can</span>
+<span class="sd">    be loaded and used in the web application.</span>
+<span class="sd">    Similar to :py:meth:`generate_densities()`, this method also returns a dictionary</span>
+<span class="sd">    with generated parametric densities.</span>
+
+<span class="sd">    dataset: ``Dataset``</span>
+<span class="sd">        Required for obtaining quantity types, contexts, and filtered data.</span>
+<span class="sd">    </span>
+<span class="sd">    distns_dict: ``dict[int, FitResult]``</span>
+<span class="sd">        Dictionary with all fit results for a data transform. The `int`-key is just the</span>
+<span class="sd">        previously used grid index and not relevant here.</span>
+<span class="sd">    </span>
+<span class="sd">    dist_transform: ``DistTransform``</span>
+<span class="sd">        The chosen transformation for the data.</span>
+<span class="sd">    </span>
+<span class="sd">    use_continuous: ``bool``</span>
+<span class="sd">        Used to select and generate densities based on either continuous (`True`) RVs or</span>
+<span class="sd">        discrete RVs.</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: ``dict[str, Union[Parametric, Parametric_discrete]]``</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        A dictionary where the key is made of the context and quantity type, and</span>
+<span class="sd">        the value is the generated :py:class:`Union[Parametric, Parametric_discrete]` density.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">distns_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
     <span class="n">data_df</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">df</span>
 
@@ -156,7 +222,32 @@
 
 
 
-<div class="viewcode-block" id="generate_empirical"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">clazz</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Empirical</span><span class="p">,</span> <span class="n">KDE_approx</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">):</span>
+<div class="viewcode-block" id="generate_empirical"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">clazz</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Empirical</span><span class="p">,</span> <span class="n">KDE_approx</span><span class="p">],</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a set of empirical (continuous) densities for a given density type</span>
+<span class="sd">    (Empirical or KDE_Approx) and data transform.</span>
+
+<span class="sd">    dataset: ``Dataset``</span>
+<span class="sd">        Required for obtaining quantity types, contexts, and filtered data.</span>
+<span class="sd">    </span>
+<span class="sd">    densities_dir: ``Path``</span>
+<span class="sd">        The directory to store the generated densities. The resulting file is a key</span>
+<span class="sd">        of the used density type and data transform.</span>
+<span class="sd">    </span>
+<span class="sd">    clazz: ``Union[Empirical, KDE_approx]``</span>
+<span class="sd">        The type of density you wish to create.</span>
+<span class="sd">    </span>
+<span class="sd">    transform: ``DistTransform``</span>
+<span class="sd">        The chosen transformation for the data.</span>
+<span class="sd">    </span>
+<span class="sd">    :return:</span>
+<span class="sd">        This method does not return anything but only writes the result to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">temp</span> <span class="o">=</span> <span class="n">generate_densities</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="n">clazz</span><span class="p">,</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">unique_vals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resample_samples</span><span class="o">=</span><span class="mi">75_000</span><span class="p">)</span>
     <span class="n">dens_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">densities_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./densities_</span><span class="si">{</span><span class="n">clazz</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">))</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">dens_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
@@ -165,7 +256,33 @@
 
 
 
-<div class="viewcode-block" id="generate_parametric"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_parametric">[docs]</a><span class="k">def</span> <span class="nf">generate_parametric</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">fits_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">clazz</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">):</span>
+<div class="viewcode-block" id="generate_parametric"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_parametric">[docs]</a><span class="k">def</span> <span class="nf">generate_parametric</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">fits_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">clazz</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">],</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a set of parametric densities for a given density type</span>
+<span class="sd">    (Parametric or Parametric_discrete) and data transform.</span>
+
+<span class="sd">    dataset: ``Dataset``</span>
+<span class="sd">        Required for obtaining quantity types, contexts, and filtered data.</span>
+<span class="sd">    </span>
+<span class="sd">    densities_dir: ``Path``</span>
+<span class="sd">        The directory to store the generated densities. The resulting file is a key</span>
+<span class="sd">        of the used density type and data transform.</span>
+<span class="sd">    </span>
+<span class="sd">    clazz: ``Union[Parametric, Parametric_discrete]``</span>
+<span class="sd">        The type of density you wish to create.</span>
+<span class="sd">    </span>
+<span class="sd">    transform: ``DistTransform``</span>
+<span class="sd">        The chosen transformation for the data.</span>
+<span class="sd">    </span>
+<span class="sd">    :return:</span>
+<span class="sd">        This method does not return anything but only writes the result to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fits_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fits_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./pregen_distns_</span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">fits_file</span><span class="p">):</span>
         <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot generate parametric distribution for </span><span class="si">{</span><span class="n">clazz</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> and transformation </span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">, because the file </span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s1"> does not exist. Did you forget to create the fits using the script pregenerate_distns.py?&#39;</span><span class="p">)</span>
@@ -183,7 +300,28 @@
 
 
 
-<div class="viewcode-block" id="generate_empirical_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical_discrete">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical_discrete</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">):</span>
+<div class="viewcode-block" id="generate_empirical_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical_discrete">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical_discrete</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">DistTransform</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates discrete empirical densities for a given data transform. Only uses</span>
+<span class="sd">    the type :py:class:``Empirical_discrete`` for this.</span>
+
+<span class="sd">    dataset: ``Dataset``</span>
+<span class="sd">        Required for obtaining quantity types, contexts, and filtered data.</span>
+<span class="sd">    </span>
+<span class="sd">    densities_dir: ``Path``</span>
+<span class="sd">        The directory to store the generated densities. The resulting file is a key</span>
+<span class="sd">        of the used density type and data transform.</span>
+<span class="sd">    </span>
+<span class="sd">    transform: ``DistTransform``</span>
+<span class="sd">        The chosen transformation for the data.</span>
+<span class="sd">    </span>
+<span class="sd">    :return:</span>
+<span class="sd">        This method does not return anything but only writes the result to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">the_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Empirical_discrete</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">contexts</span><span class="p">(</span><span class="n">include_all_contexts</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -202,11 +340,6 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">dens_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
         <span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">the_dict</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Finished generating empirical Densities for </span><span class="si">{</span><span class="n">Empirical_discrete</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> with transform </span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
-
-
-
-
-
 </pre></div>
 
            </div>

@@ -78,23 +78,74 @@
 <span class="kn">from</span> <span class="nn">scipy.stats._distn_infrastructure</span> <span class="kn">import</span> <span class="n">rv_continuous</span><span class="p">,</span> <span class="n">rv_discrete</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.data.pregenerate_fit</span> <span class="kn">import</span> <span class="n">fit</span><span class="p">,</span> <span class="n">Fitter</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.data.pregenerate_fit</span> <span class="kn">import</span> <span class="n">fit</span><span class="p">,</span> <span class="n">Fitter</span><span class="p">,</span> <span class="n">FitResult</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
 
 
 
 
-<div class="viewcode-block" id="generate_parametric_fits"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_distns.generate_parametric_fits">[docs]</a><span class="k">def</span> <span class="nf">generate_parametric_fits</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">num_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fitter_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Fitter</span><span class="p">],</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">selected_rvs_c</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">rv_continuous</span><span class="p">]],</span> <span class="n">selected_rvs_d</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">rv_discrete</span><span class="p">]],</span> <span class="n">data_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]],</span> <span class="n">transform_values_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">data_discrete_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]],</span> <span class="n">transform_values_discrete_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-    <span class="c1"># The thinking is this: To each data series we can always fit a continuous distribution,</span>
-    <span class="c1"># whether it&#39;s discrete or continuous data. The same is not true the other way round, i.e.,</span>
-    <span class="c1"># we should not fit a discrete distribution if the data is known to be continuous.</span>
-    <span class="c1"># Therefore, we do the following:</span>
-    <span class="c1">#</span>
-    <span class="c1"># - Regardless of the data, always attempt to fit a continuous RV</span>
-    <span class="c1"># - For all discrete data, also attempt to fit a discrete RV</span>
-    <span class="c1">#</span>
-    <span class="c1"># That means that for discrete data, we will have two kinds of fitted RVs.</span>
-    <span class="c1"># Also, when fitting a continuous RV to discrete data, we will add jitter to the data.</span>
+<div class="viewcode-block" id="generate_parametric_fits"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate_distns.generate_parametric_fits">[docs]</a><span class="k">def</span> <span class="nf">generate_parametric_fits</span><span class="p">(</span>
+    <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">num_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">fitter_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Fitter</span><span class="p">],</span>
+    <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="p">,</span>
+    <span class="n">selected_rvs_c</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">rv_continuous</span><span class="p">]],</span>
+    <span class="n">selected_rvs_d</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">rv_discrete</span><span class="p">]],</span>
+    <span class="n">data_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]],</span>
+    <span class="n">transform_values_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">data_discrete_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]],</span>
+    <span class="n">transform_values_discrete_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FitResult</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The thinking is this: To each data series we can always fit a continuous distribution,</span>
+<span class="sd">    whether it&#39;s discrete or continuous data. The same is not true the other way round, i.e.,</span>
+<span class="sd">    we must not fit a discrete distribution if the data is known to be continuous.</span>
+<span class="sd">    Therefore, we do the following:</span>
+<span class="sd">    </span>
+<span class="sd">    - Regardless of the data, always attempt to fit a continuous RV</span>
+<span class="sd">    - For all discrete data, also attempt to fit a discrete RV</span>
+<span class="sd">    </span>
+<span class="sd">    That means that for discrete data, we will have two kinds of fitted RVs.</span>
+<span class="sd">    Also, when fitting a continuous RV to discrete data, we will add jitter to the data.</span>
+
+
+<span class="sd">    ds: ``Dataset``</span>
+<span class="sd">        The data, needed for obtaining quantity types and contexts. Also passed forward to</span>
+<span class="sd">        :py:meth:`fit()`.</span>
+<span class="sd">    </span>
+<span class="sd">    num_jobs: ``int``</span>
+<span class="sd">        Degree of parallelization used.</span>
+<span class="sd">    </span>
+<span class="sd">    fitter_type: ``type[Fitter]``</span>
+<span class="sd">        The class for the fitter to use, either :py:class:`Fitter` or :py:class:`FitterPymoo`.</span>
+<span class="sd">    </span>
+<span class="sd">    dist_transform: ``DistTransform``</span>
+<span class="sd">        The transform for which to generate parametric fits for. Later, we will save a single</span>
+<span class="sd">        file per transform, containing all related fits.</span>
+<span class="sd">    </span>
+<span class="sd">    selected_rvs_c: ``list[type[rv_continuous]]``</span>
+<span class="sd">        Continuous RVs to attempt to fit.</span>
+<span class="sd">    </span>
+<span class="sd">    selected_rvs_d: ``list[type[rv_discrete]]``</span>
+<span class="sd">        Discrete RVs to attempt to fit.</span>
+<span class="sd">    </span>
+<span class="sd">    data_dict: ``dict[str, NDArray[Shape[&quot;*&quot;], Float]]``</span>
+<span class="sd">        A dictionary where they key consists of the context and the quantity type.</span>
+<span class="sd">        For each entry, it contains a 1-D array of data used for fitting.</span>
+<span class="sd">    </span>
+<span class="sd">    transform_values_dict: ``dict[str, float]``</span>
+<span class="sd">        Similar to ``data_dict``, this dictionary contains the transformation value that</span>
+<span class="sd">        was used to transform the data in the 1-D array.</span>
+<span class="sd">    </span>
+<span class="sd">    data_discrete_dict: ``dict[str, NDArray[Shape[&quot;*&quot;], Float]]``</span>
+<span class="sd">        Like ``data_dict``, but for discrete RVs fitted to discrete data.</span>
+<span class="sd">        </span>
+<span class="sd">    transform_values_discrete_dict: ``dict[str, float]``</span>
+<span class="sd">        Like ``transform_values_dict``, but for the discrete datas.</span>
+<span class="sd">    </span>
+<span class="sd">    :return:</span>
+<span class="sd">        A list of :py:class:``FitResult`` objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;context&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">contexts</span><span class="p">(</span><span class="n">include_all_contexts</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
