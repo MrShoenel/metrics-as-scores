@@ -8,11 +8,21 @@ from metrics_as_scores.cli.MainWorkflow import MainWorkflow
 
 
 def cli():
+    """
+    Main routine for the command line interface. It runs the main menu in
+    a never-terminating loop (except for when the user presses Ctr+c).
+    """
     wf = MainWorkflow()
     wf.print_welcome()
 
     while not wf.stop:
-        wf.main_menu()
+        try:
+            wf.main_menu()
+        except KeyboardInterrupt:
+            break
+        except Exception as ex:
+            wf.q.print(text=f'An error ({type(ex).__name__}) has occurred: {str(ex)}', style=wf.style_err)
+            wf.q.print(text='\nRestarting main menu.\n', style=wf.style_err)
 
 
 if __name__ == '__main__':
