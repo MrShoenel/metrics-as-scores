@@ -94,10 +94,6 @@ class Density(ABC):
     @property
     def ideal_value(self) -> Union[float, None]:
         return self._ideal_value
-    
-    @property
-    def is_quality_score(self) -> bool:
-        return self.ideal_value is not None
 
     @property
     def dist_transform(self) -> DistTransform:
@@ -159,15 +155,6 @@ class Density(ABC):
         if np.isscalar(x) or isinstance(x, list):
             x = np.asarray(x)
         return self.cdf(x)
-    
-    def save_to_file(self, file: str) -> None:
-        with open(file=file, mode='wb') as f:
-            pickle.dump(obj=self, file=f)
-    
-    @staticmethod
-    def load_from_file(file: str) -> 'Density':
-        with open(file=file, mode='rb') as f:
-            return pickle.load(file=f)
 
 
 class KDE_integrate(Density):
