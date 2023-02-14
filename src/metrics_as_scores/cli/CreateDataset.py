@@ -15,6 +15,9 @@ import pandas as pd
 
 
 default_ds = MAS_DIR.joinpath('./datasets/_default')
+"""
+:meta private:
+"""
 
 
 class CreateDatasetWorkflow(Workflow):
@@ -61,7 +64,6 @@ previous menu afterwards.
             ready = not self.q.confirm(message='Continue setting ideal values?', default=True).ask()
         
         return type_dict
-    
 
     def _read_csv(self, path_like: str) -> pd.DataFrame:
         sep = self.q.text(message='What is the separator used?', default=',', validate=lambda s: s in [',', ';', ' ', '\t']).ask()
@@ -74,15 +76,12 @@ previous menu afterwards.
             sheet = int(sheet)
         header = self.q.text('Zero-based index of header column?', default='0', validate=isint).ask()
         return pd.read_excel(io=path_like, sheet_name=sheet, header=header)
-    
 
     def _is_feature_discrete(self, df: pd.DataFrame, col_data: str, col_type: str, use_type: str) -> bool:
         temp = df.loc[df[col_type] == use_type, :]
         vals = temp[col_data].to_numpy()
         # Check if all values are integer.
         return np.all(np.mod(vals, 1) == 0)
-
-    
 
     def _create_manifest(self) -> tuple[LocalDataset, pd.DataFrame]:
         jsd: LocalDataset = {}
@@ -178,7 +177,6 @@ is no best value for lines of code (size) of software.
         jsd['author'] = list(a.strip() for a in temp)
 
         return (jsd, df)
-    
 
     def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
         self.q.print('We will now perform some statistical tests and summarize the results.')
@@ -200,9 +198,7 @@ is no best value for lines of code (size) of software.
         file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
         tukeyhsd.to_csv(file_tukey, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_tukey)
-        
 
-    
 
     def create_own(self) -> None:
         """
