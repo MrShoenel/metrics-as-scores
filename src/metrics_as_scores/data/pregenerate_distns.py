@@ -75,16 +75,21 @@ def generate_parametric_fits(
         A list of :py:class:``FitResult`` objects.
     """
 
-    param_grid = {
-        'context': list(ds.contexts(include_all_contexts=True)),
-        'qtype': ds.quantity_types, # Fit continuous to all
-        'rv': list([rv.__name__ for rv in selected_rvs_c]), # continuous here, discrete below
-        'type': ['continuous'],
-        'dist_transform': [dist_transform] }
-    expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
+    print()
+
+    expanded_grid: pd.DataFrame = None
+    all_types = ds.quantity_types
+    if len(all_types) > 0 and len(selected_rvs_c) > 0:
+        param_grid = {
+            'context': list(ds.contexts(include_all_contexts=True)),
+            'qtype': all_types, # Fit continuous to all
+            'rv': list([rv.__name__ for rv in selected_rvs_c]), # continuous here, discrete below
+            'type': ['continuous'],
+            'dist_transform': [dist_transform] }
+        expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
 
     discrete_types = ds.quantity_types_discrete
-    if len(discrete_types) > 0:
+    if len(discrete_types) > 0 and len(selected_rvs_d) > 0:
         # Only fit discrete if we have it
         param_grid = {
             'context': list(ds.contexts(include_all_contexts=True)),
@@ -92,8 +97,11 @@ def generate_parametric_fits(
             'rv': list([rv.__name__ for rv in selected_rvs_d]),
             'type': ['discrete'],
             'dist_transform': [dist_transform] }
-        expanded_grid = pd.concat([
-            expanded_grid, pd.DataFrame(ParameterGrid(param_grid=param_grid))])
+        temp = pd.DataFrame(ParameterGrid(param_grid=param_grid))
+        expanded_grid = temp if expanded_grid is None else pd.concat([expanded_grid, temp])
+    
+    if expanded_grid is None:
+        raise Exception('Not enough quantity types and random variables were selected for fitting. Aborting.')
 
     def get_datas(grid_idx) -> tuple[NDArray[Shape["*"], Float], NDArray[Shape["*"], Float], float]:
         row = expanded_grid.iloc[grid_idx,]
