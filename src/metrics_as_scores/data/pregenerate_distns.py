@@ -75,8 +75,6 @@ def generate_parametric_fits(
         A list of :py:class:``FitResult`` objects.
     """
 
-    print()
-
     expanded_grid: pd.DataFrame = None
     all_types = ds.quantity_types
     if len(all_types) > 0 and len(selected_rvs_c) > 0:
