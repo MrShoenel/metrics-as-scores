@@ -209,7 +209,7 @@ class Fitter:
         """Shortcut getter to return whether the used random variable is continuous."""
         return issubclass(self.dist, rv_continuous)
 
-    def fit(self, data: NDArray[Shape["*"], Float]) -> dict[str, Union[float, int]]:
+    def fit(self, data: NDArray[Shape["*"], Float], **kwargs) -> dict[str, Union[float, int]]:
         """
         Convenience method to fit the random variable. If it is continuous, calls
         :py:meth:`rv_continuous.fit()`, which uses maximum likelihood estimation.
