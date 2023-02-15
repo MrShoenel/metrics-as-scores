@@ -231,7 +231,7 @@ class Fitter:
             bounds = list(Fitter.Practical_Ranges[dist.__name__].values())
             bounds.append([int(np.floor(np.min(data))), int(np.ceil(np.max(data)))]) # for 'loc'
             result: _fit.FitResult = _fit.fit(dist=dist(), data=data, bounds=bounds, optimizer=Fitter._optimizer_de)
-            params = result.params
+            params = result.params._asdict()
 
         return params
 
