@@ -159,7 +159,7 @@ def fit(
 
     try:
         fitter = fitter_type(dist=RV)
-        params = fitter.fit(data=data, minimize_seeds=[1_3_3_7, 0xdeadbeef], verbose=False)
+        params = fitter.fit(data=data, verbose=False)
         params_tuple = tuple(params.values())
 
         ret_dict.update(dict(params = params))
