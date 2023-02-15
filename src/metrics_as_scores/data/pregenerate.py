@@ -135,7 +135,13 @@ def fits_to_MAS_densities(
                     use_key = f'params_{pi.name}'
                     if pi.name.endswith('_') and not use_key in df_cols:
                         use_key = use_key.rstrip('_')
-                    params += (best[use_key],)
+                    try:
+                        params += (best[use_key],)
+                    except KeyError:
+                        # Happens when the candidate was not actually fit, e.g., when a discrete RV
+                        # was selected for continuous data.
+                        the_dict[key] = Use_class.unfitted(dist_transform=dist_transform)
+                        continue
                 
                 data = data_df[(data_df[dataset.ds['colname_type']] == qtype)]
                 if context != '__ALL__':
