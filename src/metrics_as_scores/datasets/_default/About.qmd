@@ -352,7 +352,7 @@ with open(file=str(dataset_dir.joinpath('./densities/densities_KDE_approx_EXPECT
 
 import numpy as np
 from typing import Callable
-from scipy.optimize import direct, minimize
+from scipy.optimize import direct
 from scipy.integrate import quad
 from itertools import product
 from joblib import Parallel, delayed
@@ -365,7 +365,7 @@ def find_score_pdf(score: float, dist: KDE_approx) -> float:
 	pdf_scale, _ = quad(func=dist.pdf, a=0, b=dist._range_data[1] * 10)
 	pdf = lambda x: dist.pdf(x) / pdf_scale
 	ccdf = lambda x: 1.0 - quad(func=pdf, a=0, b=x)[0]
-	res = minimize(fun=lambda x: (score - ccdf(x))**2, x0=0.001, bounds=((0,dist._range_data[1] * 10),))
+	res = direct(func=lambda x: (score - ccdf(x))**2, bounds=((0,dist._range_data[1] * 10),))
 	return res.x[0]
 
 
