@@ -37,7 +37,7 @@ class MainWorkflow(Workflow):
             ('Download and install a known or existing dataset', 'download'),
             ('Create Own Dataset to be used with Metrics-As-Scores', 'create'),
             ('Fit Parametric Distributions for Own Dataset', 'fit'),
-            ('Pre-generate distributions for usage in Web-Application', 'pre_gen'),
+            ('Pre-generate distributions for usage in the Web-Application', 'pre_gen'),
             ('Bundle Own dataset so it can be published', 'bundle'),
             ('Run local, interactive Web-Application using a selected dataset', 'webapp'),
             ('Quit', 'q')
