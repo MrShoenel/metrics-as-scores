@@ -3,7 +3,7 @@
 		"name": "Metrics and Domains From the Qualitas.class corpus",
 		"author": "Sebastian Hönel",
 		"id": "qcc",
-		"info_url": "https://doi.org/10.5281/zenodo.7633950",
+		"info_url": "https://doi.org/10.5281/zenodo.7633949",
 		"download": "https://zenodo.org/record/7633950/files/dataset.zip?download=1",
 		"size": 4322195829,
 		"size_extracted": 10046352180
@@ -21,7 +21,7 @@
 		"name": "Price, weight, and other properties of over 1,200 ideal-cut and best-clarity diamonds",
 		"author": "Sebastian Hönel",
 		"id": "diamonds-ideal-if",
-		"info_url": "https://doi.org/10.5281/zenodo.7647597",
+		"info_url": "https://doi.org/10.5281/zenodo.7647596",
 		"download": "https://zenodo.org/record/7647597/files/dataset.zip?download=1",
 		"size": 316900863,
 		"size_extracted": 508263329
