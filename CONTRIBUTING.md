@@ -33,13 +33,13 @@ The `mas` command will help you create a bundle that can be uploaded.
 
 ### 1.1.1. Registering Your Dataset
 
-Lastly, if you want to make available your dataset to others by having it added to the [`known-datasets`](/metrics-as-scores/blob/master/datasets/known-datasets.json), open an issue and ask for inclusion.
+Lastly, if you want to make available your dataset to others by having it added to the list of [**known datasets**](/MrShoenel/metrics-as-scores#known-datasets), open an issue and ask for inclusion.
 Please ascertain that your dataset fully works with the Web Application prior to opening an issue.
 
 
 ## 1.2. Contribute to the Software
 
-If you wish to contribute to the Metrics As Scores application, you are welcome to [open a new issue](./issues) for
+If you wish to contribute to the Metrics As Scores application, you are welcome to [open a new issue](/MrShoenel/metrics-as-scores/issues) for
 
 - Suggesting new features
 - Reporting errors
@@ -48,5 +48,5 @@ If you wish to contribute to the Metrics As Scores application, you are welcome 
 
 There is no issue template. However, when reporting bugs, make sure to disclose the exact version used, both of Metrics As Scores, your platform, the dataset, etc., and to provide, if possible, a minimum reproducible example.
 
-The most common way to contribute new features, bug fixes, and maintenance patches is to fork the repository and [open a pull request](./pulls).
+The most common way to contribute new features, bug fixes, and maintenance patches is to fork the repository and [open a pull request](/MrShoenel/metrics-as-scores/pulls).
 
