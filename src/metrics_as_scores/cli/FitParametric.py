@@ -17,7 +17,7 @@ import pandas as pd
 
 from metrics_as_scores.__init__ import DATASETS_DIR
 from scipy.stats._continuous_distns import norminvgauss_gen, gausshyper_gen, genhyperbolic_gen, geninvgauss_gen, invgauss_gen, studentized_range_gen
-from scipy.stats._discrete_distns import nhypergeom_gen, hypergeom_gen
+from scipy.stats._discrete_distns import betabinom_gen, logser_gen, planck_gen, nbinom_gen, nchypergeom_fisher_gen, nchypergeom_wallenius_gen, nhypergeom_gen, hypergeom_gen, yulesimon_gen, zipfian_gen
 
 
 
@@ -78,7 +78,7 @@ is dramatically more computationally expensive to compute, since a
 global search has to be performed.'''.strip())
         # Note how we will use the RV's type, not the problem's!
         from scipy.stats import _discrete_distns
-        recommended_ignore = list(rv.__name__ for rv in [nhypergeom_gen, hypergeom_gen])
+        recommended_ignore = list(rv.__name__ for rv in [betabinom_gen, logser_gen, planck_gen, nbinom_gen, nchypergeom_fisher_gen, nchypergeom_wallenius_gen, nhypergeom_gen, hypergeom_gen, yulesimon_gen, zipfian_gen])
         return self.q.checkbox(message='Select discrete random variables:', choices=[Choice(title=dp[0], value=getattr(_discrete_distns, dp[0]), checked=not dp[0] in recommended_ignore) for dp in Discrete_Problems.items()]).ask()
     
 
