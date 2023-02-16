@@ -93,7 +93,7 @@ def get_known_datasets(use_local_file: bool=False) -> list[KnownDataset]:
     return loads(urlopen(url=KNOWN_DATASETS_FILE).read().decode('utf-8'))
 
 
-def format_file_size(num_bytes: int) -> str:
+def format_file_size(num_bytes: int, digits: int=2) -> str:
     """
     Formats bytes into a string with a suffix for bytes, kilobite, etc.
     The number of bytes in the prefix is less than 1000 and may be rounded
@@ -114,4 +114,8 @@ def format_file_size(num_bytes: int) -> str:
         size /= 1e3
         i += 1
     
-    return f'{round(size, 2)} {suffixes[i]}'
+    res = round(number=size, ndigits=digits)
+    if digits == 0:
+        res = int(res)
+    
+    return f'{res} {suffixes[i]}'
