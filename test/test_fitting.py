@@ -1,4 +1,3 @@
-import base
 import numpy as np
 from pytest import raises
 from scipy.stats._continuous_distns import norm
