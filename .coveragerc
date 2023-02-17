@@ -1,2 +1,2 @@
 [run]
-omit = src/metrics_as_scores/webapp/*
+omit = */webapp/*
