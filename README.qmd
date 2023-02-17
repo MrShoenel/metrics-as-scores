@@ -46,7 +46,7 @@ The current version is `v{MAS_VERSION}`.
 
 Version **`v2.x.x`** has the following new features:
 
-- [Textual User Interface (TUI)](#sec-tui)
+- [Textual User Interface (TUI)](#text-based-user-interface-tui)
 - Proper documentation and testing
 - New version on PyPI. Install the package and run the command line interface by typing **`mas`**!
 
@@ -78,8 +78,8 @@ Given an *ideal* value for a metric (which may also be user-defined), we can tra
 # Usage
 
 You may install Metrics As Scores directly from PyPI.
-For users that wish to [**contribute**](./CONTRIBUTING.md) to Metrics As Scores, a [development setup](#sec-dev-setup) is recommended.
-In either case, after the installation, [**you have access to the text-based user interface**](#sec-tui).
+For users that wish to [**contribute**](./CONTRIBUTING.md) to Metrics As Scores, a [development setup](#development-setup) is recommended.
+In either case, after the installation, [**you have access to the text-based user interface**](#text-based-user-interface-tui).
 
 ```shell
 # Installation from PyPI:
@@ -92,7 +92,7 @@ You can **bring up the TUI** simply by typing the following after installing or 
 mas
 ```
 
-## Text-based User Interface (TUI) {#sec-tui}
+## Text-based User Interface (TUI)
 
 Metrics As Scores features a text-based command line user interface (TUI).
 It offers a couple of workflows/wizards, that help you to work and interact with the application.
@@ -103,7 +103,7 @@ There is no need to modify any source code, if you want to do one of the followi
 - Download and install a known or existing dataset
 - Create Own Dataset to be used with Metrics-As-Scores
 - Fit Parametric Distributions for Own Dataset
-- Pre-generate distributions for usage in the [**Web-Application**](#sec-webapp)
+- Pre-generate distributions for usage in the [**Web-Application**](#web-application)
 - Bundle Own dataset so it can be published
 - Run local, interactive Web-Application using a selected dataset
 
@@ -112,7 +112,7 @@ There is no need to modify any source code, if you want to do one of the followi
 
 
 
-## Web Application {#sec-webapp}
+## Web Application
 
 Metrics As Scores' main feature is perhaps the Web Application.
 It can be run directly and locally from the TUI using a selected dataset (you may download a known dataset or use your own).
@@ -124,7 +124,7 @@ The Web Application includes a detailed [Help section](https://metrics-as-scores
 
 ![Metrics As Scores Interactive Web Appliction](./WebApp.png "Metrics As Scores Interactive Web Appliction")
 
-## Development Setup {#sec-dev-setup}
+## Development Setup
 
 This project was developed using and requires Python `>=3.10`. Steps:
 
@@ -263,7 +263,7 @@ These tests are then used to select some best fitting random variable for displa
 
 
 
-## Known Datasets {#sec-known-datasets}
+## Known Datasets
 
 The following is a curated list of known, publicly available datasets that can be used with Metrics As Scores.
 These datasets can be downloaded using the text-based user interface.

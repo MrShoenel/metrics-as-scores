@@ -5,12 +5,13 @@ Metrics As Scores
 
 - <a href="#usage" id="toc-usage"><span
   class="toc-section-number">1</span> Usage</a>
-  - <a href="#sec-tui" id="toc-sec-tui"><span
+  - <a href="#text-based-user-interface-tui"
+    id="toc-text-based-user-interface-tui"><span
     class="toc-section-number">1.1</span> Text-based User Interface
     (TUI)</a>
-  - <a href="#sec-webapp" id="toc-sec-webapp"><span
+  - <a href="#web-application" id="toc-web-application"><span
     class="toc-section-number">1.2</span> Web Application</a>
-  - <a href="#sec-dev-setup" id="toc-sec-dev-setup"><span
+  - <a href="#development-setup" id="toc-development-setup"><span
     class="toc-section-number">1.3</span> Development Setup</a>
     - <a href="#setting-up-a-virtual-environment"
       id="toc-setting-up-a-virtual-environment"><span
@@ -29,7 +30,7 @@ Metrics As Scores
   class="toc-section-number">3</span> Datasets</a>
   - <a href="#use-your-own" id="toc-use-your-own"><span
     class="toc-section-number">3.1</span> Use Your Own</a>
-  - <a href="#sec-known-datasets" id="toc-sec-known-datasets"><span
+  - <a href="#known-datasets" id="toc-known-datasets"><span
     class="toc-section-number">3.2</span> Known Datasets</a>
 - <a href="#personalizing-the-web-application"
   id="toc-personalizing-the-web-application"><span
@@ -48,7 +49,7 @@ The current version is `v2.1.4`.
 
 Version **`v2.x.x`** has the following new features:
 
-- [Textual User Interface (TUI)](#sec-tui)
+- [Textual User Interface (TUI)](#text-based-user-interface-tui)
 - Proper documentation and testing
 - New version on PyPI. Install the package and run the command line
   interface by typing **`mas`**!
@@ -82,9 +83,9 @@ scores.
 
 You may install Metrics As Scores directly from PyPI. For users that
 wish to [**contribute**](./CONTRIBUTING.md) to Metrics As Scores, a
-[development setup](#sec-dev-setup) is recommended. In either case,
+[development setup](#development-setup) is recommended. In either case,
 after the installation, [**you have access to the text-based user
-interface**](#sec-tui).
+interface**](#text-based-user-interface-tui).
 
 ``` shell
 # Installation from PyPI:
@@ -111,7 +112,7 @@ code, if you want to do one of the following:
 - Create Own Dataset to be used with Metrics-As-Scores
 - Fit Parametric Distributions for Own Dataset
 - Pre-generate distributions for usage in the
-  [**Web-Application**](#sec-webapp)
+  [**Web-Application**](#web-application)
 - Bundle Own dataset so it can be published
 - Run local, interactive Web-Application using a selected dataset
 
@@ -309,12 +310,12 @@ that can be used with Metrics As Scores. These datasets can be
 downloaded using the text-based user interface.
 
 - Metrics and Domains From the Qualitas.class corpus (Hönel 2023b). 10
-  GB. <https://doi.org/10.5281/zenodo.7633950>.
+  GB. <https://doi.org/10.5281/zenodo.7633949>.
 - ELISA Spectrophotometer Samples (Hönel 2023a). 266 MB.
   <https://doi.org/10.5281/zenodo.7633989>.
 - Price, weight, and other properties of over 1,200 ideal-cut and
   best-clarity diamonds (Hönel 2023c). 508 MB.
-  <https://doi.org/10.5281/zenodo.7647597>.
+  <https://doi.org/10.5281/zenodo.7647596>.
 
 ------------------------------------------------------------------------
 
