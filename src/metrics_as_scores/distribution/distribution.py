@@ -542,6 +542,28 @@ class Parametric(Density):
             self.practical_domain
             self.practical_range_pdf
     
+
+    def _min_max(self, x: float) -> float:
+        """
+        Used to safely vectorize a CDF, such that it returns `0.0` for when
+        `x` lies before our range, and `1.0` if `x` lies beyond our range.
+
+        x: ``float``
+            The `x` to obtain the CDF's `y` for.
+        
+        :return:
+            A value in the range :math:`[0,1]`.
+        """
+        if not self.is_fit:
+            # Let the CDF handle this.
+            return self._cdf(x)
+
+        if x < self.range[0]:
+            return 0.0
+        elif x > self.range[1]:
+            return 1.0
+        return self._cdf(x)
+    
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric':
         """
