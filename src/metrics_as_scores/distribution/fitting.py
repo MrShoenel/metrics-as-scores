@@ -414,7 +414,8 @@ class StatisticalTest:
 
         data1_jittered, data2_jittered = None, None
         if self.discrete_data1:
-            expo = np.log10(abs(np.min(data1)))
+            temp = abs(np.min(data2))
+            expo = 0 if temp == 0 else np.log10(temp)
             rng = default_rng(seed=667788)
             jitter1 = rng.uniform(low=pow(10., expo - 6), high=pow(10., expo - 5), size=data1.size)
             data1_jittered = data1 + jitter1
@@ -422,7 +423,8 @@ class StatisticalTest:
             data1_jittered = data1
 
         if self.discrete_data2:
-            expo = np.log10(abs(np.min(data2)))
+            temp = abs(np.min(data2))
+            expo = 0 if temp == 0 else np.log10(temp)
             rng = default_rng(seed=112233)
             jitter2 = rng.uniform(low=pow(10., expo - 6), high=pow(10., expo - 5), size=data2_num_samples if data2_num_samples is not None else data1.size)
             data2_jittered = data2 + jitter2
