@@ -317,6 +317,7 @@ class KDE_integrate(Density):
     Therefore, :py:class:`KDE_approx` is used in practice.
     """
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
+        self._data = data
         self._kde = gaussian_kde(dataset=np.asarray(data))
         lb, ub = np.min(data), np.max(data)
         ext = np.max(data) - lb
@@ -330,10 +331,22 @@ class KDE_integrate(Density):
         
         m_lb = direct(func=pdf, bounds=((lb - ext, lb),), f_min=1e-6)
         m_ub = direct(func=pdf, bounds=((ub, ub + ext),), f_min=1e-6)
-        
-        ppf = cdf_to_ppf(cdf=np.vectorize(cdf), x=data, y_left=np.min(data), y_right=np.max(data))
 
-        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=ppf, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
+        super().__init__(range=(m_lb.x, m_ub.x), pdf=pdf, cdf=cdf, ppf=None, ideal_value=ideal_value, dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context, kwargs=kwargs)
+    
+    def init_ppf(self, cdf_samples: int=100) -> 'KDE_integrate':
+        """
+        Initializes the PPF. We get `x` and `y` from the CDF. Then, we swap the two
+        and interpolate a PPF. Since obtaining each `y` from the CDF means we need
+        to compute an integral, be careful with setting a high number of ``cdf_samples``.
+
+        cdf_samples: ``int``
+            The number of samples to take from the CDF (which is computed by integrating the
+            PDF, so be careful).
+        """
+        self._ppf = cdf_to_ppf(cdf=self.cdf, x=self._data, y_left=np.min(self._data), y_right=np.max(self._data), cdf_samples=cdf_samples)
+        self.ppf = np.vectorize(self._ppf)
+        return self
 
 
 
