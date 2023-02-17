@@ -20,6 +20,6 @@ jobs:
 
     - name: Generate Report
       run: |
-        poe cov
+        pytest
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v3
