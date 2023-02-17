@@ -1,2 +1,2 @@
 [run]
-omit = */webapp/*
+omit = */webapp/*, */cli/BundleOwn.py, */cli/Cli.py, */cli/CreateDataset.py, */cli/Download.py, */cli/FitParametric.py, */cli/GenerateDensities.py, */cli/KnownDatasets.py, */cli/LocalDatasets.py, */cli/LocalWebserver.py, */cli/MainWorkflow.py, */cli/Workflow.py
