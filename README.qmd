@@ -171,6 +171,23 @@ source venv/bin/activate # Linux
 ```
 
 
+### Running Tests
+
+Tests are run using `poethepoet`:
+
+```shell
+# Runs the tests and prints coverage
+(venv) C:\metrics-as-scores>poe test
+```
+
+You can also generate coverage reports:
+
+```shell
+# Writes reports to the local directory htmlcov
+(venv) C:\metrics-as-scores>poe cov
+```
+
+
 --------------
 
 

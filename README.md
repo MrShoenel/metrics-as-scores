@@ -19,6 +19,8 @@ Metrics As Scores
       Environment</a>
     - <a href="#installing-packages" id="toc-installing-packages"><span
       class="toc-section-number">1.3.2</span> Installing Packages</a>
+    - <a href="#running-tests" id="toc-running-tests"><span
+      class="toc-section-number">1.3.3</span> Running Tests</a>
 - <a href="#example-usage" id="toc-example-usage"><span
   class="toc-section-number">2</span> Example Usage</a>
   - <a href="#software-metrics-example"
@@ -183,6 +185,22 @@ The same in Linux:
 source venv/bin/activate # Linux
 (venv) ubuntu@vm:/tmp/metrics-as-scores$ pip install poetry
 (venv) ubuntu@vm:/tmp/metrics-as-scores$ poetry install
+```
+
+### Running Tests
+
+Tests are run using `poethepoet`:
+
+``` shell
+# Runs the tests and prints coverage
+(venv) C:\metrics-as-scores>poe test
+```
+
+You can also generate coverage reports:
+
+``` shell
+# Writes reports to the local directory htmlcov
+(venv) C:\metrics-as-scores>poe cov
 ```
 
 ------------------------------------------------------------------------
