@@ -112,6 +112,7 @@ class SelfResetLazy(Generic[T]):
         finally:
             self._semaphore.release()
 
+    @property
     def value_volatile(self) -> Union[None, T]:
         """
         Volatile getter for the may-not-present value.
