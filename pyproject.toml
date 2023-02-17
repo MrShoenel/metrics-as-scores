@@ -74,5 +74,5 @@ addopts = [
 ]
 
 [tool.poe.tasks]
-test = "pytest"
+test = "pytest --no-cov"
 cov = "pytest --cov-report html:htmlcov"
