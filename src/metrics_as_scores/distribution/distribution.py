@@ -1000,7 +1000,7 @@ class Dataset:
             A data frame with columns `qtype`, `stat`, `pval`, `group1`, and `group2`.
         """
         if len(list(qtypes)) < 1:
-            raise Exception('Requires one or metrics.')
+            raise Exception('Requires one or more quantity types.')
         
         unique_context_pairs: list[tuple[str, str]] = list(combinations(iterable=self.contexts(include_all_contexts=True), r=2))
         
