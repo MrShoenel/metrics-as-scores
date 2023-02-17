@@ -449,12 +449,12 @@ class Empirical_discrete(Empirical):
     """
     def __init__(self, data: NDArray[Shape["*"], Float], ideal_value: float=None, dist_transform: DistTransform=DistTransform.NONE, transform_value: float=None, qtype: str=None, context: str=None, **kwargs) -> None:
         self._data_valid = not (data.shape[0] == 1 and np.isnan(data[0]))
-        data_int = np.rint(data).astype(int)
+        data_int = np.full(shape=data.shape, fill_value=np.nan) if not self._data_valid else np.rint(data).astype(int)
         if self._data_valid and not np.allclose(a=data, b=data_int, rtol=1e-10, atol=1e-12):
             raise Exception('The data does not appear to be integral.')
 
         self._unique, self._counts = np.unique(data_int, return_counts=True)
-        self._unique, self._counts = self._unique.astype(int), self._counts.astype(int)
+        self._unique, self._counts = np.full(shape=self._unique.shape, fill_value=np.nan) if not self._data_valid else self._unique.astype(int), self._counts.astype(int)
         self._idx: dict[int, int] = { self._unique[i]: self._counts[i] for i in range(self._unique.shape[0]) }
 
         if self._data_valid:
