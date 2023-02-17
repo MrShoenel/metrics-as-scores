@@ -97,6 +97,17 @@ def test_Parametric():
     assert dens.dist_name == 'norm_gen'
     assert dens.is_fit
     assert dens.use_stat_test == 'ks_2samp_jittered'
+    assert np.allclose(dens.cdf(rng.normal(loc=-1e4, size=100)), np.zeros(shape=(100,))) # Those are out of range
+    assert np.allclose(dens.cdf(rng.normal(loc= 1e4, size=100)), np.ones(shape=(100,))) # Those are out of range
+    temp = dens.ppf(rng.uniform(low=0.1, high=0.9, size=100))
+    assert np.all((temp > -50) & (temp < 50))
+
+    assert isinstance(dens.pval, float) and not np.isnan(dens.pval)
+    assert isinstance(dens.stat, float) and not np.isnan(dens.stat)
+    dens.use_stat_test = 'epps_singleton_2samp_jittered'
+    assert isinstance(dens.pval, float) and not np.isnan(dens.pval)
+    assert isinstance(dens.stat, float) and not np.isnan(dens.stat)
+
 
     # Test unfit:
     dens = Parametric.unfitted(dist_transform=DistTransform.NONE)
@@ -106,8 +117,9 @@ def test_Parametric():
     temp = dens.practical_range_pdf
     assert temp[0] == 0 and temp[1] == 0
 
-    assert np.allclose(dens.pdf(rng.normal(size = 100)), np.zeros(shape=(100,)))
-    assert np.allclose(dens.cdf(rng.normal(size = 100)), np.zeros(shape=(100,)))
+    assert np.allclose(dens.pdf(rng.normal(size=100)), np.zeros(shape=(100,)))
+    assert np.allclose(dens.cdf(rng.normal(size=100)), np.zeros(shape=(100,)))
+    assert np.allclose(dens.ppf(rng.uniform(low=0.0, high=1.0, size=100)), np.zeros(shape=(100,)))
 
     with raises(Exception):
         dens.pval
