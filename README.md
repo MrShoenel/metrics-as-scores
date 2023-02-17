@@ -1,6 +1,7 @@
 Metrics As Scores
 [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119)
 [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)
+[![codecov](https://codecov.io/github/MrShoenel/metrics-as-scores/branch/master/graph/badge.svg?token=HO1GYXVEUQ)](https://codecov.io/github/MrShoenel/metrics-as-scores)
 ================
 
 - <a href="#usage" id="toc-usage"><span
