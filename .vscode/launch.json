@@ -21,6 +21,14 @@
 			"program": "${file}",
 			"console": "integratedTerminal",
 			"justMyCode": false
+		},
+		{
+			"name": "Debug Tests",
+			"type": "python",
+			"request": "test",
+			"console": "integratedTerminal",
+			"justMyCode": false,
+			"env": {"PYTEST_ADDOPTS": "--no-cov"}
 		}
 	]
 }
