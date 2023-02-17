@@ -1,9 +1,12 @@
 import numpy as np
+import warnings
 from pytest import raises
 from numpy.random import default_rng
 from scipy.stats._continuous_distns import norm_gen
+from scipy.stats._discrete_distns import poisson_gen
 from metrics_as_scores.distribution.distribution import DistTransform, Density, KDE_integrate, KDE_approx, Empirical, Empirical_discrete, Parametric, Parametric_discrete
 from metrics_as_scores.distribution.fitting import StatisticalTest
+from metrics_as_scores.distribution.fitting import Fitter
 
 
 def test_Density():
@@ -75,6 +78,9 @@ def test_Empirical_discrete():
     assert dens.is_fit == False
     dens = Empirical_discrete.unfitted(dist_transform=DistTransform.NONE)
     assert dens.is_fit == False
+    # Its CDF/PPF only return NaNs:
+    assert np.all(np.isnan(dens.cdf(rng.normal(size=100))))
+    assert np.all(np.isnan(dens.ppf(rng.normal(size=100))))
 
     # Let's make it valid:
     data = rng.poisson(size=500)
@@ -125,3 +131,31 @@ def test_Parametric():
         dens.pval
     with raises(Exception):
         dens.stat
+
+
+def test_Parametric_discrete():
+    rng = default_rng(seed=1)
+    data = rng.poisson(size=50)
+    warnings.filterwarnings("ignore", message="divide by zero encountered") 
+    fitter = Fitter(poisson_gen)
+    warnings.simplefilter('always')
+    params = fitter.fit(data=data)
+    theta = tuple(params.values())
+    inst = poisson_gen()
+
+    # Make a fit one:
+    st = StatisticalTest(data1=data, cdf=lambda x: inst.cdf(x, *theta), ppf_or_data2=lambda p: inst.ppf(p, *theta))
+    dens = Parametric_discrete(dist=poisson_gen(), dist_params=theta, range=(np.min(data), np.max(data)), stat_tests=st)
+
+    # Let's make sure the PMF sums to ~1:
+    # Since it's a smooth parametric distribution, we gotta widen the range
+    probs = np.array([dens.pmf(x) for x in range(np.min(data)-20, np.max(data) + 20)])
+    assert abs(1.0 - np.sum(probs)) <= 1e-12
+    assert dens.pmf(np.min(data) - 20) <= 1e-300 # technically zero
+
+
+    # Unfit -> dist_params=None
+    dens = Parametric_discrete.unfitted(dist_transform=DistTransform.NONE)
+    assert np.allclose(dens.pdf(rng.normal(size=100)), np.zeros(shape=(100,)))
+    assert np.allclose(dens.cdf(rng.normal(size=100)), np.zeros(shape=(100,)))
+    assert np.allclose(dens.ppf(rng.uniform(low=0.0, high=1.0, size=100)), np.zeros(shape=(100,)))
