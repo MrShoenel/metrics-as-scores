@@ -13,6 +13,13 @@ elisa_manifest_file = this_dir.joinpath('./elisa-manifest.json')
 elisa_data_file = this_dir.joinpath('./elisa-org-data.csv')
 
 
+def get_elisa() -> Dataset:
+    elisa_manifest: LocalDataset = None
+    with open(file=str(elisa_manifest_file), mode='r', encoding='utf-8') as fp:
+        elisa_manifest = load(fp=fp)
+    return Dataset(ds=elisa_manifest, df=pd.read_csv(str(elisa_data_file), index_col=False))
+
+
 def test_Dataset():
     qcc_manifest: LocalDataset = None
     with open(file=str(qcc_manifest_file), mode='r', encoding='utf-8') as fp:
@@ -86,11 +93,7 @@ def test_Dataset_data():
 
 
 def test_Dataset_transform():
-    elisa_manifest: LocalDataset = None
-    with open(file=str(elisa_manifest_file), mode='r', encoding='utf-8') as fp:
-        elisa_manifest = load(fp=fp)
-    # We test the dataset loading the QCC manifest.
-    ds = Dataset(ds=elisa_manifest, df=pd.read_csv(str(elisa_data_file), index_col=False))
+    ds = get_elisa()
     data = ds.data(qtype='Lot1')
     data_d = np.rint(10.0 * data)
 
@@ -107,12 +110,7 @@ def test_Dataset_transform():
 
 
 def test_Dataset_stat_tests():
-    elisa_manifest: LocalDataset = None
-    with open(file=str(elisa_manifest_file), mode='r', encoding='utf-8') as fp:
-        elisa_manifest = load(fp=fp)
-    # We test the dataset loading the QCC manifest.
-    ds = Dataset(ds=elisa_manifest, df=pd.read_csv(str(elisa_data_file), index_col=False))
-
+    ds = get_elisa()
     qtypes = ds.quantity_types
     contexts_all = list(ds.contexts(include_all_contexts=True))
     
