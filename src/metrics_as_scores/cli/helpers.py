@@ -98,7 +98,7 @@ def get_known_datasets(use_local_file: bool=False) -> list[KnownDataset]:
     :rtype: ``list[KnownDataset]``
     """
     if use_local_file:
-        with open(file=str(DATASETS_DIR.joinpath(f'./known-datasets.json')), mode='r', encoding='utf-8') as fp:
+        with open(file=str(DATASETS_DIR.joinpath('./known-datasets.json')), mode='r', encoding='utf-8') as fp:
             return load(fp=fp)
     return loads(urlopen(url=KNOWN_DATASETS_FILE).read().decode('utf-8'))
 
@@ -129,7 +129,7 @@ def format_file_size(num_bytes: int, digits: int=2) -> str:
         i += 1
     
     res = round(number=size, ndigits=digits)
-    if digits == 0:
+    if digits == 0 or i == 0: # Still bytes
         res = int(res)
     
     return f'{res} {suffixes[i]}'
