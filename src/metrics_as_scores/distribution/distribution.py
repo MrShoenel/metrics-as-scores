@@ -592,14 +592,14 @@ class Parametric(Density):
         """Shortcut getter for the p-value of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return p-value for non-fitted random variable.')
-        return self.stat_tests[f'{self.use_stat_test}_pval']
+        return self.stat_tests.tests[self.use_stat_test]['pval']
     
     @property
     def stat(self) -> float:
         """Shortcut getter for the test statistic of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return statistical test statistic for non-fitted random variable.')
-        return self.stat_tests[f'{self.use_stat_test}_stat']
+        return self.stat_tests.tests[self.use_stat_test]['pval']
     
     @property
     def is_fit(self) -> bool:
