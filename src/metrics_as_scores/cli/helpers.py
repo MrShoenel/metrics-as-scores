@@ -103,6 +103,10 @@ def format_file_size(num_bytes: int, digits: int=2) -> str:
     num_bytes: ``int``
         Unsigned integer with amount of bytes.
     
+    digits: ``int``
+        The number of digits for rounding. If set to `0`, the rounded value
+        is cast to integer.
+    
     :returns:
         The size in bytes, formatted.
     """
