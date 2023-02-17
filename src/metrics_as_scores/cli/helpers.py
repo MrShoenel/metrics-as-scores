@@ -1,5 +1,5 @@
 from os import scandir
-from typing import Iterable
+from typing import Iterable, Union
 from pathlib import Path
 from json import load, loads
 from urllib.request import urlopen
@@ -25,6 +25,9 @@ def isint(s: str) -> bool:
     :returns:
         `True` if the string can be converted to an `int`; `False`, otherwise.
     """
+    if not isinstance(s, str):
+        return False
+    
     try:
         int(s)
         return True
@@ -32,7 +35,7 @@ def isint(s: str) -> bool:
         return False
 
 
-def isnumeric(s: str) -> bool:
+def isnumeric(s: Union[str, int, float]) -> bool:
     """
     Attempts to convert a string to a float to check whether it is numeric.
     This is not the same as :py:meth:`str::isnumeric()`, as this method
@@ -47,6 +50,13 @@ def isnumeric(s: str) -> bool:
     :returns:
         `True` if the string is numeric; `False`, otherwise.
     """
+    if isinstance(s, bool):
+        return False
+    if isinstance(s, int) or isinstance(s, float):
+        return True
+    if not isinstance(s, str):
+        return False
+    
     try:
         float(s)
         return True
