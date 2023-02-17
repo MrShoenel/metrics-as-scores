@@ -14,8 +14,8 @@ jobs:
         fetch-depth: '2'
     - name: Generate Report
       run: |
-        pip install pytest
-        pip install pytest-codecov
+        pip install poetry
+        poetry install
         pytest --codecov
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
