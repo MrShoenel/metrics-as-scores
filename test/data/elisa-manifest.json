@@ -1,0 +1,47 @@
+{
+  "origin": "elisa.csv",
+  "colname_data": "OPTDENS",
+  "colname_type": "LOT",
+  "colname_context": "RUN",
+  "contexts": [
+    "Run1",
+    "Run2",
+    "Run3",
+    "Run4",
+    "Run5"
+  ],
+  "desc_qtypes": {
+    "Lot1": "The first lot",
+    "Lot2": "The second lot",
+    "Lot3": "The third lot",
+    "Lot4": "The fourth lot",
+    "Lot5": "The fifth lot"
+  },
+  "desc_contexts": {
+    "Run1": "The first run",
+    "Run2": "The second run",
+    "Run3": "The third run",
+    "Run4": "The fourth run",
+    "Run5": "The fifth run"
+  },
+  "qtypes": {
+    "Lot1": "continuous",
+    "Lot2": "continuous",
+    "Lot3": "continuous",
+    "Lot4": "continuous",
+    "Lot5": "continuous"
+  },
+  "ideal_values": {
+    "Lot1": null,
+    "Lot2": null,
+    "Lot3": null,
+    "Lot4": null,
+    "Lot5": null
+  },
+  "name": "Elisa Spectrophotometer Positive Samples",
+  "desc": "The ELISA dataset contains data from a spectrophotometer that determined the optical density of positive control samples, from five different lots, across five different runs.",
+  "id": "elisa",
+  "author": [
+    "Sebastian H\u00f6nel"
+  ]
+}
