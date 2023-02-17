@@ -15,6 +15,6 @@ jobs:
     - name: Generate Report
       run: |
         pip install .
-        pytest --codecov
+        pytest --cov-report html
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
