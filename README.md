@@ -57,7 +57,8 @@ From version **`v2.x.x`** it has the following new features:
 - New version on PyPI. Install the package and run the command line
   interface by typing **`mas`**!
 
-![Metrics As Scores Demo.](demo.webm)
+[Metrics As Scores
+Demo.](https://user-images.githubusercontent.com/5049151/219892077-58854478-b761-4a3d-9faf-2fe46c122cf5.webm)
 
 ------------------------------------------------------------------------
 
