@@ -51,6 +51,7 @@ scikit-learn = "^1.2.1"
 nptyping = "^2.4.1"
 pytest-cov = "^4.0.0"
 poethepoet = "^0.18.1"
+wget = "^3.2"
 
 
 [tool.poetry.group.dev.dependencies]
