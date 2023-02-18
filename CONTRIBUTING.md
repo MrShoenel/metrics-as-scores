@@ -6,6 +6,7 @@ Contributing to Metrics As Scores
 	- [Contributions of New Datasets](#contributions-of-new-datasets)
 		- [Registering Your Dataset](#registering-your-dataset)
 	- [Contribute to the Software](#contribute-to-the-software)
+- [Support](#support)
 
 
 # How To Contribute to *Metrics As Scores*
@@ -50,3 +51,8 @@ There is no issue template. However, when reporting bugs, make sure to disclose 
 
 The most common way to contribute new features, bug fixes, and maintenance patches is to fork the repository and [open a pull request](https://github.com/MrShoenel/metrics-as-scores/pulls).
 
+
+# Support
+
+If you require support, please open a new issue.
+Should you decide to post a question to, e.g., StackOverflow, please use the tags `python-mas` or `metrics-as-scores`.
