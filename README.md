@@ -48,7 +48,7 @@ between versions
 [**`v1.0.8`**](/MrShoenel/metrics-as-scores/tree/v1.0.8) and
 **`v2.x.x`**.
 
-The current version is `v2.1.4`.
+The current version is `v2.2.0`.
 
 Version **`v2.x.x`** has the following new features:
 
