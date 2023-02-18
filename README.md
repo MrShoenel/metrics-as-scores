@@ -45,17 +45,24 @@ Metrics As Scores
 
 **Please Note**: ***Metrics As Scores*** (`MAS`) changed considerably
 between versions
-[**`v1.0.8`**](/MrShoenel/metrics-as-scores/tree/v1.0.8) and
-**`v2.x.x`**.
+[**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
+and **`v2.x.x`**.
 
 The current version is `v2.2.0`.
 
-Version **`v2.x.x`** has the following new features:
+From version **`v2.x.x`** it has the following new features:
 
 - [Textual User Interface (TUI)](#text-based-user-interface-tui)
 - Proper documentation and testing
 - New version on PyPI. Install the package and run the command line
   interface by typing **`mas`**!
+
+<video controls autoplay loop muted>
+<source src="demo.webm" type="video/webm">
+</source>
+<source src="demo.mp4" type="video/mp4">
+</source>
+</video>
 
 ------------------------------------------------------------------------
 
@@ -85,10 +92,11 @@ scores.
 # Usage
 
 You may install Metrics As Scores directly from PyPI. For users that
-wish to [**contribute**](./CONTRIBUTING.md) to Metrics As Scores, a
-[development setup](#development-setup) is recommended. In either case,
-after the installation, [**you have access to the text-based user
-interface**](#text-based-user-interface-tui).
+wish to
+[**contribute**](https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md)
+to Metrics As Scores, a [development setup](#development-setup) is
+recommended. In either case, after the installation, [**you have access
+to the text-based user interface**](#text-based-user-interface-tui).
 
 ``` shell
 # Installation from PyPI:
@@ -120,7 +128,7 @@ code, if you want to do one of the following:
 - Run local, interactive Web-Application using a selected dataset
 
 ![Metrics As Scores Text-based User Interface
-(TUI)](./TUI.png "Metrics As Scores Text-based User Interface (TUI)")
+(TUI).](./TUI.png "Metrics As Scores Text-based User Interface (TUI).")
 
 ## Web Application
 
@@ -137,7 +145,7 @@ section](https://metrics-as-scores.ml/#help) that should answer most of
 your questions.
 
 ![Metrics As Scores Interactive Web
-Appliction](./WebApp.png "Metrics As Scores Interactive Web Appliction")
+.](./WebApp.png "Metrics As Scores Interactive Web Appliction.")
 
 ## Development Setup
 
@@ -273,10 +281,10 @@ to learn how.
 Metrics As Scores has a built-in wizard that lets you import your own
 dataset! There is another wizard that bundles your dataset so that it
 can be shared with others. You may [**contribute your
-dataset**](./CONTRIBUTING.md) so we can add it to the curated list of
-known datasets (see next section). If you do not have an own dataset,
-you can use the built-in wizard to download any of the known datasets,
-too!
+dataset**](https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md)
+so we can add it to the curated list of known datasets (see next
+section). If you do not have an own dataset, you can use the built-in
+wizard to download any of the known datasets, too!
 
 Note that Metrics As Scores supports you with all tools necessary to
 create a publishable dataset. For example, it carries out the common
@@ -342,13 +350,13 @@ downloaded using the text-based user interface.
 
 The web application *“[Metrics As
 Scores](https://metrics-as-scores.ml/)”* is located in the directory
-[`src/metrics_as_scores/webapp/`](./src/metrics_as_scores/webapp/). The
-app itself has three vertical blocks: a header, the interactive part,
-and a footer. Header and footer can be easily edited by modifing the
-files
-[`src/metrics_as_scores/webapp/header.html`](./src/metrics_as_scores/webapp/header.html)
+[`src/metrics_as_scores/webapp/`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/).
+The app itself has three vertical blocks: a header, the interactive
+part, and a footer. Header and footer can be easily edited by modifing
+the files
+[`src/metrics_as_scores/webapp/header.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/header.html)
 and
-[`src/metrics_as_scores/webapp/footer.html`](./src/metrics_as_scores/webapp/footer.html).
+[`src/metrics_as_scores/webapp/footer.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/footer.html).
 
 Note that when you create your own dataset, you get to add sections to
 the header and footer using two HTML fragments. This is recommended over
@@ -356,7 +364,7 @@ modifying the web application directly.
 
 If you want to change the title of the application, you will have to
 modify the file
-[`src/metrics_as_scores/webapp/main.py`](./src/metrics_as_scores/webapp/main.py)
+[`src/metrics_as_scores/webapp/main.py`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/main.py)
 at the very end:
 
 ``` python
