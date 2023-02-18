@@ -57,12 +57,7 @@ From version **`v2.x.x`** it has the following new features:
 - New version on PyPI. Install the package and run the command line
   interface by typing **`mas`**!
 
-<video controls autoplay loop muted>
-<source src="demo.webm" type="video/webm">
-</source>
-<source src="demo.mp4" type="video/mp4">
-</source>
-</video>
+![Metrics As Scores Demo.](demo.webm)
 
 ------------------------------------------------------------------------
 
