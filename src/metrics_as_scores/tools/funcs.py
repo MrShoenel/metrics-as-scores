@@ -23,7 +23,7 @@ def nonlinspace(start: float, stop: float, num: int, func: Callable[[float], flo
         A function that, given a linear `x`, creates a non-linear `y`. The default
         is :code:`lambda x: 1. - .9 * square(x)`.
     """
-    if abs(stop - start) < 1e20:
+    if abs(stop - start) < 1e-20:
         return linspace(start=start, stop=stop, num=num)
     func = vectorize(func)
     step_lens = func(linspace(start=-1., stop=1., num=num))
