@@ -20,7 +20,8 @@ def generate_densities(
     clazz: type[Density]=Empirical,
     unique_vals: bool=None,
     resample_samples=250_000,
-    dist_transform: DistTransform=DistTransform.NONE
+    dist_transform: DistTransform=DistTransform.NONE,
+    num_jobs: int=None
 ) -> dict[str, Density]:
     """
     Generates a set of :py:class:`Density` objects for a certain :py:class:`DistTransform`.
@@ -69,7 +70,7 @@ def generate_densities(
 
         return (f'{context}_{qtype}', clazz(data=data, resample_samples=resample_samples, compute_ranges=True, ideal_value=dataset.ideal_values[qtype], dist_transform=dist_transform, transform_value=transform_value, qtype=qtype, context=context))
 
-    cdfs = Parallel(n_jobs=-1)(delayed(get_density)(i) for i in tqdm(range(len(expanded_grid.index))))
+    cdfs = Parallel(n_jobs=-1 if num_jobs is None else num_jobs)(delayed(get_density)(i) for i in tqdm(range(len(expanded_grid.index))))
     return dict(cdfs)
 
 
