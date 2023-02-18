@@ -7,6 +7,12 @@ bibliography:
   - src/metrics_as_scores/datasets/known-datasets.bib
   
 format:
+  pdf:
+    title: "Metrics As Scores [![DOI](./zenodo.eps)](https://zenodo.org/badge/latestdoi/524333119)"
+    table-of-contents: true
+    toc-depth: 3
+    papersize: a4
+    documentclass: scrartcl
   gfm:
     citeproc: true
     toc: true
@@ -37,14 +43,14 @@ dm = lambda s: display(Markdown(s))
 #| echo: false
 
 dm(f'''
-**Please Note**: ___Metrics As Scores___ (`MAS`) changed considerably between versions [**`v1.0.8`**](/MrShoenel/metrics-as-scores/tree/v1.0.8) and **`v2.x.x`**.
+**Please Note**: ___Metrics As Scores___ (`MAS`) changed considerably between versions [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8) and **`v2.x.x`**.
 
 The current version is `v{MAS_VERSION}`.
 '''.strip())
 ```
 
 
-Version **`v2.x.x`** has the following new features:
+From version **`v2.x.x`** it has the following new features:
 
 - [Textual User Interface (TUI)](#text-based-user-interface-tui)
 - Proper documentation and testing
@@ -78,7 +84,7 @@ Given an *ideal* value for a metric (which may also be user-defined), we can tra
 # Usage
 
 You may install Metrics As Scores directly from PyPI.
-For users that wish to [**contribute**](./CONTRIBUTING.md) to Metrics As Scores, a [development setup](#development-setup) is recommended.
+For users that wish to [**contribute**](https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md) to Metrics As Scores, a [development setup](#development-setup) is recommended.
 In either case, after the installation, [**you have access to the text-based user interface**](#text-based-user-interface-tui).
 
 ```shell
@@ -108,7 +114,7 @@ There is no need to modify any source code, if you want to do one of the followi
 - Run local, interactive Web-Application using a selected dataset
 
 
-![Metrics As Scores Text-based User Interface (TUI)](./TUI.png "Metrics As Scores Text-based User Interface (TUI)")
+![Metrics As Scores Text-based User Interface (TUI).](./TUI.png "Metrics As Scores Text-based User Interface (TUI).")
 
 
 
@@ -122,7 +128,7 @@ It offers five different principal types of densities: Parametric, Parametric (d
 The Web Application includes a detailed [Help section](https://metrics-as-scores.ml/#help) that should answer most of your questions.
 
 
-![Metrics As Scores Interactive Web Appliction](./WebApp.png "Metrics As Scores Interactive Web Appliction")
+![Metrics As Scores Interactive Web .](./WebApp.png "Metrics As Scores Interactive Web Appliction.")
 
 ## Development Setup
 
@@ -251,7 +257,7 @@ Metrics As Scores can use existing and own datasets. Please keep reading to lear
 
 Metrics As Scores has a built-in wizard that lets you import your own dataset!
 There is another wizard that bundles your dataset so that it can be shared with others.
-You may [**contribute your dataset**](./CONTRIBUTING.md) so we can add it to the curated list of known datasets (see next section).
+You may [**contribute your dataset**](https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md) so we can add it to the curated list of known datasets (see next section).
 If you do not have an own dataset, you can use the built-in wizard to download any of the known datasets, too!
 
 
@@ -307,16 +313,16 @@ dm('\n'.join([format_dataset(ds) for ds in get_known_datasets()]))
 
 # Personalizing the Web Application
 
-The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/metrics_as_scores/webapp/`](./src/metrics_as_scores/webapp/).
+The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/metrics_as_scores/webapp/`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/).
 The app itself has three vertical blocks: a header, the interactive part, and a footer.
-Header and footer can be easily edited by modifing the files [`src/metrics_as_scores/webapp/header.html`](./src/metrics_as_scores/webapp/header.html) and [`src/metrics_as_scores/webapp/footer.html`](./src/metrics_as_scores/webapp/footer.html).
+Header and footer can be easily edited by modifing the files [`src/metrics_as_scores/webapp/header.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/header.html) and [`src/metrics_as_scores/webapp/footer.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/footer.html).
 
 
 Note that when you create your own dataset, you get to add sections to the header and footer using two HTML fragments.
 This is recommended over modifying the web application directly.
 
 
-If you want to change the title of the application, you will have to modify the file [`src/metrics_as_scores/webapp/main.py`](./src/metrics_as_scores/webapp/main.py) at the very end:
+If you want to change the title of the application, you will have to modify the file [`src/metrics_as_scores/webapp/main.py`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/main.py) at the very end:
 
 ```python
 # Change this line to your desired title.
