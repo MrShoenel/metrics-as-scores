@@ -1,11 +1,14 @@
 import numpy as np
+from tempfile import tempdir
+from pathlib import Path
 from test_Dataset import get_elisa
+from pickle import dump
 #from metrics_as_scores.data.pregenerate_fit import fit, get_data_tuple
 from metrics_as_scores.data.pregenerate_distns import generate_parametric_fits
 from metrics_as_scores.distribution.fitting import FitterPymoo
-from metrics_as_scores.distribution.distribution import DistTransform
+from metrics_as_scores.distribution.distribution import DistTransform, Parametric
 from metrics_as_scores.cli.FitParametric import FitParametricWorkflow
-from metrics_as_scores.data.pregenerate import fits_to_MAS_densities
+from metrics_as_scores.data.pregenerate import fits_to_MAS_densities, generate_parametric
 from scipy.stats._continuous_distns import norm_gen
 
 
@@ -38,6 +41,14 @@ def test_generate_parametric_fits():
     
     for fr in res:
         assert isinstance(fr['params'], dict)
+    
+
+    # Write res so we can read it in generate_parametric
+    fits_dir = Path(tempdir)
+    with open(file=str(fits_dir.joinpath(f'./pregen_distns_{DistTransform.NONE.name}.pickle')), mode='wb') as fp:
+        dump(obj=res, file=fp)
+    
+    generate_parametric(dataset=ds, densities_dir=fits_dir, fits_dir=fits_dir, clazz=Parametric, transform=DistTransform.NONE)
 
 
     # Let's try to make MAS densities directly, because
