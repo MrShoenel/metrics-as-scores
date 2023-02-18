@@ -231,7 +231,7 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">fitter</span> <span class="o">=</span> <span class="n">fitter_type</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">RV</span><span class="p">)</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">minimize_seeds</span><span class="o">=</span><span class="p">[</span><span class="mi">1_3_3_7</span><span class="p">,</span> <span class="mh">0xdeadbeef</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">params_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
         <span class="n">ret_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">))</span>

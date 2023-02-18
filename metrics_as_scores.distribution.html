@@ -474,6 +474,19 @@ Therefore, <a class="reference internal" href="#metrics_as_scores.distribution.d
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.KDE_integrate.init_ppf">
+<span class="sig-name descname"><span class="pre">init_ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cdf_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metrics_as_scores.distribution.distribution.KDE_integrate" title="metrics_as_scores.distribution.distribution.KDE_integrate"><span class="pre">KDE_integrate</span></a></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#KDE_integrate.init_ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.KDE_integrate.init_ppf" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the PPF. We get <cite>x</cite> and <cite>y</cite> from the CDF. Then, we swap the two
+and interpolate a PPF. Since obtaining each <cite>y</cite> from the CDF means we need
+to compute an integral, be careful with setting a high number of <code class="docutils literal notranslate"><span class="pre">cdf_samples</span></code>.</p>
+<dl class="simple">
+<dt>cdf_samples: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt><dd><p>The number of samples to take from the CDF (which is computed by integrating the
+PDF, so be careful).</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -595,6 +608,22 @@ used later to choose some best-fitting parametric density by a specific test.</p
 </dd>
 <dt>compute_ranges: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>Whether or not to compute the practical domain of the data and the practical range
 of the PDF. Both of these use optimization to find the results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Parametric._min_max">
+<span class="sig-name descname"><span class="pre">_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Parametric._min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Parametric._min_max" title="Permalink to this definition"></a></dt>
+<dd><p>Used to safely vectorize a CDF, such that it returns <cite>0.0</cite> for when
+<cite>x</cite> lies before our range, and <cite>1.0</cite> if <cite>x</cite> lies beyond our range.</p>
+<dl class="simple">
+<dt>x: <code class="docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The <cite>x</cite> to obtain the CDF’s <cite>y</cite> for.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A value in the range <span class="math notranslate nohighlight">\([0,1]\)</span>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1009,7 +1038,7 @@ problems that are defined for each discrete random variable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.fitting.Fitter.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.fit" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/fitting.html#Fitter.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.fitting.Fitter.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience method to fit the random variable. If it is continuous, calls
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">rv_continuous.fit()</span></code>, which uses maximum likelihood estimation.
 If it is discrete, uses differential evolution to find an estimate.</p>

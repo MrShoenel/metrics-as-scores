@@ -156,67 +156,10 @@ that handles out-of-bounds values explicitly. Also, we assume that <code class="
 <section id="module-metrics_as_scores.tools.lazy">
 <span id="metrics-as-scores-tools-lazy-module"></span><h2>metrics_as_scores.tools.lazy module<a class="headerlink" href="#module-metrics_as_scores.tools.lazy" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.tools.lazy.</span></span><span class="sig-name descname"><span class="pre">Lazy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn_create_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/tools/lazy.html#Lazy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
-<p>Helper class to lazily compute a value, thread-safe.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn_create_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/tools/lazy.html#Lazy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>fn_create_val: <code class="docutils literal notranslate"><span class="pre">Callable[[],</span> <span class="pre">T]</span></code></dt><dd><p>Function that produces the desired value.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.unset_value">
-<span class="sig-name descname"><span class="pre">unset_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/tools/lazy.html#Lazy.unset_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.unset_value" title="Permalink to this definition"></a></dt>
-<dd><p>Used to explicitly unset (destroy) the previously produced value.
-This method is thread-safe.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.has_value_volatile">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_value_volatile</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.has_value_volatile" title="Permalink to this definition"></a></dt>
-<dd><p>Checks, in a volatile manner, if a value is present.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.has_value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.has_value" title="Permalink to this definition"></a></dt>
-<dd><p>Checks whether a value is present, after having acquired the lock.
-Note that the value may be gone after method exit anyway.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.value_volatile">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_volatile</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.value_volatile" title="Permalink to this definition"></a></dt>
-<dd><p>Returns, in a volatile manner, the value. The value may or may not exist.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">T</span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.value" title="Permalink to this definition"></a></dt>
-<dd><p>Gets the value. If it was not produced previously, it will be produced first.
-Therefore, this getter is guaranteed to return a value (provided the factory
-of the value does not throw).</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.Lazy.value_future">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_future</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Future</span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.Lazy.value_future" title="Permalink to this definition"></a></dt>
-<dd><p>Gets an awaitable <code class="xref py py-class docutils literal notranslate"><span class="pre">Future</span></code> that will yield the produced value
-once it is available.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.SelfResetLazy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.tools.lazy.</span></span><span class="sig-name descname"><span class="pre">SelfResetLazy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn_create_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_destroy_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/tools/lazy.html#SelfResetLazy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.lazy.SelfResetLazy" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
-<p>Similar to <a class="reference internal" href="#metrics_as_scores.tools.lazy.Lazy" title="metrics_as_scores.tools.lazy.Lazy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lazy</span></code></a>, this class also automatically destroys its value
+<p>Similar to <code class="xref py py-class docutils literal notranslate"><span class="pre">Lazy</span></code>, this class also automatically destroys its value
 after some timeout, so that subsequent requests to it force the factory to
 produce a new instance.</p>
 <dl class="py method">
@@ -257,9 +200,9 @@ present, it is passed to py:meth:<cite>fn_destroy_val()</cite> first.</p>
 <dd><p>Thread-safe getter for checking if a value is present.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="metrics_as_scores.tools.lazy.SelfResetLazy.value_volatile">
-<span class="sig-name descname"><span class="pre">value_volatile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/tools/lazy.html#SelfResetLazy.value_volatile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.lazy.SelfResetLazy.value_volatile" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_volatile</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#metrics_as_scores.tools.lazy.SelfResetLazy.value_volatile" title="Permalink to this definition"></a></dt>
 <dd><p>Volatile getter for the may-not-present value.</p>
 </dd></dl>
 

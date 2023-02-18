@@ -298,6 +298,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate"><code class="docutils literal notranslate"><span class="pre">KDE_integrate</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate.__init__"><code class="docutils literal notranslate"><span class="pre">KDE_integrate.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate.init_ppf"><code class="docutils literal notranslate"><span class="pre">KDE_integrate.init_ppf()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_approx"><code class="docutils literal notranslate"><span class="pre">KDE_approx</span></code></a><ul>
@@ -318,6 +319,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric"><code class="docutils literal notranslate"><span class="pre">Parametric</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.__init__"><code class="docutils literal notranslate"><span class="pre">Parametric.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric._min_max"><code class="docutils literal notranslate"><span class="pre">Parametric._min_max()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.unfitted"><code class="docutils literal notranslate"><span class="pre">Parametric.unfitted()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.use_stat_test"><code class="docutils literal notranslate"><span class="pre">Parametric.use_stat_test</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric.pval"><code class="docutils literal notranslate"><span class="pre">Parametric.pval</span></code></a></li>
@@ -501,23 +503,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="metrics_as_scores.tools.html#module-metrics_as_scores.tools.lazy">metrics_as_scores.tools.lazy module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy"><code class="docutils literal notranslate"><span class="pre">Lazy</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.__init__"><code class="docutils literal notranslate"><span class="pre">Lazy.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.unset_value"><code class="docutils literal notranslate"><span class="pre">Lazy.unset_value()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.has_value_volatile"><code class="docutils literal notranslate"><span class="pre">Lazy.has_value_volatile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.has_value"><code class="docutils literal notranslate"><span class="pre">Lazy.has_value</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.value_volatile"><code class="docutils literal notranslate"><span class="pre">Lazy.value_volatile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.value"><code class="docutils literal notranslate"><span class="pre">Lazy.value</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.Lazy.value_future"><code class="docutils literal notranslate"><span class="pre">Lazy.value_future</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.__init__"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.reset_after"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.reset_after</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.unset_value"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.unset_value()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.has_value_volatile"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.has_value_volatile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.has_value"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.has_value</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.value_volatile"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.value_volatile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.value_volatile"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.value_volatile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.value"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.value</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.tools.html#metrics_as_scores.tools.lazy.SelfResetLazy.value_future"><code class="docutils literal notranslate"><span class="pre">SelfResetLazy.value_future</span></code></a></li>
 </ul>
