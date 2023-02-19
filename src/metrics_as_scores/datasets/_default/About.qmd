@@ -61,7 +61,7 @@ dm(f"""
 ```
 
 
-This dataset has the following **Quantity Types**:
+This dataset has the following **Features**:
 
 ```{python}
 #| echo: false
@@ -83,7 +83,7 @@ contexts = list(dataset.contexts(include_all_contexts=False))
 contexts.sort(key=natsort)
 
 dm(f'''
-It has a total of {len(contexts)} **Contexts**: {format_comma_and(list([f'*{c}*' for c in contexts]))}.''')
+It has a total of {len(contexts)} **Groups**: {format_comma_and(list([f'*{c}*' for c in contexts]))}.''')
 ```
 
 
@@ -91,25 +91,25 @@ It has a total of {len(contexts)} **Contexts**: {format_comma_and(list([f'*{c}*'
 # Analysis
 
 In this section, results for the analysis of variance (ANOVA) and Tukey's Honest Significance Test (TukeyHSD) are shown.
-These tests will give a first indication as to how different the quantity types are across contexts.
+These tests will give a first indication as to how different the features are across groups.
 These two tests were used in the original paper [@honel2022qrs] that *Metrics As Scores* was initially conceived for.
 
 
 These tests are conducted to help answering related questions, such as:
 
-- Are there significant statistical differences for each type of quantity across all contexts?
-- Is each context in its entirety (i.e., considering all types of quantities) distinguishable from the other contexts?
-- What are good/bad or common/extreme scores for each context of the given dataset?
+- Are there significant statistical differences for each feature across all groups?
+- Is each group in its entirety (i.e., considering all features) distinguishable from the other groups?
+- What are good/bad or common/extreme scores for each group of the given dataset?
 
 
 ## ANOVA
 
 This test analyzes the differences among means [@Chambers2017-fu].
-For each type of quantity, this test analyzes if means of its samples are significantly different across contexts.
+For each feature, this test analyzes if means of its samples are significantly different across groups.
 The null hypothesis of this test is that there are *no* significant differences.
 This test yields a p-value and an F-statistic.
 The latter is the mean square of each independent variable divided by the mean square of the residuals.
-Large F-statistics indicate that the variation among contexts is likely.
+Large F-statistics indicate that the variation among groups is likely.
 The p-value then indicates how likely it is for the F-statistic to have occurred, given the null hypothesis is true.
 
 
@@ -120,14 +120,14 @@ KS2 does not check for a certain type of probability distribution since it uses 
 Its test statistic is the maximum vertical distance between the two CDFs.
 For two samples $\mathbf{x},\mathbf{y}$, the statistic is calculated as $D_{\mathbf{x},\mathbf{y}}\tight{=}\sup_t\,\abs{F_{\mathcal{X}}(t)\tight{-}F_{\mathcal{Y}}(t)}$.
 The null hypothesis is that the samples' CDFs are identical, that is, $F_{\mathcal{X}}\tight{=}F_{\mathcal{Y}}$.
-This test is used to compare one type of quantity between two contexts.
+This test is used to compare one feature between two groups.
 
 
 ## TukeyHSD
 
 This test is used to gain insights into the results of an ANOVA test.
 While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons [@tukey1949hsd].
-For example, by choosing a certain type of quantity and context, we obtain a list of other contexts that are significantly statistically different.
+For example, by choosing a certain feature and group, we obtain a list of other groups that are significantly statistically different.
 The null hypothesis of this test is the same as for the ANOVA test.
 
 
@@ -139,9 +139,9 @@ Here we present some insights from conducting the ANOVA- KS2-, and TukeyHSD test
 ## ANOVA
 
 @tbl-anova show the results of the ANOVA analysis.
-For each type of quantity, it indicates whether the quantity types' means vary significantly across contexts.
-For this test, we also add a virtual contexts, in which we simply merge the values of all contexts and effectively disregard the context.
-Therefore, the ANOVA test also indicates whether quantity types' values are different in a specific context when compared to all recorded values.
+For each feature, it indicates whether the features' means vary significantly across groups.
+For this test, we also add a virtual group, in which we simply merge the values of all groups and effectively disregard the group attribute.
+Therefore, the ANOVA test also indicates whether the features' values are different in a specific group when compared to all recorded values.
 
 
 ```{python}
@@ -155,15 +155,15 @@ row = df_anova.iloc[0,:].to_dict()
 null_holds = row["pval"] > use_alpha
 interpret: str=None
 if null_holds:
-	interpret = f'For a significance level of $\\alpha\\tight{{=}}{use_alpha}$, the null hypothesis cannot be rejected, meaning that the means of samples of the quantity type {row["qtype"]} are not statistically significantly different across contexts.'
+	interpret = f'For a significance level of $\\alpha\\tight{{=}}{use_alpha}$, the null hypothesis cannot be rejected, meaning that the means of samples of the feature {row["qtype"]} are not statistically significantly different across groups.'
 else:
-	interpret = f'We cannot accept the null hypothesis for a significance level of $\\alpha\\tight{{=}}{use_alpha}$, meaning that the the means of samples of the quantity type {row["qtype"]} have statistically significantly different means across contexts.'
+	interpret = f'We cannot accept the null hypothesis for a significance level of $\\alpha\\tight{{=}}{use_alpha}$, meaning that the the means of samples of the feature {row["qtype"]} have statistically significantly different means across groups.'
 
 
 dm(f'''
-@tbl-anova shows, for each quantity type, if there was corroboration for the null hypothesis, which here is whether the samples of the same quantity type have the same mean across contexts.
-So, for example, samples of the first quantity type **{row["qtype"]}** were compared across
-contexts {format_comma_and(list([f"*{c}*" for c in row["across_contexts"].split(";")]))}.
+@tbl-anova shows, for each feature, if there was corroboration for the null hypothesis, which here is whether the samples of the same feature have the same mean across groups.
+So, for example, samples of the first feature **{row["qtype"]}** were compared across
+groups {format_comma_and(list([f"*{c}*" for c in row["across_contexts"].split(";")]))}.
 {interpret}
 '''.strip())
 ```
@@ -176,7 +176,7 @@ contexts {format_comma_and(list([f"*{c}*" for c in row["across_contexts"].split(
 #| echo: false
 
 temp = df_anova[['qtype', 'pval', 'stat']]
-Markdown(tabulate(tabular_data=temp, headers=['Quantity Type', 'p-Value', 'F-Statistic'], showindex=False))
+Markdown(tabulate(tabular_data=temp, headers=['Feature', 'p-Value', 'F-Statistic'], showindex=False))
 ```
 
 
@@ -192,11 +192,11 @@ r = int(n * (n - 1) / 2)
 dm(f'''
 The two-sample Kolmogorov--Smirnov test checks if two samples stem from an identical distribution (which is the null hypothesis).
 The KS2 test requires pairwise comparisons.
-For each type of quantity, we compare it within all the contexts.
+For each feature, we compare it within all the groups.
 Therefore, all pair-wise combinations are computed.
-This dataset has ${n-1}$ contexts plus one virtual (in which we effectively disregard the context, therefore, $n\\tight{{=}}{n}$).
-The number of pair-wise comparisons per type of quantity, therefore, is $n\\tight{{\\times}}(n\\tight{{-}}1)\\tight{{\\div}}2\\tight{{=}}{r}$.
-In other words, each type of quantity can significantly stick out anywhere between zero and ${r}$ times.
+This dataset has ${n-1}$ groups plus one virtual (in which we effectively disregard the group, therefore, $n\\tight{{=}}{n}$).
+The number of pair-wise comparisons per feature, therefore, is $n\\tight{{\\times}}(n\\tight{{-}}1)\\tight{{\\div}}2\\tight{{=}}{r}$.
+In other words, each feature can significantly stick out anywhere between zero and ${r}$ times.
 @fig-ks2 shows the results of the KS2 test using the significance threshold $\\alpha\\tight{{=}}{use_alpha}$.
 '''.strip())
 ```
@@ -204,7 +204,7 @@ In other words, each type of quantity can significantly stick out anywhere betwe
 
 ```{python}
 #| label: fig-ks2
-#| fig-cap: The frequency with which quantity types were considered to come from the same distribution. Numbers close to the max indicate that the type of quantity is not significantly different across contexts.
+#| fig-cap: The frequency with which features were considered to come from the same distribution. Numbers close to the max indicate that the feature is not significantly different across groups.
 #| echo: false
 #| warning: false
 
@@ -234,7 +234,7 @@ plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Computer Modern Roman"
 })
-plt.title("Frequency with which metrics are similar across contexts.")
+plt.title("Frequency with which features are similar across groups.")
 plt.show()
 ```
 
@@ -251,18 +251,18 @@ m = len(qtypes)
 r = (n-1) * m
 
 dm(f'''
-Per context, this test allows us to report how many types of quantities are different, compared to all other contexts' types of quantities.
-Consider the set of contexts $\\mathit{{C}}$ and the set of quantity types $\\mathit{{Q}}$.
-Given a context $c_i$ and a quantity type $q_j$, this test reports all other contexts $\\mathit{{C}}^{{\\setminus c_i}}$ that have a statistically significantly different distribution for $q_j$.
-However, for $c_i$, we aggregate these counts across all quantity types.
-We have a total of $n\\tight{{=}}{n-1}+1$ contexts (including the virtual context).
-Therefore, the amount of quantity types ($m\\tight{{=}}{len(qtypes)}$) that are different in different contexts can maximally be $(n\\tight{{-}}1)\\tight{{\\times}}m\\tight{{=}}{r}$.
+Per group, this test allows us to report how many features are different, compared to all other groups' features.
+Consider the set of groups $\\mathit{{G}}$ and the set of features $\\mathit{{F}}$.
+Given a group $g_i$ and a feature $f_j$, this test reports all other groups $\\mathit{{G}}^{{\\setminus g_i}}$ that have a statistically significantly different distribution for $f_j$.
+However, for $g_i$, we aggregate these counts across all features.
+We have a total of $n\\tight{{=}}{n-1}+1$ groups (including the virtual group).
+Therefore, the number of features ($m\\tight{{=}}{len(qtypes)}$) that are different in different groups can maximally be $(n\\tight{{-}}1)\\tight{{\\times}}m\\tight{{=}}{r}$.
 '''.strip())
 ```
 
 ```{python}
 #| label: fig-tukey
-#| fig-cap: Number of quantity types that are different per context, by comparing each context to all other contexts.
+#| fig-cap: Number of features that are different per group, by comparing each group to all other groups.
 #| echo: false
 #| warning: false
 
@@ -272,7 +272,7 @@ temp = list()
 for idx in range(len(df_tukey.index)):
 	row = df_tukey.iloc[idx,:].to_dict()
 	if row['reject']:
-		# Reject null hypothesis -> qtype's contexts are different
+		# Reject null hypothesis -> feature's groups are different
 		temp.append(row['group1'])
 		temp.append(row['group2'])
 
@@ -307,7 +307,7 @@ plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Computer Modern Roman"
 })
-plt.title("Number of quantity types different per context.")
+plt.title("Number of features different per group.")
 plt.show()
 ```
 
@@ -321,7 +321,7 @@ use_qty = qtypes[0]
 
 dm(f'''
 In this section, we demonstrate some common or extreme values by showing what (maximum) distance is required to achieve a score as shown in header of @tbl-common-extreme.
-The example shown here is that of the first type of quantity (**{use_qty}**), which has been transformed using each context's expection, $\\mathbb{{E}}[X]$.
+The example shown here is that of the first feature (**{use_qty}**), which has been transformed using each group's expection, $\\mathbb{{E}}[X]$.
 Since it is practically unlikely to have uniformly distributed quantities, a linear increase in score is usually associated with a non-linear decrease in distance.
 Note that the values in @tbl-common-extreme are approximate.
 
@@ -347,7 +347,7 @@ with open(file=str(dataset_dir.joinpath('./densities/densities_KDE_approx_EXPECT
 
 ```{python}
 #| label: tbl-common-extreme
-#| tbl-cap: The required maximum distance from the context's expectation $\mathbb{E}[X]$ to achieve a score less than or equal to $x$. The __ALL__-context is shown as well.
+#| tbl-cap: The required maximum distance from the group's expectation $\mathbb{E}[X]$ to achieve a score less than or equal to $x$. The __ALL__-group is shown as well.
 #| echo: false
 
 import numpy as np
