@@ -68,20 +68,19 @@ Contains the data and scripts needed for the application
 This package accompanies the paper entitled “*Contextual
 Operationalization of Metrics As Scores: Is My Metric Value Good?*”
 (Hönel et al. 2022). It seeks to answer the question whether or not the
-context a software metric was captured in, matters. It enables the user
-to compare contexts and to understand their differences. In order to
+domain a software metric was captured in, matters. It enables the user
+to compare domains and to understand their differences. In order to
 answer the question of whether a metric value is actually good, we need
 to transform it into a **score**. Scores are normalized **and
 rectified** distances, that can be compared in an apples-to-apples
-manner, across contexts. The same metric value might be good in one
-context, while it is not in another. To borrow an example from the
-context of software: It is much more acceptable (or common) to have
-large applications (in terms of lines of code) in the contexts/domains
-of games and databases than it is for the domains of IDEs and SDKs.
-Given an *ideal* value for a metric (which may also be user-defined), we
-can transform observed metric values to distances from that value and
-then use the cumulative distribution function to map distances to
-scores.
+manner, across domains. The same metric value might be good in one
+domain, while it is not in another. To borrow an example from the domain
+of software: It is much more acceptable (or common) to have large
+applications (in terms of lines of code) in the domains of games and
+databases than it is for the domains of IDEs and SDKs. Given an *ideal*
+value for a metric (which may also be user-defined), we can transform
+observed metric values to distances from that value and then use the
+cumulative distribution function to map distances to scores.
 
 ------------------------------------------------------------------------
 
@@ -131,10 +130,10 @@ code, if you want to do one of the following:
 Metrics As Scores’ main feature is perhaps the Web Application. It can
 be run directly and locally from the TUI using a selected dataset (you
 may download a known dataset or use your own). The Web Application
-allows to visually inspect each *quantity type* across all the defined
-contexts. It feates the PDF/PMF, CDF and CCDF, as well as the PPF for
-each quantity in each context. It offers five different principal types
-of densities: Parametric, Parametric (discrete), Empirical, Empirical
+allows to visually inspect each *feature* across all the defined
+*groups*. It feates the PDF/PMF, CDF and CCDF, as well as the PPF for
+each feature in each group. It offers five different principal types of
+densities: Parametric, Parametric (discrete), Empirical, Empirical
 (discrete), and (approximate) Kernel Density Estimation. The Web
 Application includes a detailed [Help
 section](https://metrics-as-scores.ml/#help) that should answer most of
@@ -215,13 +214,13 @@ You can also generate coverage reports:
 *Metrics As Scores* can be thought of an *interactive*, *multiple-ANOVA*
 analysis and explorer. The analysis of variance (ANOVA; John M. Chambers
 (2017)) is usually used to analyze the differences among *hypothesized*
-group means for a single *quantity*. An ANOVA might be used to estimate
+group means for a single *feature*. An ANOVA might be used to estimate
 the goodness-of-fit of a statistical model. Beyond ANOVA, `MAS` seeks to
-answer the question of whether a sample of a certain quantity is more or
-less common across groups. For each group, we can determine what might
-constitute a common/ideal value, and how distant the sample is from that
-value. This is expressed in terms of a percentile (a standardized scale
-of `[0,1]`), which we call **score**.
+answer the question of whether a sample of a certain quantity (feature)
+is more or less common across groups. For each group, we can determine
+what might constitute a common/ideal value, and how distant the sample
+is from that value. This is expressed in terms of a percentile (a
+standardized scale of `[0,1]`), which we call **score**.
 
 ## Software Metrics Example
 
@@ -241,7 +240,7 @@ Since there are many software metrics that are captured simultaneously,
 we can also compare domains in their entirety: How many metrics are
 statistically significantly different from each other? Is there a set of
 domains that are not distinguishable from each other? Are there metrics
-that are always different across contexts and must be used with care?
+that are always different across domains and must be used with care?
 
 This example is available as a downloadable dataset (Hönel 2023b). It is
 based on software metrics and application domains of the “Qualitas.class
@@ -257,7 +256,7 @@ color. Suppose we are interested in examining properties of diamonds of
 the highest quality only, across colors. Therefore, we select only those
 diamonds from the dataset that have an *ideal* cut and the best (*IF*)
 clarity. Now only the color quality gives a context to each diamonds and
-its attributes.
+its attributes (i.e., diamonds are now *grouped* by color).
 
 This constellation now allows us to examine differences across
 differently colored diamonds. For example, there are considerable
@@ -287,19 +286,19 @@ create a publishable dataset. For example, it carries out the common
 statistical tests:
 
 - ANOVA (John M. Chambers 2017): Analysis of variance of your data
-  across the available contexts.
+  across the available groups.
 - Tukey’s Honest Significance Test (TukeyHSD; Tukey (1949)): This test
   is used to gain insights into the results of an ANOVA test. While the
   former only allows obtaining the amount of corroboration for the null
   hypothesis, TukeyHSD performs all pairwise comparisons (for all
-  possible combinations of any two contexts).
+  possible combinations of any two groups).
 - Two-sample T-test: Compares the means of two samples to give an
   indication whether or not they appear to come from the same
-  distribution. Again, this is useful for comparing contexts. Tukey’s
-  test is used to gain insights into the results of an ANOVA test. While
-  the former only allows obtaining the amount of corroboration for the
-  null hypothesis, TukeyHSD performs all pairwise comparisons (for all
-  possible combinations of any two contexts).
+  distribution. Again, this is useful for comparing groups. Tukey’s test
+  is used to gain insights into the results of an ANOVA test. While the
+  former only allows obtaining the amount of corroboration for the null
+  hypothesis, TukeyHSD performs all pairwise comparisons (for all
+  possible combinations of any two groups).
 
 It also creates an **automatic report** based on these tests that you
 can simply render into a PDF using Quarto.
