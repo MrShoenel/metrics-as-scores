@@ -142,9 +142,9 @@ a never-terminating loop (except for when the user presses Ctr+c).</p>
 <p>This workflow creates an own, local dataset from a single data source that can
 be read by Pandas from file or URL. The original dataset needs three columns:
 For a single sample, one column holds the numeric observation, one holds the
-ordinal type, and one holds the context associated with it. A dataset can hold
-one or more types, but should hold at least two contexts in order to compare
-distributions of a single sample type across contexts.
+ordinal type (name of feature), and one holds the group associated with it. A
+dataset can hold one or more features, but should hold at least two groups in
+order to compare distributions of a single sample type across groups.
 This workflow creates the entire dataset: The manifest JSON, the parametric fits,
 the pre-generated distributions. When done, the dataset is installed, such that it
 can be discovered and used by the local Web-Application. If you wish to publish
@@ -196,7 +196,7 @@ and then enter the ID here.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.FitParametric.</span></span><span class="sig-name descname"><span class="pre">FitParametricWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/FitParametric.html#FitParametricWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.FitParametric.FitParametricWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
 <p>This workflow fits distributions to an existing dataset. For each
-type of quantity, and for each context, a large number of random
+feature, and for each group, a large number of random
 variables are fit, and a number of statistical tests are carried
 out such that the best-fitting distribution may be selected/used.
 Regardless of whether a quantity is continuous or discrete, many
@@ -209,9 +209,9 @@ you want to attempt to fit. However, if you intend to share your
 dataset and make it available to others, then you should include
 and attempt to fit all distributions.</p>
 <p>The following process, once begun, will save the result of fitting
-a single type of quantity (from within a single context) as a
-separate file. If the file already exists, no new fit is attempted.
-This is so that this process can be interrupted and resumed.</p>
+a single feature (from within a single group) as a separate file.
+If the file already exists, no new fit is attempted. This is so that
+this process can be interrupted and resumed.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.FitParametric.FitParametricWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/FitParametric.html#FitParametricWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.FitParametric.FitParametricWorkflow.__init__" title="Permalink to this definition"></a></dt>
@@ -237,10 +237,10 @@ Web Application. While those can be large, generating them on-the-fly is
 usually not possible in acceptable time. Using pre-generated functions
 is a trade-off between space and user experience, where we sacrifice the
 former as it is cheaper.</p>
-<p>For each quantity and each context, we pre-generate functions for the
+<p>For each feature and each group, we pre-generate functions for the
 probability density (PDF), the cumulative distribution (CDF) and its
 complement (CCDF), as well as the quantile (or percent point) function
-(PPF). So for one quantity and one context, we pre-generate one density
+(PPF). So for one feature and one group, we pre-generate one density
 that unites those four functions.</p>
 <p>There are 5 primary classes of densities: Parametric, Parametric_discrete,
 Empirical, Empirical_discrete, and KDE_approx. Please refer to the
@@ -297,7 +297,7 @@ contributing guidelines).</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.LocalDatasets.</span></span><span class="sig-name descname"><span class="pre">LocalDatasetsWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalDatasets.html#LocalDatasetsWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
 <p>This workflow lists all locally available datasets. This includes downloaded
-and installed datasets, as well manually created datasets.</p>
+and installed datasets, as well as manually created datasets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/LocalDatasets.html#LocalDatasetsWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.LocalDatasets.LocalDatasetsWorkflow.__init__" title="Permalink to this definition"></a></dt>

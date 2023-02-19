@@ -96,7 +96,7 @@
 <div class="viewcode-block" id="FitParametricWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.FitParametric.FitParametricWorkflow">[docs]</a><span class="k">class</span> <span class="nc">FitParametricWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
     <span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">This workflow fits distributions to an existing dataset. For each</span>
-<span class="s1">type of quantity, and for each context, a large number of random</span>
+<span class="s1">feature, and for each group, a large number of random</span>
 <span class="s1">variables are fit, and a number of statistical tests are carried</span>
 <span class="s1">out such that the best-fitting distribution may be selected/used.</span>
 <span class="s1">Regardless of whether a quantity is continuous or discrete, many</span>
@@ -111,9 +111,9 @@
 <span class="s1">and attempt to fit all distributions.</span>
 
 <span class="s1">The following process, once begun, will save the result of fitting</span>
-<span class="s1">a single type of quantity (from within a single context) as a</span>
-<span class="s1">separate file. If the file already exists, no new fit is attempted.</span>
-<span class="s1">This is so that this process can be interrupted and resumed.</span>
+<span class="s1">a single feature (from within a single group) as a separate file.</span>
+<span class="s1">If the file already exists, no new fit is attempted. This is so that</span>
+<span class="s1">this process can be interrupted and resumed.</span>
 <span class="s1">    &#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 <div class="viewcode-block" id="FitParametricWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.FitParametric.FitParametricWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -143,8 +143,8 @@
     <span class="k">def</span> <span class="nf">_select_discrete_rvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">rv_discrete</span><span class="p">]]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">You can now select the discrete random variables that you want to</span>
-<span class="s1">additionally attempt to fit to discrete quantity types. Select all</span>
-<span class="s1">in case you intend to redistribute and publicize your dataset.</span>
+<span class="s1">additionally attempt to fit to discrete features. Select all in</span>
+<span class="s1">case you intend to redistribute and publicize your dataset.</span>
 <span class="s1">While there are much fewer discrete random variables, their fitting</span>
 <span class="s1">is dramatically more computationally expensive to compute, since a</span>
 <span class="s1">global search has to be performed.&#39;&#39;&#39;</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
