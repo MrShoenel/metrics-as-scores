@@ -25,9 +25,9 @@ class CreateDatasetWorkflow(Workflow):
 This workflow creates an own, local dataset from a single data source that can
 be read by Pandas from file or URL. The original dataset needs three columns:
 For a single sample, one column holds the numeric observation, one holds the
-ordinal type, and one holds the context associated with it. A dataset can hold
-one or more types, but should hold at least two contexts in order to compare
-distributions of a single sample type across contexts.
+ordinal type (name of feature), and one holds the group associated with it. A
+dataset can hold one or more features, but should hold at least two groups in
+order to compare distributions of a single sample type across groups.
 This workflow creates the entire dataset: The manifest JSON, the parametric fits,
 the pre-generated distributions. When done, the dataset is installed, such that it
 can be discovered and used by the local Web-Application. If you wish to publish
@@ -104,17 +104,17 @@ previous menu afterwards.
         col_data = self.ask(prompt='Which column holds the data?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_data'] = col_data
         del available_cols[col_data]
-        col_type = self.ask(prompt='What is the name of the type column?', options=list(available_cols.keys()), rtype=str)
+        col_type = self.ask(prompt='What is the name of the features\' column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_type'] = col_type
         del available_cols[col_type]
-        col_ctx = self.ask(prompt='What is the name of the context column?', options=list(available_cols.keys()), rtype=str)
+        col_ctx = self.ask(prompt='What is the name of the groups\' column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_context'] = col_ctx
         del available_cols[col_ctx]
 
         # Now we only retain those two columns and all complete rows
         df = df.loc[:, [col_data, col_type, col_ctx]]
         df = df.loc[~(df.isna().any(axis=1)), :]
-        # Let's convert the type and context column to string.
+        # Let's convert the feature and group column to string.
         df[col_type] = df[col_type].astype(str)
         df[col_ctx] = df[col_ctx].astype(str)
 
@@ -125,19 +125,19 @@ previous menu afterwards.
         contexts = list([str(a) for a in df[col_ctx].unique()])
         contexts.sort(key=natsort)
         jsd['contexts'] = contexts
-        self.print_info(text_normal='The following quantity types were found: ', text_vital=', '.join(qtypes))
-        self.print_info(text_normal='The following contexts exist in the data: ', text_vital=', '.join(contexts))
+        self.print_info(text_normal='The following features were found: ', text_vital=', '.join(qtypes))
+        self.print_info(text_normal='The following groups exist in the data: ', text_vital=', '.join(contexts))
 
         # Let's ask some descriptions for qtypes and contexts:
-        self.q.print('\nYou should now enter a very brief (max. 30 characters) description for each quantity type.\n')
+        self.q.print('\nYou should now enter a very brief (max. 50 characters) description for each feature.\n')
         jsd['desc_qtypes'] = { qtype: None for qtype in qtypes }
         for qtype in qtypes:
-            jsd['desc_qtypes'][qtype] = self.q.text(message=f'Enter a description for {qtype}: ', validate=lambda s: len(s) > 0 and len(s) <= 30).ask().strip()
+            jsd['desc_qtypes'][qtype] = self.q.text(message=f'Enter a description for {qtype}: ', validate=lambda s: len(s) > 0 and len(s) <= 50).ask().strip()
         
-        self.q.print('\nYou can now enter an optional brief (max. 30 characters) description for each context.\n')
+        self.q.print('\nYou can now enter an optional brief (max. 50 characters) description for each group.\n')
         jsd['desc_contexts'] = { ctx: None for ctx in contexts }
         for ctx in contexts:
-            temp = self.q.text(message=f'Enter an optional description for {ctx} (empty for none): ', validate=lambda s: len(s) <= 30).ask().strip()
+            temp = self.q.text(message=f'Enter an optional description for {ctx} (empty for none): ', validate=lambda s: len(s) <= 50).ask().strip()
             jsd['desc_contexts'][ctx] = None if len(temp) == 0 else temp
 
         # Determine if features are discrete or continuous
@@ -151,12 +151,12 @@ previous menu afterwards.
             self.q.print(f' [{jsd["qtypes"][t]}]')
 
         # Ideal Values:
-        self.q.print(f'\nYou can now define custom ideal values for each type of quantity.', style=self.style_mas)
+        self.q.print(f'\nYou can now define custom ideal values for each feature.', style=self.style_mas)
         self.q.print(10*'-')
         self.q.print('''
-An ideal (utopian) value for a type of quantity represents the most desirable
+An ideal (utopian) value for a feature represents the most desirable
 value for it. Depending on your use case, it is possible that there is no such
-value for each type of quantity. For example, in software metrics, the lowest
+value for each feature. For example, in software metrics, the lowest
 possible - and therefore most desirable - value for complexity, is 1. Most other
 software metrics, however, do not have such an ideal value. For example, there
 is no best value for lines of code (size) of software.

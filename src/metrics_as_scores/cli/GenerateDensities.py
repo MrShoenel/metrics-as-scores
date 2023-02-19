@@ -18,10 +18,10 @@ usually not possible in acceptable time. Using pre-generated functions
 is a trade-off between space and user experience, where we sacrifice the
 former as it is cheaper.
 
-For each quantity and each context, we pre-generate functions for the
+For each feature and each group, we pre-generate functions for the
 probability density (PDF), the cumulative distribution (CDF) and its
 complement (CCDF), as well as the quantile (or percent point) function
-(PPF). So for one quantity and one context, we pre-generate one density
+(PPF). So for one feature and one group, we pre-generate one density
 that unites those four functions.
 
 There are 5 primary classes of densities: Parametric, Parametric_discrete,

@@ -24,7 +24,7 @@ from scipy.stats._discrete_distns import betabinom_gen, logser_gen, planck_gen, 
 class FitParametricWorkflow(Workflow):
     __doc__ = '''
 This workflow fits distributions to an existing dataset. For each
-type of quantity, and for each context, a large number of random
+feature, and for each group, a large number of random
 variables are fit, and a number of statistical tests are carried
 out such that the best-fitting distribution may be selected/used.
 Regardless of whether a quantity is continuous or discrete, many
@@ -39,9 +39,9 @@ dataset and make it available to others, then you should include
 and attempt to fit all distributions.
 
 The following process, once begun, will save the result of fitting
-a single type of quantity (from within a single context) as a
-separate file. If the file already exists, no new fit is attempted.
-This is so that this process can be interrupted and resumed.
+a single feature (from within a single group) as a separate file.
+If the file already exists, no new fit is attempted. This is so that
+this process can be interrupted and resumed.
     '''.strip()
 
     def __init__(self) -> None:
@@ -71,8 +71,8 @@ fast.'''.strip())
     def _select_discrete_rvs(self) -> Iterable[type[rv_discrete]]:
         self.q.print('''
 You can now select the discrete random variables that you want to
-additionally attempt to fit to discrete quantity types. Select all
-in case you intend to redistribute and publicize your dataset.
+additionally attempt to fit to discrete features. Select all in
+case you intend to redistribute and publicize your dataset.
 While there are much fewer discrete random variables, their fitting
 is dramatically more computationally expensive to compute, since a
 global search has to be performed.'''.strip())
