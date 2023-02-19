@@ -13,10 +13,16 @@ and installed datasets, as well as manually created datasets.
         super().__init__()
     
     def _print_json_dataset(self, jsd: LocalDataset) -> None:
-        self.q.print('     Name: ', style=self.style_mas, end='')
-        self.q.print(jsd['name'])
-        self.q.print('       ID: ', style=self.style_mas, end='')
-        self.q.print(jsd['id'])
+        self.q.print('   Author: ', style=self.style_mas, end='')
+        self.q.print(', '.join(jsd['author']))
+        self.q.print('  Name/ID: ', style=self.style_mas, end='')
+        self.q.print(f'{jsd["name"]} [{jsd["id"]}]')
+        self.q.print('    About: ', style=self.style_mas, end='')
+        self.q.print(jsd['desc'])
+        self.q.print(' Features: ', style=self.style_mas, end='')
+        self.q.print(', '.join(jsd['qtypes']))
+        self.q.print('   Groups: ', style=self.style_mas, end='')
+        self.q.print(', '.join(jsd['contexts']))
 
     def show_datasets(self) -> None:
         """Main entry point for this workflow."""
