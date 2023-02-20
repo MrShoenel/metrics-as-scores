@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from tempfile import tempdir
 from pathlib import Path
 from test_Dataset import get_elisa
@@ -33,6 +34,13 @@ def test_generate_empirical():
 def test_generate_empirical_discrete():
     ds = get_elisa()
     ds.ds['qtypes'] = { 'Lot1': 'continuous' }
+    ds.ds['contexts'] = ['Run1']
+
+    generate_empirical_discrete(dataset=ds, densities_dir=Path(tempdir), transform=DistTransform.NONE)
+
+    # Test discrete data:
+    ds = get_elisa()
+    ds.ds['qtypes'] = { 'Lot1': 'discrete' }
     ds.ds['contexts'] = ['Run1']
 
     generate_empirical_discrete(dataset=ds, densities_dir=Path(tempdir), transform=DistTransform.NONE)
