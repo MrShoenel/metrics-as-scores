@@ -45,7 +45,6 @@ from pymoo.termination.default import DefaultTermination
 from pymoo.indicators.igd import IGD
 from pymoo.termination.cv import ConstraintViolationTermination
 from pymoo.termination.default import DefaultTermination
-from pymoo.indicators.igd import IGD
 from pymoo.termination.robust import RobustTermination
 from pymoo.termination.default import SingleObjectiveSpaceTermination
 from pymoo.termination.xtol import DesignSpaceTermination
@@ -62,7 +61,7 @@ from scipy.stats import cramervonmises, cramervonmises_2samp, ks_1samp, ks_2samp
 # We override this class because of a bug in pymoo.
 class DesignSpaceTerminationFixed(DesignSpaceTermination):
     def _delta(self, prev, current):
-        if prev.dtype == float and current.dtype == float:
+        if prev.dtype == float and current.dtype == float: # pragma: no cover
             return IGD(current).do(prev)
         else:
             # The error was here: it uses axis=1, but it appears this does not work
@@ -319,7 +318,7 @@ class FitterPymoo(Fitter):
             results.sort(key=lambda r: r.F[0])
             return results[0].X
 
-        raise Exception('Optimization did not find a maximum likelihood estimate.')
+        raise Exception('Optimization did not find a maximum likelihood estimate.') # pragma: no cover
 
 
 
@@ -456,7 +455,7 @@ class StatisticalTest:
                         result = epps_singleton_2samp(x=use_data1, y=use_data2)
                         pval = result.pvalue
                         stat = result.statistic
-                except:
+                except: # pragma: no cover
                     pass # Ignore a failed test; e.g. Epps requires > 4 samples
 
                 # Always create the entry, even for failed tests.

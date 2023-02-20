@@ -87,7 +87,9 @@ def generate_parametric_fits(
         expanded_grid = pd.DataFrame(ParameterGrid(param_grid=param_grid))
 
     discrete_types = ds.quantity_types_discrete
-    if len(discrete_types) > 0 and len(selected_rvs_d) > 0:
+    # We will not cover this because it is too expensive to try and
+    # fit a discrete random variable.
+    if len(discrete_types) > 0 and len(selected_rvs_d) > 0: # pragma: no cover
         # Only fit discrete if we have it
         param_grid = {
             'context': list(ds.contexts(include_all_contexts=True)),
@@ -108,7 +110,7 @@ def generate_parametric_fits(
         discrete_discrete = ds.is_qtype_discrete(qtype=row.qtype) and row.rv in selected_rvs_d
         if discrete_discrete:
             # Fit a discrete RV to discrete data
-            return (data_discrete_dict[key], data_discrete_dict[key_u], transform_values_discrete_dict[key])
+            return (data_discrete_dict[key], data_discrete_dict[key_u], transform_values_discrete_dict[key]) # pragma: no cover
         return (data_dict[key], data_dict[key_u], transform_values_dict[key])
 
     rng = default_rng(seed=76543210)

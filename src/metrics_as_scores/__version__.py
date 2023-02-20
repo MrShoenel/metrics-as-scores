@@ -21,9 +21,9 @@ This variable will reflect the version exactly as it was specified in the `pypro
 if pyproject_root.exists() and load(pyproject_root)['tool']['poetry']['name'] == 'metrics-as-scores':
     IS_MAS_LOCAL = True
     __version__ = load(pyproject_root)['tool']['poetry']['version']
-elif pyproject_local.exists():
+elif pyproject_local.exists(): # pragma: no cover
     __version__ = load(pyproject_local)['tool']['poetry']['version']
-else:
+else: # pragma: no cover
     raise Exception('Cannot determine version.')
 
 del this_dir

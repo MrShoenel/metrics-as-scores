@@ -75,14 +75,14 @@ def get_local_datasets() -> Iterable[LocalDataset]:
     for d in scandir(path=str(DATASETS_DIR.resolve())):
         if d.is_dir():
             if d.name == '_default':
-                continue
+                continue # pragma: no cover
             try:
                 manifest = DATASETS_DIR.joinpath(f'./{d.name}/manifest.json')
                 if manifest.exists():
                     with open(file=str(manifest), mode='r', encoding='utf-8') as fp:
                         manifest: LocalDataset = load(fp=fp)
                         yield manifest
-            except:
+            except: # pragma: no cover
                 pass
 
 

@@ -141,7 +141,8 @@ def fit(
     RV: type[Union[rv_continuous, rv_discrete]] = None
     if fit_continuous:
         RV = Continuous_RVs_dict[row.rv]
-    else:
+    else: # pragma: no cover
+        # We will not cover testing fitting of discrete RVs.
         RV = Discrete_RVs_dict[row.rv]
 
     unique_vals = ds.is_qtype_discrete(qtype=qtype) and fit_continuous
@@ -177,11 +178,11 @@ def fit(
         data_st = data if not unique_vals else np.rint(data) # Remove jitter for test
         st = StatisticalTest(data1=data_st, cdf=temp_cdf, ppf_or_data2=temp_ppf, max_samples=25_000)
         ret_dict.update(dict(stat_tests = dict(st)))
-    except Exception as e:
+    except Exception: # pragma: no cover
         # print(e)
         # Do nothing at the moment, and allow returning a dict without params and stat_tests
         pass
-    finally:
+    finally: # pragma: no cover
         if write_temporary_results:
             end = timer() - start
             print(f'DONE! it took {format(end, "0>5.0f")} seconds ({row.type}), [{row.rv}]')

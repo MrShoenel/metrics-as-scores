@@ -17,4 +17,4 @@ Have a look at :py:const:`IS_MAS_LOCAL`.
 :meta hide-value:
 """
 if not DATASETS_DIR.exists():
-    DATASETS_DIR.mkdir(exist_ok=False)
+    DATASETS_DIR.mkdir(exist_ok=False) # pragma: no cover

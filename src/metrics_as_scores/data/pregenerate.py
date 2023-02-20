@@ -124,7 +124,7 @@ def fits_to_MAS_densities(
             candidates = df[(df.context == context) & (df.qtype == qtype) & (df.type == the_type) & (df.dist_transform == dist_transform.name)]
             if len(candidates.index) == 0:
                 # No fit at all :(
-                the_dict[key] = Use_class.unfitted(dist_transform=dist_transform)
+                the_dict[key] = Use_class.unfitted(dist_transform=dist_transform) # pragma: no cover
             else:
                 candidates = candidates.sort_values(by=[use_stat], ascending=True, inplace=False) # Lowest D-stat first
                 best = candidates.head(1).iloc[0,]
@@ -135,10 +135,10 @@ def fits_to_MAS_densities(
                 for pi in dist._param_info():
                     use_key = f'params_{pi.name}'
                     if pi.name.endswith('_') and not use_key in df_cols:
-                        use_key = use_key.rstrip('_')
+                        use_key = use_key.rstrip('_') # pragma: no cover
                     try:
                         params += (best[use_key],)
-                    except KeyError:
+                    except KeyError: # pragma: no cover
                         # Happens when the candidate was not actually fit, e.g., when a discrete RV
                         # was selected for continuous data.
                         the_dict[key] = Use_class.unfitted(dist_transform=dist_transform)
@@ -221,7 +221,7 @@ def generate_parametric(
     fits_file = str(fits_dir.joinpath(f'./pregen_distns_{transform.name}.pickle').resolve())
     if not exists(fits_file):
         warn(f'Cannot generate parametric distribution for {clazz.__name__} and transformation {transform.name}, because the file {fits_file} does not exist. Did you forget to create the fits using the script pregenerate_distns.py?')
-        return
+        return # pragma: no cover
 
     with open(fits_file, 'rb') as f:
         distns_list = load(f)
