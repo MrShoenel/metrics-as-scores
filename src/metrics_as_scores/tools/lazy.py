@@ -26,6 +26,7 @@ class SelfResetLazy(Generic[T]):
             Amount of time, in seconds, after which the produced value ought to be destroyed.
         """
         self._val: T = None
+        self._val_type: type = None
         self._has_val = False
         self._semaphore = Semaphore(1)
 
@@ -72,6 +73,7 @@ class SelfResetLazy(Generic[T]):
                 if callable(self._fn_destroy_val):
                     self._fn_destroy_val(self._val) # Pass in the current value
                 self._val = None
+                self._val_type = None
                 self._has_val = False
                 collect()
         finally:
@@ -129,6 +131,7 @@ class SelfResetLazy(Generic[T]):
             self._semaphore.acquire()
             if not self._has_val:
                 self._val = self._fn_create_val()
+                self._val_type = type(self._val)
                 self._has_val = True
                 self._set_timer()
             return self._val
@@ -143,7 +146,8 @@ class SelfResetLazy(Generic[T]):
         f = Future()
 
         temp = self._val
-        if type(temp) is T and self.has_value_volatile:
+        tempt = self._val_type
+        if not tempt is None and isinstance(temp, tempt) and self.has_value_volatile: # pragma: no cover
             f.set_result(temp)
         else:
             def set_val():
