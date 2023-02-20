@@ -1,8 +1,10 @@
+from re import escape
 import numpy as np
 from tempfile import tempdir
 from pathlib import Path
 from test_Dataset import get_elisa
 from pickle import dump
+from pytest import raises
 #from metrics_as_scores.data.pregenerate_fit import fit, get_data_tuple
 from metrics_as_scores.data.pregenerate_distns import generate_parametric_fits
 from metrics_as_scores.distribution.fitting import FitterPymoo
@@ -26,6 +28,20 @@ def test_generate_parametric_fits():
     transform_values_dict, data_dict = fpw._get_data_tuples(dist_transform=DistTransform.NONE, continuous=True)
     # Discrete:
     transform_values_discrete_dict, data_discrete_dict = fpw._get_data_tuples(dist_transform=DistTransform.NONE, continuous=False)
+
+    # Should throw for empty grid:
+    with raises(Exception, match='Not enough quantity types and random variables were selected for fitting. Aborting.'):
+        generate_parametric_fits(
+            ds=ds,
+            num_jobs=1,
+            fitter_type=FitterPymoo,
+            dist_transform=DistTransform.NONE,
+            data_dict=data_dict,
+            transform_values_dict=transform_values_dict,
+            data_discrete_dict=data_discrete_dict,
+            transform_values_discrete_dict=transform_values_discrete_dict,
+            selected_rvs_c=[],
+            selected_rvs_d=[])
 
     res = generate_parametric_fits(
         ds=ds,
@@ -61,4 +77,12 @@ def test_generate_parametric_fits():
     r1 = dens_dict['Run1_Lot1']
     temp = r1.cdf(np.linspace(start=0.9, stop=1.8, num=100))
     assert np.all((temp >= 0.0) & (temp <= 1.0))
-    
+
+
+    # Also test what happens if fits-file does not exist:
+    import warnings
+    warnings.filterwarnings("error")
+    fits_file = str(fits_dir.joinpath(f'./pregen_distns_{DistTransform.EXPECTATION.name}.pickle').resolve()) 
+    with raises(Exception, match=escape(f'Cannot generate parametric distribution for {Parametric.__name__} and transformation {DistTransform.EXPECTATION.name}, because the file {fits_file} does not exist. Did you forget to create the fits using the script pregenerate_distns.py?')):
+        generate_parametric(dataset=ds, densities_dir=fits_dir, fits_dir=fits_dir, clazz=Parametric, transform=DistTransform.EXPECTATION)
+    warnings.resetwarnings()
