@@ -18,7 +18,7 @@ __version__: str = None
 This variable will reflect the version exactly as it was specified in the `pyproject.toml`.
 """
 
-if pyproject_root.exists() and load(pyproject_root)['tool']['poetry']['name'] == 'metrics-as-scores':
+if pyproject_root.exists() and load(pyproject_root)['tool']['poetry']['name'] == 'metrics-as-scores': # pragma: no cover
     IS_MAS_LOCAL = True
     __version__ = load(pyproject_root)['tool']['poetry']['version']
 elif pyproject_local.exists(): # pragma: no cover
