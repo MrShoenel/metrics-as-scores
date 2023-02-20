@@ -8,72 +8,25 @@ from gc import collect
 T = TypeVar('T')
 
 
-class Lazy(Generic[T]):
-    def __init__(self, fn_create_val: Callable[[], T]) -> None:
-        self._val: T = None
-        self._has_val = False
-        self._semaphore = Semaphore(1)
-        self._fn_create_val = fn_create_val
-        self._tpe = ThreadPoolExecutor(max_workers=1)
-    
-    def unset_value(self) -> Self:
-        try:
-            self._semaphore.acquire()
-            self._val = None
-            self._has_val = False
-        finally:
-            self._semaphore.release()
-
-        return self
-
-    @property
-    def has_value_volatile(self) -> bool:
-        return self._has_val
-
-    @property
-    def has_value(self) -> bool:
-        try:
-            self._semaphore.acquire()
-            return self._has_val
-        finally:
-            self._semaphore.release()
-
-    @property
-    def value_volatile(self) -> Union[None, T]:
-        return self._val
-
-    @property
-    def value(self) -> T:
-        try:
-            self._semaphore.acquire()
-            if not self._has_val:
-                self._val = self._fn_create_val()
-                self._has_val = True
-            return self._val
-        finally:
-            self._semaphore.release()
-
-    @property
-    def value_future(self) -> Future[T]:
-        f = Future()
-
-        temp = self._val
-        if type(temp) is T and self.has_value_volatile:
-            f.set_result(temp)
-        else:
-            def set_val():
-                try:
-                    f.set_result(self.value)
-                except Exception as e:
-                    f.set_exception(e)
-            self._tpe.submit(set_val)
-
-        return f
-
-
 class SelfResetLazy(Generic[T]):
+    """
+    Similar to :py:class:`Lazy`, this class also automatically destroys its value
+    after some timeout, so that subsequent requests to it force the factory to
+    produce a new instance.
+    """
     def __init__(self, fn_create_val: Callable[[], T], fn_destroy_val: Callable[[T], Any]=None, reset_after: float=None) -> None:
+        """
+        fn_create_val: ``Callable[[], T]``
+            Function that produces the desired value.
+        
+        fn_destroy_val: ``Callable[[T], Any]``
+            Function that will be given the value before it is de-referenced here.
+        
+        reset_after: ``float``
+            Amount of time, in seconds, after which the produced value ought to be destroyed.
+        """
         self._val: T = None
+        self._val_type: type = None
         self._has_val = False
         self._semaphore = Semaphore(1)
 
@@ -85,6 +38,9 @@ class SelfResetLazy(Generic[T]):
     
     @property
     def reset_after(self):
+        """
+        Thread-safe getter for the reset-after property.
+        """
         try:
             self._semaphore.acquire()
             return self._reset_after
@@ -93,6 +49,9 @@ class SelfResetLazy(Generic[T]):
     
     @reset_after.setter
     def reset_after(self, value: float=None):
+        """
+        Thread-safe setter for the reset-after property.
+        """
         try:
             self._semaphore.acquire()
             self._reset_after = value
@@ -103,6 +62,10 @@ class SelfResetLazy(Generic[T]):
         return self
     
     def unset_value(self):
+        """
+        Thread-safe method to destroy a previously produced value. If a value is
+        present, it is passed to py:meth:`fn_destroy_val()` first.
+        """
         try:
             self._semaphore.acquire()
             self._unset_timer()
@@ -110,6 +73,7 @@ class SelfResetLazy(Generic[T]):
                 if callable(self._fn_destroy_val):
                     self._fn_destroy_val(self._val) # Pass in the current value
                 self._val = None
+                self._val_type = None
                 self._has_val = False
                 collect()
         finally:
@@ -134,25 +98,40 @@ class SelfResetLazy(Generic[T]):
 
     @property
     def has_value_volatile(self) -> bool:
+        """
+        Checks, in a volatile manner, if a value is present.
+        """
         return self._has_val
 
     @property
     def has_value(self) -> bool:
+        """
+        Thread-safe getter for checking if a value is present.
+        """
         try:
             self._semaphore.acquire()
             return self._has_val
         finally:
             self._semaphore.release()
 
+    @property
     def value_volatile(self) -> Union[None, T]:
+        """
+        Volatile getter for the may-not-present value.
+        """
         return self._val
 
     @property
     def value(self) -> T:
+        """
+        Thread-safe getter for the value. If no value is present, one will be produced
+        and this getter blocks until then.
+        """
         try:
             self._semaphore.acquire()
             if not self._has_val:
                 self._val = self._fn_create_val()
+                self._val_type = type(self._val)
                 self._has_val = True
                 self._set_timer()
             return self._val
@@ -161,10 +140,14 @@ class SelfResetLazy(Generic[T]):
 
     @property
     def value_future(self) -> Future[T]:
+        """
+        Returns an awaitable :py:class:`Future` that will hold the value once it is available.
+        """
         f = Future()
 
         temp = self._val
-        if type(temp) is T and self.has_value_volatile:
+        tempt = self._val_type
+        if not tempt is None and isinstance(temp, tempt) and self.has_value_volatile: # pragma: no cover
             f.set_result(temp)
         else:
             def set_val():

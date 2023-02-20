@@ -11,7 +11,8 @@
 			"port": 5678,
 			"host": "localhost",
 			"preLaunchTask": "launch Bokeh server",
-			"postDebugTask": "kill Bokeh server"
+			"postDebugTask": "kill Bokeh server",
+			"justMyCode": false
 		},
 		{
 			"name": "Python: Current File",
@@ -19,7 +20,15 @@
 			"request": "launch",
 			"program": "${file}",
 			"console": "integratedTerminal",
-			"justMyCode": true
+			"justMyCode": false
+		},
+		{
+			"name": "Debug Tests",
+			"type": "python",
+			"request": "test",
+			"console": "integratedTerminal",
+			"justMyCode": false,
+			"env": {"PYTEST_ADDOPTS": "--no-cov"}
 		}
 	]
 }

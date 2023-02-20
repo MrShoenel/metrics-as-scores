@@ -1,0 +1,15 @@
+number-sections: true
+bibliography: refs.bib
+pdf-engine: pdflatex
+top-level-division: section
+  
+format:
+  html:
+    code-fold: true
+  pdf:
+    documentclass: scrartcl
+    geometry: 'a4paper,margin=2.25cm'
+    keep-tex: true
+    include-in-header: 
+      text: |
+        \usepackage{bm}

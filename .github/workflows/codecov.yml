@@ -1,0 +1,22 @@
+name: CodeCov
+on: [push, pull_request]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4.5.0
+      with:
+        python-version: '3.10'
+    - uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: '2'
+    - name: Install Dependencies
+      run: pip install .
+    - name: Generate Report
+      run: pytest --cov-report html
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

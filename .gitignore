@@ -136,3 +136,6 @@ results/*.pickle
 
 # Paper PDF:
 paper/*.pdf
+
+# Copied-over pyproject.toml:
+src/metrics_as_scores/pyproject.toml

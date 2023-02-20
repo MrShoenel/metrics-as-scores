@@ -52,29 +52,6 @@
     };
 })();
 </script>
-<!-- Matomo -->
-<!-- We use cookie-less, anonymized, and GDPR-safe tracking. -->
-<script>
-(() => {
-    const h = 'metrics-as-scores.ml';
-    if (location.host !== h) {
-        return;
-    }
-    const _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(['requireCookieConsent']);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    const u = `https://${h}/trk/`;
-    _paq.push(['setTrackerUrl', `${u}matomo.php`]);
-    _paq.push(['setSiteId', '1']);
-    const g = document.createElement('script');
-    g.async = true;
-    g.src = `${u}matomo.js`;
-    document.head.appendChild(g);
-})();
-</script>
-<!-- End Matomo Code -->
 </body>
 {% endblock body%}
 </html>

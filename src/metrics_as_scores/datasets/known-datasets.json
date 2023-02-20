@@ -1,0 +1,29 @@
+[
+	{
+		"name": "Metrics and Domains From the Qualitas.class corpus",
+		"author": "Sebastian Hönel",
+		"id": "qcc",
+		"info_url": "https://doi.org/10.5281/zenodo.7633949",
+		"download": "https://zenodo.org/record/7655174/files/dataset.zip?download=1",
+		"size": 4322195829,
+		"size_extracted": 10046352180
+	},
+	{
+		"name": "ELISA Spectrophotometer Samples",
+		"author": "Sebastian Hönel",
+		"id": "elisa",
+		"info_url": "https://doi.org/10.5281/zenodo.7633989",
+		"download": "https://zenodo.org/record/7655179/files/dataset.zip?download=1",
+		"size": 166763519,
+		"size_extracted": 266100391
+	},
+	{
+		"name": "Price, weight, and other properties of over 1,200 ideal-cut and best-clarity diamonds",
+		"author": "Sebastian Hönel",
+		"id": "diamonds-ideal-if",
+		"info_url": "https://doi.org/10.5281/zenodo.7647596",
+		"download": "https://zenodo.org/record/7655192/files/dataset.zip?download=1",
+		"size": 316900638,
+		"size_extracted": 508262941
+	}
+]
