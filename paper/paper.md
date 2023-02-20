@@ -144,6 +144,9 @@ The interactive application is built using Bokeh [@bokeh] and allows for customi
 
 # Acknowledgments
 <!-- Acknowledgement of any financial support. -->
+
+The authors would like to sincerely express their gratitude towards the reviewers of the Journal of Open Source Software for their invaluable comments.
+
 This work is supported by the [Linnaeus University Centre for Data Intensive Sciences and Applications (DISA)](https://lnu.se/forskning/sok-forskning/linnaeus-university-centre-for-data-intensive-sciences-and-applications) High-Performance Computing Center.
 
 
