@@ -7,6 +7,7 @@ from scipy.stats._discrete_distns import poisson_gen
 from metrics_as_scores.distribution.distribution import DistTransform, Density, KDE_integrate, KDE_approx, Empirical, Empirical_discrete, Parametric, Parametric_discrete
 from metrics_as_scores.distribution.fitting import StatisticalTest
 from metrics_as_scores.distribution.fitting import Fitter
+from metrics_as_scores.tools.funcs import flatten_dict
 
 
 def test_Density():
@@ -99,7 +100,16 @@ def test_Parametric():
     theta = norm.fit(data=data)
 
     st = StatisticalTest(data1=data, cdf=lambda x: norm.cdf(x, *theta), ppf_or_data2=lambda p: norm.ppf(p, *theta))
-    dens = Parametric(norm_gen(), dist_params=(0.0, 1.0), range=(-1e3, 1e3), stat_tests=st, compute_ranges=True)
+    with raises(Exception, match=f'This class requires a dictionary of statistical tests, not an instance of {StatisticalTest.__name__}.'):
+        Parametric(norm_gen(), dist_params=(0.0, 1.0), range=(-1e3, 1e3), stat_tests=st, compute_ranges=True)
+    with raises(Exception, match=f'Key not allowed'):
+        Parametric(norm_gen(), dist_params=(0.0, 1.0), range=(-1e3, 1e3), stat_tests=dict(st), compute_ranges=True)
+    with raises(Exception, match=f'Value for key "FOO_BAR_pval" is not numeric.'):
+        temp_st = StatisticalTest.from_dict(d=flatten_dict(dict(st)), key_prefix='tests_')
+        temp_st['FOO_BAR_pval'] = 'bla'
+        Parametric(norm_gen(), dist_params=(0.0, 1.0), range=(-1e3, 1e3), stat_tests=temp_st, compute_ranges=True)
+    
+    dens = Parametric(norm_gen(), dist_params=(0.0, 1.0), range=(-1e3, 1e3), stat_tests=flatten_dict(dict(st)['tests']), compute_ranges=True)
     assert dens.dist_name == 'norm_gen'
     assert dens.is_fit
     assert dens.use_stat_test == 'ks_2samp_jittered'
@@ -145,7 +155,7 @@ def test_Parametric_discrete():
 
     # Make a fit one:
     st = StatisticalTest(data1=data, cdf=lambda x: inst.cdf(x, *theta), ppf_or_data2=lambda p: inst.ppf(p, *theta))
-    dens = Parametric_discrete(dist=poisson_gen(), dist_params=theta, range=(np.min(data), np.max(data)), stat_tests=st)
+    dens = Parametric_discrete(dist=poisson_gen(), dist_params=theta, range=(np.min(data), np.max(data)), stat_tests=flatten_dict(dict(st)['tests']))
 
     # Let's make sure the PMF sums to ~1:
     # Since it's a smooth parametric distribution, we gotta widen the range
