@@ -1,10 +1,12 @@
 from os import scandir
-from typing import Iterable, Union
 from pathlib import Path
+from typing import Iterable, Union
 from json import load, loads
 from urllib.request import urlopen
 from metrics_as_scores.__init__ import DATASETS_DIR
-from metrics_as_scores.distribution.distribution import LocalDataset, KnownDataset
+from metrics_as_scores.distribution.distribution import LocalDataset, KnownDataset, Dataset, Parametric, Parametric_discrete, Empirical, Empirical_discrete, KDE_approx, DistTransform
+from itertools import product
+from strenum import StrEnum
 
 
 KNOWN_DATASETS_FILE = 'https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json'
@@ -83,6 +85,118 @@ def get_local_datasets() -> Iterable[LocalDataset]:
                     manifest: LocalDataset = load(fp=fp)
                     yield manifest
 
+
+
+def required_files_folders_local_dataset(local_ds_id: str) -> tuple[list[Path], list[Path]]:
+    """
+    For a given :py:class:`LocalDataset`, returns lists of directories and files
+    that must be present in order for the local dataset to be valid. These lists
+    of directories and files must be checked when, e.g., the dataset is bundled,
+    or when the web application is instructed to use a local dataset.
+
+    local_ds_id: ``str``
+        The ID of a local dataset to check files for.
+    
+    rtype: ``tuple[list[Path], list[Path]]``
+
+    :return:
+        A list of paths to required folders and a list of paths to required files.
+    """
+
+    ds_dir = DATASETS_DIR.joinpath(f'./{local_ds_id}')
+
+    dir_densities = ds_dir.joinpath(f'./densities')
+    dir_fits = ds_dir.joinpath(f'./fits')
+    dir_stests = ds_dir.joinpath(f'./stat-tests')
+    dir_web = ds_dir.joinpath(f'./web')
+
+    dirs_required = [
+        dir_densities,
+        dir_fits,
+        dir_stests,
+        dir_web
+    ]
+
+    files_required = list([
+        dir_densities.joinpath(f'./densities_{perm[0].__name__}_{perm[1].name}.pickle')
+        for perm in product([
+            Parametric, Parametric_discrete, Empirical, Empirical_discrete, KDE_approx
+        ], list(DistTransform))
+    ]) + list([
+        dir_fits.joinpath(f'./pregen_distns_{dt.name}.pickle') for dt in list(DistTransform)
+    ]) + list([
+        dir_stests.joinpath(f'./{file}.csv') for file in ['anova', 'ks2samp', 'tukeyhsd']
+    ]) + list([
+        dir_web.joinpath(f'./{file}.html') for file in ['about', 'references']
+    ]) + list([
+        ds_dir.joinpath(f'./{file}') for file in [
+            'About.pdf',
+            'manifest.json',
+            'org-data.csv',
+            'refs.bib'
+        ]
+    ])
+
+    return dirs_required, files_required
+
+
+class PathStatus(StrEnum):
+    """
+    This is an enumeration of statuses for :py:class:`Path` objects that point
+    to directories or files.
+    """
+
+    OK = 'OK'
+    """The file or directory exists and is of correct type."""
+
+    DOESNT_EXIST = 'Does not exist'
+    """The file or directory does not exist."""
+
+    NOT_A_DIRECTORY = 'Not a directory'
+    """The Path exists, but is not a directory."""
+
+    NOT_A_FILE = 'Not a file'
+    """The Path exists, but is not a file."""
+
+
+def validate_local_dataset_files(dirs: list[Path], files: list[Path]) -> tuple[dict[Path, PathStatus], dict[Path, PathStatus]]:
+    """
+    Takes two lists, one of paths of directories, and one of paths to files of a
+    local dataset from :py:meth:`required_files_folders_local_dataset()`. Then for
+    each item on each list, checks whether it exists and is of correct type, then
+    associates a :py:class:`PathStatus` with each.
+
+    dirs: ``list[Path]``
+        A list of paths to directories needed in a local dataset.
+    
+    files: ``list[Path]``
+        A list of paths to files needed in a local dataset.
+    
+    rtype: ``tuple[dict[Path, PathStatus], dict[Path, PathStatus]]``
+
+    :return:
+        Transforms either list into a dictionary using the original path as key
+        and a :py:class:`PathStatus` as value. Then returns both dictionaries.
+    """
+    dirs_dict: dict[Path, PathStatus] = dict()
+    for d in dirs:
+        if not d.exists():
+            dirs_dict[d] = PathStatus.DOESNT_EXIST
+        elif not d.is_dir():
+            dirs_dict[d] = PathStatus.NOT_A_DIRECTORY
+        else:
+            dirs_dict[d] = PathStatus.OK
+    
+    files_dict: dict[Path, PathStatus] = dict()
+    for f in files:
+        if not f.exists():
+            files_dict[f] = PathStatus.DOESNT_EXIST
+        elif not f.is_file():
+            files_dict[f] = PathStatus.NOT_A_FILE
+        else:
+            files_dict[f] = PathStatus.OK
+    
+    return dirs_dict, files_dict
 
 
 def get_known_datasets(use_local_file: bool=False) -> list[KnownDataset]:
