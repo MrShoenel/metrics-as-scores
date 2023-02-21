@@ -474,7 +474,7 @@ class StatisticalTest:
     @staticmethod
     def from_dict(d: MutableMapping[str, Any], key_prefix: str='stat_tests_tests') -> dict[str, float]:
         """
-        Re-creates an instance from a previously to-JSON serialized object.
+        Re-creates the dictionary of tests from a previously to-JSON serialized instance.
         """
         res: dict[str, float] = {}
         for k in d.keys():
