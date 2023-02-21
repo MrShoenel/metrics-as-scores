@@ -77,3 +77,10 @@ addopts = [
 [tool.poe.tasks]
 test = "pytest --no-cov"
 cov = "pytest --cov-report html:htmlcov"
+docs_clean_win = "docs\\make clean html"
+docs_apidoc_win = "sphinx-apidoc -o docs src\\metrics_as_scores --force"
+docs_make_win = "docs\\make html"
+docs = ["docs_clean_win", "docs_apidoc_win", "docs_make_win"]
+poetry_build = "poetry build"
+peotry_install = "poetry install"
+prepare = ["peotry_install", "poetry_build", "peotry_install"]
