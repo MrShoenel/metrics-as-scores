@@ -8,6 +8,7 @@ from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import isint, isnumeric, get_known_datasets
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
 from metrics_as_scores.tools.funcs import natsort
+from questionary import Choice
 from re import match
 from os import makedirs
 from json import dump
@@ -32,6 +33,7 @@ For a single sample, one column holds the numeric observation, one holds the
 ordinal type (name of feature), and one holds the group associated with it. A
 dataset can hold one or more features, but should hold at least two groups in
 order to compare distributions of a single sample type across groups.
+
 This workflow creates the entire dataset: The manifest JSON, the parametric fits,
 the pre-generated distributions. When done, the dataset is installed, such that it
 can be discovered and used by the local Web-Application. If you wish to publish
@@ -69,6 +71,51 @@ previous menu afterwards.
         
         return type_dict
 
+    def _transform_dataset(self) -> pd.DataFrame:
+        self.q.print('\n' + 10*'-')
+        file_type = self.ask(options=[
+            'CSV', 'Excel'
+        ], prompt='What kind of file do you want to read?', rtype=str)
+
+        path = self.q.text(message='Absolute file path or URL to original file:', validate=lambda s: len(s) > 0).ask().strip()
+        df: pd.DataFrame = None
+        if file_type == 'CSV':
+            df = self._read_csv(path_like=path)
+        elif file_type == 'Excel':
+            df = self._read_excel(path_like=path)
+        
+        available_cols = OrderedDict({ k: k for k in df.columns.values.tolist() })
+        if len(available_cols) < 2:
+            raise Exception(f'Need at least one group and one feature. The loaded data frame only has these columns: [{", ".join(available_cols.keys())}]')
+        col_ctx = self.ask(prompt='What is the name of the groups\' column?', options=list(available_cols.keys()), rtype=str)
+        del available_cols[col_ctx]
+
+        df_dtypes = df.dtypes.to_dict()
+        col_feats = self.q.checkbox(message='Please select all features you would like to include.', choices=[
+            Choice(title=f'{feat} [{df_dtypes[feat]}]', value=feat) for feat in available_cols.keys()
+        ], validate=lambda str_list: len(str_list) > 0).ask()
+
+        self.print_info(text_normal='Converting data frame ', text_vital='...')
+        # Let's stack the data frame:
+        target_df = pd.DataFrame(dict(
+            Feature = [],
+            Group = [],
+            Value = []
+        ))
+
+        nrow = len(df.index)
+        for col_feat in col_feats:
+            target_df = pd.concat([target_df, pd.DataFrame(dict(
+                Feature = nrow * [col_feat],
+                Group = df[col_ctx],
+                Value = df[col_feat]
+            ))])
+        
+        return target_df
+
+        
+
+
     def _read_csv(self, path_like: str) -> pd.DataFrame:
         sep = self.q.text(message='What is the separator used?', default=',', validate=lambda s: s in [',', ';', ' ', '\t']).ask()
         dec = self.q.text(message='What is the decimal point?', default='.', validate=lambda s: s in ['.', ',']).ask()
@@ -87,33 +134,46 @@ previous menu afterwards.
         # Check if all values are integer.
         return np.all(np.mod(vals, 1) == 0)
 
-    def _create_manifest(self) -> tuple[LocalDataset, pd.DataFrame]:
+    def _create_manifest(self, transformed_df: pd.DataFrame=None) -> tuple[LocalDataset, pd.DataFrame]:
         jsd: LocalDataset = {}
 
         df: pd.DataFrame = None
-        self.q.print('You are now asked some basic info about the dataset.', style=self.style_mas)
-        self.q.print(10*'-')
-        file_type = self.ask(options=[
-            'CSV', 'Excel'
-        ], prompt='What kind of file do you want to read?', rtype=str)
-        jsd['origin'] = self.q.text(message='Absolute file path or URL to original file:', validate=lambda s: len(s) > 0).ask().strip()
-        if file_type == 'CSV':
-            df = self._read_csv(path_like=jsd['origin'])
-        elif file_type == 'Excel':
-            df = self._read_excel(path_like=jsd['origin'])
+        col_data: str = None
+        col_type: str = None
+        col_ctx: str= None
+        if transformed_df is None:
+            self.q.print('You are now asked some basic info about the dataset.', style=self.style_mas)
+            self.q.print(10*'-')
+            file_type = self.ask(options=[
+                'CSV', 'Excel'
+            ], prompt='What kind of file do you want to read?', rtype=str)
+            jsd['origin'] = self.q.text(message='Absolute file path or URL to original file:', validate=lambda s: len(s) > 0).ask().strip()
+            if file_type == 'CSV':
+                df = self._read_csv(path_like=jsd['origin'])
+            elif file_type == 'Excel':
+                df = self._read_excel(path_like=jsd['origin'])
+            
+            available_cols = OrderedDict({ k: k for k in df.columns.values.tolist() })
+            col_data = self.ask(prompt='Which column holds the data?', options=list(available_cols.keys()), rtype=str)
+            del available_cols[col_data]
+            col_type = self.ask(prompt='What is the name of the features\' column?', options=list(available_cols.keys()), rtype=str)
+            del available_cols[col_type]
+            col_ctx = self.ask(prompt='What is the name of the groups\' column?', options=list(available_cols.keys()), rtype=str)
+            del available_cols[col_ctx]
+            
+            self.q.print('')
+            self.print_info(text_normal='Having an original data frame with ', text_vital=f'{len(df.index)} rows.')
+        else:
+            df = transformed_df
+            self.print_info(text_normal='', text_vital=f'Using transformed data frame with {len(df.index)} rows.')
+            col_data = 'Value'
+            col_type = 'Feature'
+            col_ctx = 'Group'
         
-
-        available_cols = OrderedDict({ k: k for k in df.columns.values.tolist() })
-        #
-        col_data = self.ask(prompt='Which column holds the data?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_data'] = col_data
-        del available_cols[col_data]
-        col_type = self.ask(prompt='What is the name of the features\' column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_type'] = col_type
-        del available_cols[col_type]
-        col_ctx = self.ask(prompt='What is the name of the groups\' column?', options=list(available_cols.keys()), rtype=str)
         jsd['colname_context'] = col_ctx
-        del available_cols[col_ctx]
+        
 
         # Now we only retain those two columns and all complete rows
         df = df.loc[:, [col_data, col_type, col_ctx]]
@@ -122,8 +182,7 @@ previous menu afterwards.
         df[col_type] = df[col_type].astype(str)
         df[col_ctx] = df[col_ctx].astype(str)
 
-        self.q.print('')
-        self.print_info(text_normal='Having an original data frame with ', text_vital=f'{len(df.index)} rows.')
+        
         qtypes = list([str(a) for a in df[col_type].unique()])
         qtypes.sort(key=natsort)
         contexts = list([str(a) for a in df[col_ctx].unique()])
@@ -209,17 +268,35 @@ is no best value for lines of code (size) of software.
         Main entry point for this workflow.
         """
         self._print_doc(more='''
-
-You are about to create a new Dataset from a resource that can be
-read by Pandas (e.g., a CSV from file or URL). A Dataset that can
-be used by Metrics-As-Scores requires a manifest (that will be
-created as part of this process), optional parametric fits, as well
-as pre-generated distributions that are used in the Web-Application.
-The following workflow will take you through all of these steps. It
-cannot be resumed.''')
+You are about to create a new Dataset from a resource that can be read by Pandas
+(e.g., a CSV from file or URL). A Dataset that can be used by Metrics-As-Scores
+requires a manifest (that will be created as part of this process), parametric
+fits, as well as pre-generated distributions that are used in the Web Application.
+The following workflow will take you through the creation of the dataset, and other
+workflows exist to cover the fitting of random variables and generating densities.''')
         self._wait_for(what_for='to begin')
 
-        manifest, df = self._create_manifest()
+
+        self.q.print('')
+        self.q.print(text='''
+Metrics As Scores requires the data to be in a specific format: A 3-column data frame,
+where one column holds the name of the feature, one holding the name of the group, and
+one holding the associated value. This special format also allows to mix integral and
+real values in the data column, as Metrics As Scores will detect possible integrality
+automatically, per feature.
+
+If your data is not in that format, but rather in the much more common format where the
+data frame has one column with the group names, and a dedicated column for each feature,
+then you have now the choice to transform such a data frame into the format required by
+Metrics As Scores before proceeding with the creation process.
+'''.strip())
+
+        transformed_df: pd.DataFrame = None
+        self.q.print('')
+        if self.q.confirm(message='Would you like to transform a data frame first?', default=False).ask():
+            transformed_df = self._transform_dataset()
+
+        manifest, df = self._create_manifest(transformed_df=transformed_df)
         # Let's create a folder for this dataset (by ID) and out the files there.
         dataset_dir = DATASETS_DIR.joinpath(f'./{manifest["id"]}')
         fits_dir = dataset_dir.joinpath('./fits')
