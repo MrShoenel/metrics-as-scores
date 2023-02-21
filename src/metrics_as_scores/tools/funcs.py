@@ -80,4 +80,4 @@ def natsort(s: str) -> int:
 
     Courtesy of https://stackoverflow.com/a/16090640/1785141
     """
-    return [int(t) if t.isdigit() else t.lower() for t in split('(\d+)', f'{s}')]
+    return [int(t) if t.isdigit() else t.lower() for t in split(r'(\d+)', f'{s}')]

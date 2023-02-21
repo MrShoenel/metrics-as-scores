@@ -33,7 +33,7 @@ class DistTransform(StrEnum):
     """Do not apply any transform."""
 
     EXPECTATION = 'E[X] (expectation)'
-    """
+    r"""
     Compute the expectation of the random variable.
     This is similar to :math:`\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx` for a
     continuous random variable.
@@ -309,7 +309,7 @@ class Density(ABC):
 
 
 class KDE_integrate(Density):
-    """
+    r"""
     The purpose of this class is to use an empirical (typically Gaussian) PDF and to
     also provide a smooth CDF that is obtained by integrating the PDF:
     :math:`F_X(x)=\int_{-\infty}^{x} f_X(t) dt`.
