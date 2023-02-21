@@ -105,7 +105,7 @@ Metrics As Scores, using one of the locally available datasets.
             def read1(proc: Popen, std_out: bool=True):
                 while proc.returncode is None:
                     strm = proc.stdout if std_out else proc.stderr
-                    line = strm.readline().decode('utf-8').strip()
+                    line = strm.readline().decode(encoding='utf-8', errors='ignore').strip()
                     if line == '':
                         break
                     self.q.print(text=line, style=None if std_out else self.style_mas)
