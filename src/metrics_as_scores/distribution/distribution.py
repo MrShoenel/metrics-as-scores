@@ -1,3 +1,9 @@
+"""
+This module contains the base class for all densities as used in the web
+application, as well as all of its concrete implementations. Also, it
+contains enumerations and typings that describe datasets.
+"""
+
 import pandas as pd
 import numpy as np
 from abc import ABC
@@ -61,7 +67,6 @@ class DistTransform(StrEnum):
     """
 
 
-
 class JsonDataset(TypedDict):
     """
     This class is the base class for the :py:class:`LocalDataset` and the
@@ -99,7 +104,6 @@ class KnownDataset(JsonDataset):
     download: str
     size: int
     size_extracted: int
-
 
 
 class Density(ABC):
@@ -306,7 +310,6 @@ class Density(ABC):
         return self.cdf(x)
 
 
-
 class KDE_integrate(Density):
     r"""
     The purpose of this class is to use an empirical (typically Gaussian) PDF and to
@@ -346,7 +349,6 @@ class KDE_integrate(Density):
         self._ppf = cdf_to_ppf(cdf=self.cdf, x=self._data, y_left=np.min(self._data), y_right=np.max(self._data), cdf_samples=cdf_samples)
         self.ppf = np.vectorize(self._ppf)
         return self
-
 
 
 class KDE_approx(Density):
@@ -412,7 +414,6 @@ class KDE_approx(Density):
         return self.stat_test.tests['ks_2samp_jittered']['stat']
 
 
-
 class Empirical(Density):
     """
     This kind of density does not apply any smoothing for CDF, but rather uses a
@@ -437,7 +438,6 @@ class Empirical(Density):
     
     def _ppf_from_ecdf(self, q: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
         return self._ppf_interp(q)
-
 
 
 class Empirical_discrete(Empirical):
@@ -499,7 +499,6 @@ class Empirical_discrete(Empirical):
         continuous data).
         """
         return Empirical_discrete(data=np.asarray([np.nan]), dist_transform=dist_transform)
-
 
 
 class Parametric(Density):
@@ -663,7 +662,6 @@ class Parametric(Density):
         return self.dist.ppf(*(x, *self.dist_params)).reshape((x.size,))
 
 
-
 class Parametric_discrete(Parametric):
     """
     This type of density inherits from :py:class:`Parametric` and is its counterpart
@@ -700,7 +698,6 @@ class Parametric_discrete(Parametric):
         """
         from scipy.stats._continuous_distns import norm_gen
         return Parametric_discrete(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
-
 
 
 class Dataset:

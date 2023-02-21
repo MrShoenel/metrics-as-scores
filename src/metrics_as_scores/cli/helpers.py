@@ -1,10 +1,15 @@
+"""
+This module contains constants and helper functionss that are commonly
+used in any of the CLI workflows.
+"""
+
 from os import scandir
 from pathlib import Path
 from typing import Iterable, Union
 from json import load, loads
 from urllib.request import urlopen
 from metrics_as_scores.__init__ import DATASETS_DIR
-from metrics_as_scores.distribution.distribution import LocalDataset, KnownDataset, Dataset, Parametric, Parametric_discrete, Empirical, Empirical_discrete, KDE_approx, DistTransform
+from metrics_as_scores.distribution.distribution import LocalDataset, KnownDataset, Parametric, Parametric_discrete, Empirical, Empirical_discrete, KDE_approx, DistTransform
 from itertools import product
 from strenum import StrEnum
 

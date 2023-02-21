@@ -1,5 +1,9 @@
+"""
+This module contains a single function that is used in highly parallel
+scenarios for fitting continuous and discrete random variables to data.
+"""
+
 import pandas as pd
-from typing import Any
 from nptyping import Float, NDArray, Shape
 from tqdm import tqdm
 from numpy.random import default_rng

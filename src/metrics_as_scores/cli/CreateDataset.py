@@ -1,3 +1,7 @@
+"""
+This module contains the workflow for creating own datasets.
+"""
+
 from typing import Union
 from metrics_as_scores.__init__ import DATASETS_DIR, MAS_DIR
 from metrics_as_scores.cli.Workflow import Workflow

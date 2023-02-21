@@ -1,11 +1,11 @@
 """
-This is an extra module that holds functions globally, such that we
-can exploit multiprocessing effortlessly.
+This is an extra module that holds functions globally, such that we can exploit
+multiprocessing effortlessly. Here, the main :py:meth:`fit()` function is defined.
 """
 
 import numpy as np
 from pickle import dump
-from typing import Any, TypedDict, Union
+from typing import TypedDict, Union
 from nptyping import Float, NDArray, Shape
 from metrics_as_scores.distribution.distribution import DistTransform, Dataset
 from metrics_as_scores.distribution.fitting import Continuous_RVs, Discrete_RVs, Fitter, StatisticalTest, StatisticalTestJson

@@ -1,3 +1,7 @@
+"""
+This module contains the workflow for bundling own datasets.
+"""
+
 from os.path import commonpath
 from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
@@ -5,6 +9,7 @@ from metrics_as_scores.cli.helpers import get_local_datasets, required_files_fol
 from metrics_as_scores.distribution.distribution import LocalDataset
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
+
 
 
 class BundleDatasetWorkflow(Workflow):

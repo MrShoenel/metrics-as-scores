@@ -1,3 +1,8 @@
+"""
+This module contains the main workflow (the main menu) that grants access
+to all other workflows.
+"""
+
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.LocalWebserver import LocalWebserverWorkflow
 from metrics_as_scores.cli.CreateDataset import CreateDatasetWorkflow

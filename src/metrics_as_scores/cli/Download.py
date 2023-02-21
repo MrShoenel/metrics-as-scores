@@ -1,3 +1,7 @@
+"""
+This module contains the workflow for downloading known datasets.
+"""
+
 from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, get_local_datasets, KNOWN_DATASETS_FILE

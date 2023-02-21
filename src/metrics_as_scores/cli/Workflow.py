@@ -1,3 +1,7 @@
+"""
+This module contains the base class for all workflows.
+"""
+
 from typing import TypeVar
 from rich.console import Console
 import questionary

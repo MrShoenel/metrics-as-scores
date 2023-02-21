@@ -1,6 +1,11 @@
+"""
+This module contains the workflow for running the interactive web application
+locally.
+"""
+
 from concurrent.futures import ThreadPoolExecutor
 from threading import Semaphore, Thread
-from typing import Literal, Union
+from typing import Literal
 from bokeh.command.util import build_single_handler_application
 from bokeh.server.server import Server
 from pathlib import Path

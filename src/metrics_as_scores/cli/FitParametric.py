@@ -1,3 +1,8 @@
+"""
+This module contains the workflow for fitting parametric distributions
+to features of own datasets.
+"""
+
 from typing import Any, Iterable
 from pathlib import Path
 from nptyping import Float, NDArray, Shape

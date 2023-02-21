@@ -1,3 +1,8 @@
+"""
+This module contains the workflow for listing locally available datasets.
+This list includes downloaded and manually created datasets.
+"""
+
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_local_datasets
 from metrics_as_scores.distribution.distribution import LocalDataset

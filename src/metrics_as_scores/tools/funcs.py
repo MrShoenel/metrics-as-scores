@@ -1,4 +1,10 @@
+"""
+This module contains few functions that are required in multiple other modules
+and classes of Metrics As Scores.
+"""
+
 import numpy as np
+from re import split
 from collections.abc import MutableMapping
 from nptyping import Float, NDArray, Shape
 from numpy import abs, cumsum, linspace, max, min, square, sum, vectorize, interp
@@ -73,7 +79,6 @@ def cdf_to_ppf(cdf: Callable[[float], float], x: NDArray[Shape["*"], Float], cdf
     return Interpolator(xp=y_vals, fp=x_vals, left=y_left, right=y_right)
 
 
-from re import split
 def natsort(s: str) -> int:
     """
     Natural string sorting.

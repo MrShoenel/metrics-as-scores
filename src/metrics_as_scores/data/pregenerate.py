@@ -1,3 +1,9 @@
+"""
+This module contains top-level function that are used in highly parallel
+scenarios for pre-generating densities for own datasets, either from
+previously computed fits for random variables or empirical densities.
+"""
+
 from pathlib import Path
 import pandas as pd
 from typing import Union
@@ -156,7 +162,6 @@ def fits_to_MAS_densities(
     return the_dict
 
 
-
 def generate_empirical(
     dataset: Dataset,
     densities_dir: Path,
@@ -188,7 +193,6 @@ def generate_empirical(
     with open(file=dens_file, mode='wb') as fp:
         dump(obj=temp, file=fp)
     print(f'Finished generating Densities for {clazz.__name__} with transform {transform.name}.')
-
 
 
 def generate_parametric(
@@ -232,7 +236,6 @@ def generate_parametric(
     with open(file=dens_file, mode='wb') as f:
         dump(temp, f)
     print(f'Finished generating parametric Densities for {clazz.__name__} with transform {transform.name}.')
-
 
 
 def generate_empirical_discrete(
