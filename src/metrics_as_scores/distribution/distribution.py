@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pickle
 from abc import ABC
 from typing import Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
@@ -531,6 +530,14 @@ class Parametric(Density):
             Whether or not to compute the practical domain of the data and the practical range
             of the PDF. Both of these use optimization to find the results.
         """
+        if not isinstance(stat_tests, dict) or isinstance(stat_tests, StatisticalTest):
+            raise Exception(f'This class requires a dictionary of statistical tests, not an instance of {StatisticalTest.__name__}.')
+        for (key, val) in stat_tests.items():
+            if not key.endswith('_pval') and not key.endswith('_stat'):
+                raise Exception(f'Key not allowed: "{key}".')
+            if not isinstance(val, float):
+                raise Exception(f'Value for key "{key}" is not numeric.')
+
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.stat_tests = stat_tests
         self._use_stat_test = use_stat_test
