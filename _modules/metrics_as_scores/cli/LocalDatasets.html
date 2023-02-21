@@ -70,7 +70,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.cli.LocalDatasets</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the workflow for listing locally available datasets.</span>
+<span class="sd">This list includes downloaded and manually created datasets.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">get_local_datasets</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span>
 

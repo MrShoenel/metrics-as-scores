@@ -192,6 +192,15 @@
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isint"><code class="docutils literal notranslate"><span class="pre">isint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.isnumeric"><code class="docutils literal notranslate"><span class="pre">isnumeric()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_local_datasets"><code class="docutils literal notranslate"><span class="pre">get_local_datasets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.required_files_folders_local_dataset"><code class="docutils literal notranslate"><span class="pre">required_files_folders_local_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus"><code class="docutils literal notranslate"><span class="pre">PathStatus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus.OK"><code class="docutils literal notranslate"><span class="pre">PathStatus.OK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus.DOESNT_EXIST"><code class="docutils literal notranslate"><span class="pre">PathStatus.DOESNT_EXIST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus.NOT_A_DIRECTORY"><code class="docutils literal notranslate"><span class="pre">PathStatus.NOT_A_DIRECTORY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus.NOT_A_FILE"><code class="docutils literal notranslate"><span class="pre">PathStatus.NOT_A_FILE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.validate_local_dataset_files"><code class="docutils literal notranslate"><span class="pre">validate_local_dataset_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_known_datasets"><code class="docutils literal notranslate"><span class="pre">get_known_datasets()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.format_file_size"><code class="docutils literal notranslate"><span class="pre">format_file_size()</span></code></a></li>
 </ul>
@@ -547,6 +556,9 @@
 </section>
 <section id="module-metrics_as_scores">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-metrics_as_scores" title="Permalink to this heading"></a></h2>
+<p>This is the core package of Metrics As Scores. All functionality is to be found
+in sub-packages and -modules. Metrics As Scores, currently, consists of only a
+single main package (this might change in the future).</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="metrics_as_scores.DATASETS_DIR">
 <span class="sig-prename descclassname"><span class="pre">metrics_as_scores.</span></span><span class="sig-name descname"><span class="pre">DATASETS_DIR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.DATASETS_DIR" title="Permalink to this definition"></a></dt>

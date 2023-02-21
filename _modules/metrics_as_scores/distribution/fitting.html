@@ -117,7 +117,6 @@
 <span class="kn">from</span> <span class="nn">pymoo.indicators.igd</span> <span class="kn">import</span> <span class="n">IGD</span>
 <span class="kn">from</span> <span class="nn">pymoo.termination.cv</span> <span class="kn">import</span> <span class="n">ConstraintViolationTermination</span>
 <span class="kn">from</span> <span class="nn">pymoo.termination.default</span> <span class="kn">import</span> <span class="n">DefaultTermination</span>
-<span class="kn">from</span> <span class="nn">pymoo.indicators.igd</span> <span class="kn">import</span> <span class="n">IGD</span>
 <span class="kn">from</span> <span class="nn">pymoo.termination.robust</span> <span class="kn">import</span> <span class="n">RobustTermination</span>
 <span class="kn">from</span> <span class="nn">pymoo.termination.default</span> <span class="kn">import</span> <span class="n">SingleObjectiveSpaceTermination</span>
 <span class="kn">from</span> <span class="nn">pymoo.termination.xtol</span> <span class="kn">import</span> <span class="n">DesignSpaceTermination</span>
@@ -134,7 +133,7 @@
 <span class="c1"># We override this class because of a bug in pymoo.</span>
 <div class="viewcode-block" id="DesignSpaceTerminationFixed"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.DesignSpaceTerminationFixed">[docs]</a><span class="k">class</span> <span class="nc">DesignSpaceTerminationFixed</span><span class="p">(</span><span class="n">DesignSpaceTermination</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev</span><span class="p">,</span> <span class="n">current</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">prev</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">and</span> <span class="n">current</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prev</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">and</span> <span class="n">current</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">return</span> <span class="n">IGD</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="o">.</span><span class="n">do</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># The error was here: it uses axis=1, but it appears this does not work</span>
@@ -391,7 +390,7 @@
             <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">F</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">X</span>
 
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Optimization did not find a maximum likelihood estimate.&#39;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Optimization did not find a maximum likelihood estimate.&#39;</span><span class="p">)</span> <span class="c1"># pragma: no cover</span></div></div>
 
 
 
@@ -528,7 +527,7 @@
                         <span class="n">result</span> <span class="o">=</span> <span class="n">epps_singleton_2samp</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">use_data1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">use_data2</span><span class="p">)</span>
                         <span class="n">pval</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">pvalue</span>
                         <span class="n">stat</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">statistic</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
                     <span class="k">pass</span> <span class="c1"># Ignore a failed test; e.g. Epps requires &gt; 4 samples</span>
 
                 <span class="c1"># Always create the entry, even for failed tests.</span>
@@ -547,7 +546,7 @@
 <div class="viewcode-block" id="StatisticalTest.from_dict"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.fitting.StatisticalTest.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;stat_tests_tests&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Re-creates an instance from a previously to-JSON serialized object.</span>
+<span class="sd">        Re-creates the dictionary of tests from a previously to-JSON serialized instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">res</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>

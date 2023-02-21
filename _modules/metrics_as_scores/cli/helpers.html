@@ -70,13 +70,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.cli.helpers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">scandir</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains constants and helper functionss that are commonly</span>
+<span class="sd">used in any of the CLI workflows.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">scandir</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">loads</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.__init__</span> <span class="kn">import</span> <span class="n">DATASETS_DIR</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span><span class="p">,</span> <span class="n">KnownDataset</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span><span class="p">,</span> <span class="n">KnownDataset</span><span class="p">,</span> <span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">,</span> <span class="n">Empirical</span><span class="p">,</span> <span class="n">Empirical_discrete</span><span class="p">,</span> <span class="n">KDE_approx</span><span class="p">,</span> <span class="n">DistTransform</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">strenum</span> <span class="kn">import</span> <span class="n">StrEnum</span>
 
 
 <span class="n">KNOWN_DATASETS_FILE</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/MrShoenel/metrics-as-scores/master/src/metrics_as_scores/datasets/known-datasets.json&#39;</span>
@@ -148,15 +155,125 @@
         <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;_default&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">manifest</span> <span class="o">=</span> <span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">/manifest.json&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">manifest</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">manifest</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-                        <span class="n">manifest</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
-                        <span class="k">yield</span> <span class="n">manifest</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span></div>
 
+            <span class="n">manifest</span> <span class="o">=</span> <span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">/manifest.json&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">manifest</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">manifest</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                    <span class="n">manifest</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">manifest</span></div>
+
+
+
+<div class="viewcode-block" id="required_files_folders_local_dataset"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.required_files_folders_local_dataset">[docs]</a><span class="k">def</span> <span class="nf">required_files_folders_local_dataset</span><span class="p">(</span><span class="n">local_ds_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given :py:class:`LocalDataset`, returns lists of directories and files</span>
+<span class="sd">    that must be present in order for the local dataset to be valid. These lists</span>
+<span class="sd">    of directories and files must be checked when, e.g., the dataset is bundled,</span>
+<span class="sd">    or when the web application is instructed to use a local dataset.</span>
+
+<span class="sd">    local_ds_id: ``str``</span>
+<span class="sd">        The ID of a local dataset to check files for.</span>
+<span class="sd">    </span>
+<span class="sd">    rtype: ``tuple[list[Path], list[Path]]``</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        A list of paths to required folders and a list of paths to required files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">DATASETS_DIR</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">local_ds_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">dir_densities</span> <span class="o">=</span> <span class="n">ds_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./densities&#39;</span><span class="p">)</span>
+    <span class="n">dir_fits</span> <span class="o">=</span> <span class="n">ds_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./fits&#39;</span><span class="p">)</span>
+    <span class="n">dir_stests</span> <span class="o">=</span> <span class="n">ds_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./stat-tests&#39;</span><span class="p">)</span>
+    <span class="n">dir_web</span> <span class="o">=</span> <span class="n">ds_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./web&#39;</span><span class="p">)</span>
+
+    <span class="n">dirs_required</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">dir_densities</span><span class="p">,</span>
+        <span class="n">dir_fits</span><span class="p">,</span>
+        <span class="n">dir_stests</span><span class="p">,</span>
+        <span class="n">dir_web</span>
+    <span class="p">]</span>
+
+    <span class="n">files_required</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span>
+        <span class="n">dir_densities</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./densities_</span><span class="si">{</span><span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">product</span><span class="p">([</span>
+            <span class="n">Parametric</span><span class="p">,</span> <span class="n">Parametric_discrete</span><span class="p">,</span> <span class="n">Empirical</span><span class="p">,</span> <span class="n">Empirical_discrete</span><span class="p">,</span> <span class="n">KDE_approx</span>
+        <span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="n">DistTransform</span><span class="p">))</span>
+    <span class="p">])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">([</span>
+        <span class="n">dir_fits</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./pregen_distns_</span><span class="si">{</span><span class="n">dt</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">DistTransform</span><span class="p">)</span>
+    <span class="p">])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">([</span>
+        <span class="n">dir_stests</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;anova&#39;</span><span class="p">,</span> <span class="s1">&#39;ks2samp&#39;</span><span class="p">,</span> <span class="s1">&#39;tukeyhsd&#39;</span><span class="p">]</span>
+    <span class="p">])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">([</span>
+        <span class="n">dir_web</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;about&#39;</span><span class="p">,</span> <span class="s1">&#39;references&#39;</span><span class="p">]</span>
+    <span class="p">])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">([</span>
+        <span class="n">ds_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s1">&#39;About.pdf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;manifest.json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;org-data.csv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;refs.bib&#39;</span>
+        <span class="p">]</span>
+    <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">dirs_required</span><span class="p">,</span> <span class="n">files_required</span></div>
+
+
+<div class="viewcode-block" id="PathStatus"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.PathStatus">[docs]</a><span class="k">class</span> <span class="nc">PathStatus</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an enumeration of statuses for :py:class:`Path` objects that point</span>
+<span class="sd">    to directories or files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">OK</span> <span class="o">=</span> <span class="s1">&#39;OK&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The file or directory exists and is of correct type.&quot;&quot;&quot;</span>
+
+    <span class="n">DOESNT_EXIST</span> <span class="o">=</span> <span class="s1">&#39;Does not exist&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The file or directory does not exist.&quot;&quot;&quot;</span>
+
+    <span class="n">NOT_A_DIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;Not a directory&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Path exists, but is not a directory.&quot;&quot;&quot;</span>
+
+    <span class="n">NOT_A_FILE</span> <span class="o">=</span> <span class="s1">&#39;Not a file&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Path exists, but is not a file.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="validate_local_dataset_files"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.validate_local_dataset_files">[docs]</a><span class="k">def</span> <span class="nf">validate_local_dataset_files</span><span class="p">(</span><span class="n">dirs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">PathStatus</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">PathStatus</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes two lists, one of paths of directories, and one of paths to files of a</span>
+<span class="sd">    local dataset from :py:meth:`required_files_folders_local_dataset()`. Then for</span>
+<span class="sd">    each item on each list, checks whether it exists and is of correct type, then</span>
+<span class="sd">    associates a :py:class:`PathStatus` with each.</span>
+
+<span class="sd">    dirs: ``list[Path]``</span>
+<span class="sd">        A list of paths to directories needed in a local dataset.</span>
+<span class="sd">    </span>
+<span class="sd">    files: ``list[Path]``</span>
+<span class="sd">        A list of paths to files needed in a local dataset.</span>
+<span class="sd">    </span>
+<span class="sd">    rtype: ``tuple[dict[Path, PathStatus], dict[Path, PathStatus]]``</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        Transforms either list into a dictionary using the original path as key</span>
+<span class="sd">        and a :py:class:`PathStatus` as value. Then returns both dictionaries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirs_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">PathStatus</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">dirs_dict</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">DOESNT_EXIST</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">dirs_dict</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">NOT_A_DIRECTORY</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dirs_dict</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">OK</span>
+    
+    <span class="n">files_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">PathStatus</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">files_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">DOESNT_EXIST</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">files_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">NOT_A_FILE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">files_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">OK</span>
+    
+    <span class="k">return</span> <span class="n">dirs_dict</span><span class="p">,</span> <span class="n">files_dict</span></div>
 
 
 <div class="viewcode-block" id="get_known_datasets"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.helpers.get_known_datasets">[docs]</a><span class="k">def</span> <span class="nf">get_known_datasets</span><span class="p">(</span><span class="n">use_local_file</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">KnownDataset</span><span class="p">]:</span>

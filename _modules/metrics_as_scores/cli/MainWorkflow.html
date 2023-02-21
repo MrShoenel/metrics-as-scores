@@ -70,7 +70,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.cli.MainWorkflow</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the main workflow (the main menu) that grants access</span>
+<span class="sd">to all other workflows.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.LocalWebserver</span> <span class="kn">import</span> <span class="n">LocalWebserverWorkflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.CreateDataset</span> <span class="kn">import</span> <span class="n">CreateDatasetWorkflow</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.KnownDatasets</span> <span class="kn">import</span> <span class="n">KnownDatasetsWorkflow</span>
@@ -103,6 +108,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># The main options/Functions for M-a-S:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span>
             <span class="p">(</span><span class="s1">&#39;Show Installed Datasets&#39;</span><span class="p">,</span> <span class="s1">&#39;show_local&#39;</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;Show List of Known Datasets Available Online That Can Be Downloaded&#39;</span><span class="p">,</span> <span class="s1">&#39;show_known&#39;</span><span class="p">),</span>

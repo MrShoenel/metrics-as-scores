@@ -71,13 +71,13 @@
              
   <h1>Source code for metrics_as_scores.data.pregenerate_fit</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This is an extra module that holds functions globally, such that we</span>
-<span class="sd">can exploit multiprocessing effortlessly.</span>
+<span class="sd">This is an extra module that holds functions globally, such that we can exploit</span>
+<span class="sd">multiprocessing effortlessly. Here, the main :py:meth:`fit()` function is defined.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pickle</span> <span class="kn">import</span> <span class="n">dump</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">nptyping</span> <span class="kn">import</span> <span class="n">Float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">Shape</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">DistTransform</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.fitting</span> <span class="kn">import</span> <span class="n">Continuous_RVs</span><span class="p">,</span> <span class="n">Discrete_RVs</span><span class="p">,</span> <span class="n">Fitter</span><span class="p">,</span> <span class="n">StatisticalTest</span><span class="p">,</span> <span class="n">StatisticalTestJson</span>
@@ -213,7 +213,8 @@
     <span class="n">RV</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">rv_continuous</span><span class="p">,</span> <span class="n">rv_discrete</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">fit_continuous</span><span class="p">:</span>
         <span class="n">RV</span> <span class="o">=</span> <span class="n">Continuous_RVs_dict</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">rv</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="c1"># We will not cover testing fitting of discrete RVs.</span>
         <span class="n">RV</span> <span class="o">=</span> <span class="n">Discrete_RVs_dict</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">rv</span><span class="p">]</span>
 
     <span class="n">unique_vals</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_qtype_discrete</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fit_continuous</span>
@@ -249,11 +250,11 @@
         <span class="n">data_st</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">unique_vals</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Remove jitter for test</span>
         <span class="n">st</span> <span class="o">=</span> <span class="n">StatisticalTest</span><span class="p">(</span><span class="n">data1</span><span class="o">=</span><span class="n">data_st</span><span class="p">,</span> <span class="n">cdf</span><span class="o">=</span><span class="n">temp_cdf</span><span class="p">,</span> <span class="n">ppf_or_data2</span><span class="o">=</span><span class="n">temp_ppf</span><span class="p">,</span> <span class="n">max_samples</span><span class="o">=</span><span class="mi">25_000</span><span class="p">)</span>
         <span class="n">ret_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">stat_tests</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">st</span><span class="p">)))</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
         <span class="c1"># print(e)</span>
         <span class="c1"># Do nothing at the moment, and allow returning a dict without params and stat_tests</span>
         <span class="k">pass</span>
-    <span class="k">finally</span><span class="p">:</span>
+    <span class="k">finally</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
         <span class="k">if</span> <span class="n">write_temporary_results</span><span class="p">:</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DONE! it took </span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0&gt;5.0f&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> seconds (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s1">), [</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">rv</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>

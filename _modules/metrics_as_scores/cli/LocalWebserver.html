@@ -70,18 +70,31 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.cli.LocalWebserver</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the workflow for running the interactive web application</span>
+<span class="sd">locally.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Semaphore</span><span class="p">,</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 <span class="kn">from</span> <span class="nn">bokeh.command.util</span> <span class="kn">import</span> <span class="n">build_single_handler_application</span>
 <span class="kn">from</span> <span class="nn">bokeh.server.server</span> <span class="kn">import</span> <span class="n">Server</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.__init__</span> <span class="kn">import</span> <span class="n">IS_MAS_LOCAL</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.Workflow</span> <span class="kn">import</span> <span class="n">Workflow</span>
-<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">isint</span><span class="p">,</span> <span class="n">get_local_datasets</span>
+<span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">PathStatus</span><span class="p">,</span> <span class="n">isint</span><span class="p">,</span> <span class="n">get_local_datasets</span><span class="p">,</span> <span class="n">required_files_folders_local_dataset</span><span class="p">,</span> <span class="n">validate_local_dataset_files</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span>
 <span class="kn">from</span> <span class="nn">questionary</span> <span class="kn">import</span> <span class="n">Choice</span>
 
 <span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">webapp_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./webapp&#39;</span><span class="p">)</span>
 <span class="n">root_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+
+
+
+
+
 
 <div class="viewcode-block" id="LocalWebserverWorkflow"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow">[docs]</a><span class="k">class</span> <span class="nc">LocalWebserverWorkflow</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
     <span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
@@ -90,54 +103,110 @@
 <span class="s1">&#39;&#39;&#39;</span>
 <div class="viewcode-block" id="LocalWebserverWorkflow.__init__"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="kc">None</span></div>
     
 
     <span class="k">def</span> <span class="nf">_port_and_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">LocalDataset</span><span class="p">]:</span>
+        <span class="k">class</span> <span class="nc">LocalDatasetWithMissingFiles</span><span class="p">(</span><span class="n">LocalDataset</span><span class="p">):</span>
+            <span class="n">missing_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span>
+        
         <span class="k">def</span> <span class="nf">check_port</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">isint</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="n">r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">65536</span>
+        
+        <span class="k">def</span> <span class="nf">check_files</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">LocalDatasetWithMissingFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LocalDatasetWithMissingFiles</span><span class="p">:</span>
+            <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;missing_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="o">=</span> <span class="n">validate_local_dataset_files</span><span class="p">(</span><span class="o">*</span><span class="n">required_files_folders_local_dataset</span><span class="p">(</span><span class="n">local_ds_id</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
 
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Enter a Port number:&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="mi">5678</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="n">check_port</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;densities_&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">files</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">==</span> <span class="n">PathStatus</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;missing_files&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="n">ds</span>
+        
+
+        <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Enter a Port number:&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="mi">5678</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="n">check_port</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">())</span>
+        <span class="n">ds_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span>
+            <span class="n">check_files</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">get_local_datasets</span><span class="p">()</span>
+        <span class="p">])</span>
+        <span class="n">ds_list_missing</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">ds_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;missing_files&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_list_missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">ds_list_missing</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;The following dataset misses pre-generated densities: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_normal</span><span class="o">=</span><span class="s1">&#39;The following densities are missing: &#39;</span><span class="p">,</span> <span class="n">text_vital</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;missing_files&#39;</span><span class="p">]])))</span>
+        
+        <span class="n">ds_list_OK</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">ds_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;missing_files&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">use_ds</span><span class="p">:</span> <span class="n">LocalDataset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_list_OK</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;There are no datasets available or none of the datasets is complete.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
                 <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Please choose one of the following Datasets:&#39;</span><span class="p">,</span>
-                <span class="n">choices</span><span class="o">=</span><span class="nb">list</span><span class="p">([</span><span class="n">Choice</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">get_local_datasets</span><span class="p">()]))</span><span class="o">.</span><span class="n">ask</span><span class="p">())</span>
+                <span class="n">choices</span><span class="o">=</span><span class="nb">list</span><span class="p">([</span><span class="n">Choice</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">ds_list_OK</span><span class="p">]))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">port</span><span class="p">,</span> <span class="n">use_ds</span>
     
-    <span class="k">def</span> <span class="nf">_type_quit_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Enter &quot;q&quot; to shut down the application:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_type_quit_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">internal</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;Close the browser and type e&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;E&quot;</span><span class="si">}</span><span class="s1">nter &quot;q&quot; to shut down the application:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
     
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server_process"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_process">[docs]</a>    <span class="k">def</span> <span class="nf">start_server_process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">port</span><span class="p">,</span> <span class="n">use_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port_and_dataset</span><span class="p">()</span>
-
-        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">DEVNULL</span>
+        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
         <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">executable</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+
+        <span class="k">class</span> <span class="nc">State</span><span class="p">():</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">running</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="n">running</span>
 
         <span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">started_successfully</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="n">running</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">success_semaphore</span> <span class="o">=</span> <span class="n">Semaphore</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">bokeh</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./bokeh&#39;</span><span class="p">)</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">bokeh</span><span class="p">),</span> <span class="s1">&#39;serve&#39;</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">webapp_dir</span><span class="p">),</span>
-                <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--show&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;--args&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="n">use_dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;--args&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
             <span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span>
                 <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;preload&#39;</span><span class="p">)</span>
-            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">)</span>
+            
+            <span class="n">my_env</span> <span class="o">=</span> <span class="p">{</span> <span class="o">**</span><span class="n">environ</span><span class="p">,</span> <span class="s1">&#39;PYTHONUNBUFFERED&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span> <span class="p">}</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">read1</span><span class="p">(</span><span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">std_out</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">while</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">strm</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="n">std_out</span> <span class="k">else</span> <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">strm</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">std_out</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;bokeh app running at&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">success_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                        <span class="k">break</span>
+                    <span class="k">if</span> <span class="s1">&#39;cannot start bokeh server&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">success_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">read1</span><span class="p">(</span><span class="n">proc</span><span class="o">=</span><span class="n">proc</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">read1</span><span class="p">(</span><span class="n">proc</span><span class="o">=</span><span class="n">proc</span><span class="p">,</span> <span class="n">std_out</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">()</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span> <span class="c1"># don&#39;t care.</span></div>
+            <span class="n">success_semaphore</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span> <span class="c1"># don&#39;t care.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">It was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server_internally"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_internally">[docs]</a>    <span class="k">def</span> <span class="nf">start_server_internally</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">port</span><span class="p">,</span> <span class="n">use_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port_and_dataset</span><span class="p">()</span>
-
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;generate_session_ids&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s1">&#39;redirect_root&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
@@ -147,11 +216,11 @@
             <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
             <span class="s1">&#39;sign_sessions&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
             <span class="s1">&#39;develop&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
+            <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
             <span class="s1">&#39;use_index&#39;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">}</span>
         
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="n">use_dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dataset=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preload</span><span class="p">:</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;preload&#39;</span><span class="p">)</span>
         <span class="n">app</span> <span class="o">=</span> <span class="n">build_single_handler_application</span><span class="p">(</span>
@@ -162,10 +231,9 @@
         <span class="n">tpe</span> <span class="o">=</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">start_server</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">(</span><span class="n">internal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">server</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
                 <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-                <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">all_fds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
         
@@ -175,22 +243,30 @@
         <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">show</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="n">server</span><span class="o">.</span><span class="n">io_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="n">tpe</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-            
+
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server">[docs]</a>    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Main entry point for this workflow.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_print_doc</span><span class="p">()</span>
-        
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Choose Method of Running the Web-App:&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
-            <span class="s1">&#39;Use External Process (works usually better)&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Run Internal Application Server&#39;</span>
-        <span class="p">])</span>
+
+        <span class="n">r</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">,</span> <span class="s1">&#39;internal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;proc&#39;</span>
+        <span class="k">if</span> <span class="n">IS_MAS_LOCAL</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Choose Method of Running the Web-App:&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;Use External Process (works usually better)&#39;</span><span class="p">,</span> <span class="s1">&#39;proc&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;Run Internal Application Server (for debugging)&#39;</span><span class="p">,</span> <span class="s1">&#39;internal&#39;</span><span class="p">)</span>
+            <span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">preload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Would you like to pre-load the entire dataset into memory?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
             <span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;Yes (Only recommended if you have enough memory)&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port_and_dataset</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;proc&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_process</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_internally</span><span class="p">()</span></div></div>

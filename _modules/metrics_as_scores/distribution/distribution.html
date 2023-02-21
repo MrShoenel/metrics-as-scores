@@ -70,9 +70,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.distribution.distribution</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the base class for all densities as used in the web</span>
+<span class="sd">application, as well as all of its concrete implementations. Also, it</span>
+<span class="sd">contains enumerations and typings that describe datasets.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TypedDict</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
@@ -105,7 +110,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Do not apply any transform.&quot;&quot;&quot;</span>
 
     <span class="n">EXPECTATION</span> <span class="o">=</span> <span class="s1">&#39;E[X] (expectation)&#39;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the expectation of the random variable.</span>
 <span class="sd">    This is similar to :math:`\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx` for a</span>
 <span class="sd">    continuous random variable.</span>
@@ -132,7 +137,6 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The supremum is the highest observed value of some empirical random variable.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
-
 
 
 <div class="viewcode-block" id="JsonDataset"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.JsonDataset">[docs]</a><span class="k">class</span> <span class="nc">JsonDataset</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
@@ -172,7 +176,6 @@
     <span class="n">download</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">size_extracted</span><span class="p">:</span> <span class="nb">int</span></div>
-
 
 
 <div class="viewcode-block" id="Density"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Density">[docs]</a><span class="k">class</span> <span class="nc">Density</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
@@ -379,9 +382,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
 
 
-
 <div class="viewcode-block" id="KDE_integrate"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_integrate">[docs]</a><span class="k">class</span> <span class="nc">KDE_integrate</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The purpose of this class is to use an empirical (typically Gaussian) PDF and to</span>
 <span class="sd">    also provide a smooth CDF that is obtained by integrating the PDF:</span>
 <span class="sd">    :math:`F_X(x)=\int_{-\infty}^{x} f_X(t) dt`.</span>
@@ -419,7 +421,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ppf</span> <span class="o">=</span> <span class="n">cdf_to_ppf</span><span class="p">(</span><span class="n">cdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cdf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">y_left</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">),</span> <span class="n">y_right</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">),</span> <span class="n">cdf_samples</span><span class="o">=</span><span class="n">cdf_samples</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ppf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ppf</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
-
 
 
 <div class="viewcode-block" id="KDE_approx"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.KDE_approx">[docs]</a><span class="k">class</span> <span class="nc">KDE_approx</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
@@ -485,7 +486,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_test</span><span class="o">.</span><span class="n">tests</span><span class="p">[</span><span class="s1">&#39;ks_2samp_jittered&#39;</span><span class="p">][</span><span class="s1">&#39;stat&#39;</span><span class="p">]</span></div>
 
 
-
 <div class="viewcode-block" id="Empirical"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical">[docs]</a><span class="k">class</span> <span class="nc">Empirical</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This kind of density does not apply any smoothing for CDF, but rather uses a</span>
@@ -510,7 +510,6 @@
     
     <span class="k">def</span> <span class="nf">_ppf_from_ecdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppf_interp</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div>
-
 
 
 <div class="viewcode-block" id="Empirical_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Empirical_discrete">[docs]</a><span class="k">class</span> <span class="nc">Empirical_discrete</span><span class="p">(</span><span class="n">Empirical</span><span class="p">):</span>
@@ -574,7 +573,6 @@
         <span class="k">return</span> <span class="n">Empirical_discrete</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span></div></div>
 
 
-
 <div class="viewcode-block" id="Parametric"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric">[docs]</a><span class="k">class</span> <span class="nc">Parametric</span><span class="p">(</span><span class="n">Density</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This density encapsulates a parameterized and previously fitted random variable.</span>
@@ -603,6 +601,14 @@
 <span class="sd">            Whether or not to compute the practical domain of the data and the practical range</span>
 <span class="sd">            of the PDF. Both of these use optimization to find the results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stat_tests</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stat_tests</span><span class="p">,</span> <span class="n">StatisticalTest</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;This class requires a dictionary of statistical tests, not an instance of </span><span class="si">{</span><span class="n">StatisticalTest</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">stat_tests</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_pval&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_stat&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Key not allowed: &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Value for key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; is not numeric.&#39;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">rv_generic</span><span class="p">,</span> <span class="n">rv_continuous</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span> <span class="o">=</span> <span class="n">stat_tests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_use_stat_test</span> <span class="o">=</span> <span class="n">use_stat_test</span>
@@ -664,14 +670,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the p-value of the selected statistical test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot return p-value for non-fitted random variable.&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="o">.</span><span class="n">tests</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="p">][</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="si">}</span><span class="s1">_pval&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut getter for the test statistic of the selected statistical test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot return statistical test statistic for non-fitted random variable.&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="o">.</span><span class="n">tests</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="p">][</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_tests</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">use_stat_test</span><span class="si">}</span><span class="s1">_stat&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -728,7 +734,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_params</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,))</span></div></div>
 
 
-
 <div class="viewcode-block" id="Parametric_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Parametric_discrete">[docs]</a><span class="k">class</span> <span class="nc">Parametric_discrete</span><span class="p">(</span><span class="n">Parametric</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This type of density inherits from :py:class:`Parametric` and is its counterpart</span>
@@ -765,7 +770,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">scipy.stats._continuous_distns</span> <span class="kn">import</span> <span class="n">norm_gen</span>
         <span class="k">return</span> <span class="n">Parametric_discrete</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">norm_gen</span><span class="p">(),</span> <span class="n">dist_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">stat_tests</span><span class="o">=</span><span class="p">{},</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span></div></div>
-
 
 
 <div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>

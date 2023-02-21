@@ -70,7 +70,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for metrics_as_scores.data.pregenerate</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains top-level function that are used in highly parallel</span>
+<span class="sd">scenarios for pre-generating densities for own datasets, either from</span>
+<span class="sd">previously computed fits for random variables or empirical densities.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
@@ -196,7 +202,7 @@
             <span class="n">candidates</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">context</span> <span class="o">==</span> <span class="n">context</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">qtype</span> <span class="o">==</span> <span class="n">qtype</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">the_type</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dist_transform</span> <span class="o">==</span> <span class="n">dist_transform</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># No fit at all :(</span>
-                <span class="n">the_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Use_class</span><span class="o">.</span><span class="n">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span>
+                <span class="n">the_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Use_class</span><span class="o">.</span><span class="n">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span> <span class="c1"># pragma: no cover</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">candidates</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">use_stat</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Lowest D-stat first</span>
                 <span class="n">best</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,]</span>
@@ -207,10 +213,10 @@
                 <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="n">dist</span><span class="o">.</span><span class="n">_param_info</span><span class="p">():</span>
                     <span class="n">use_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;params_</span><span class="si">{</span><span class="n">pi</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
                     <span class="k">if</span> <span class="n">pi</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">use_key</span> <span class="ow">in</span> <span class="n">df_cols</span><span class="p">:</span>
-                        <span class="n">use_key</span> <span class="o">=</span> <span class="n">use_key</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+                        <span class="n">use_key</span> <span class="o">=</span> <span class="n">use_key</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="c1"># pragma: no cover</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">params</span> <span class="o">+=</span> <span class="p">(</span><span class="n">best</span><span class="p">[</span><span class="n">use_key</span><span class="p">],)</span>
-                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
                         <span class="c1"># Happens when the candidate was not actually fit, e.g., when a discrete RV</span>
                         <span class="c1"># was selected for continuous data.</span>
                         <span class="n">the_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Use_class</span><span class="o">.</span><span class="n">unfitted</span><span class="p">(</span><span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">)</span>
@@ -226,7 +232,6 @@
                     <span class="n">transform_value</span><span class="o">=</span><span class="n">best</span><span class="o">.</span><span class="n">transform_value</span><span class="p">,</span> <span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">the_dict</span></div>
-
 
 
 <div class="viewcode-block" id="generate_empirical"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical</span><span class="p">(</span>
@@ -262,7 +267,6 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Finished generating Densities for </span><span class="si">{</span><span class="n">clazz</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> with transform </span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
 
 
-
 <div class="viewcode-block" id="generate_parametric"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_parametric">[docs]</a><span class="k">def</span> <span class="nf">generate_parametric</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">densities_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -293,7 +297,7 @@
     <span class="n">fits_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fits_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./pregen_distns_</span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">fits_file</span><span class="p">):</span>
         <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot generate parametric distribution for </span><span class="si">{</span><span class="n">clazz</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> and transformation </span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">, because the file </span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s1"> does not exist. Did you forget to create the fits using the script pregenerate_distns.py?&#39;</span><span class="p">)</span>
-        <span class="k">return</span>
+        <span class="k">return</span> <span class="c1"># pragma: no cover</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fits_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">distns_list</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -304,7 +308,6 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">dens_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">dump</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Finished generating parametric Densities for </span><span class="si">{</span><span class="n">clazz</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> with transform </span><span class="si">{</span><span class="n">transform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
-
 
 
 <div class="viewcode-block" id="generate_empirical_discrete"><a class="viewcode-back" href="../../../metrics_as_scores.data.html#metrics_as_scores.data.pregenerate.generate_empirical_discrete">[docs]</a><span class="k">def</span> <span class="nf">generate_empirical_discrete</span><span class="p">(</span>
