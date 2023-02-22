@@ -141,6 +141,8 @@ def test_Parametric():
         dens.pval
     with raises(Exception):
         dens.stat
+    
+    dens.compute_practical_domain()
 
 
 def test_Parametric_discrete():
