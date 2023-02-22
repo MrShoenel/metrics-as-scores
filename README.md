@@ -24,11 +24,15 @@ Metrics As Scores
       class="toc-section-number">1.3.3</span> Running Tests</a>
 - <a href="#example-usage" id="toc-example-usage"><span
   class="toc-section-number">2</span> Example Usage</a>
+  - <a href="#concrete-example-using-the-iris-dataset"
+    id="toc-concrete-example-using-the-iris-dataset"><span
+    class="toc-section-number">2.1</span> Concrete Example Using the Iris
+    Dataset</a>
   - <a href="#software-metrics-example"
     id="toc-software-metrics-example"><span
-    class="toc-section-number">2.1</span> Software Metrics Example</a>
+    class="toc-section-number">2.2</span> Software Metrics Example</a>
   - <a href="#diamonds-example" id="toc-diamonds-example"><span
-    class="toc-section-number">2.2</span> Diamonds Example</a>
+    class="toc-section-number">2.3</span> Diamonds Example</a>
 - <a href="#datasets" id="toc-datasets"><span
   class="toc-section-number">3</span> Datasets</a>
   - <a href="#use-your-own" id="toc-use-your-own"><span
@@ -48,7 +52,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.3.3`.
+The current version is `v2.4.0`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -221,6 +225,14 @@ is more or less common across groups. For each group, we can determine
 what might constitute a common/ideal value, and how distant the sample
 is from that value. This is expressed in terms of a percentile (a
 standardized scale of `[0,1]`), which we call **score**.
+
+## Concrete Example Using the Iris Dataset
+
+The notebook
+[`notebooks/Example-create-own-dataset.ipynb`](https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-create-own-dataset.ipynb)
+holds a concrete example for creating/importing/using one’s own dataset.
+Although all necessary steps can be achieved using the **TUI**, this
+notebook demonstrates a complete example of implementing this in code.
 
 ## Software Metrics Example
 
