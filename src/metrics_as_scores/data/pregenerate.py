@@ -4,8 +4,9 @@ scenarios for pre-generating densities for own datasets, either from
 previously computed fits for random variables or empirical densities.
 """
 
-from pathlib import Path
+import numpy as np
 import pandas as pd
+from pathlib import Path
 from typing import Union
 from warnings import warn
 from os.path import exists
@@ -154,6 +155,10 @@ def fits_to_MAS_densities(
                 if context != '__ALL__':
                     data = data[(data[dataset.ds['colname_context']] == context)]
                 data = data[dataset.ds['colname_data']].to_numpy()
+                
+                # Re-apply the transform to the data:
+                if best.transform_value is not None:
+                    data = np.abs(data - best.transform_value)
                 
                 the_dict[key] = Use_class(dist=dist, stat_tests=stat_tests_dict, use_stat_test=use_test, dist_params=params, range=(data.min(), data.max()),
                     compute_ranges=True, ideal_value=dataset.ideal_values[best.qtype], dist_transform=dist_transform,
