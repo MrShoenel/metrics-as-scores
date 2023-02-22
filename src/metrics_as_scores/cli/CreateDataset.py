@@ -377,8 +377,8 @@ Metrics As Scores before proceeding with the creation process.
         self._save_manifest_and_data()
 
         self.q.print('')
-        self.print_info(text_normal='Wrote manifest to: ', text_vital=self.path_manifest)
-        self.print_info(text_normal='Wrote original dataset to: ', text_vital=self.path_df_data)
+        self.print_info(text_normal='Wrote manifest to: ', text_vital=str(self.path_manifest))
+        self.print_info(text_normal='Wrote original dataset to: ', text_vital=str(self.path_df_data))
         self.q.print('\n' + 10*'-' + '\n')
 
         # Let's run the statistical tests and write them out:
