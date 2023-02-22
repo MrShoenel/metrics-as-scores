@@ -109,8 +109,8 @@ def transform_to_MAS_dataset(df: pd.DataFrame, group_col: str, feature_cols: lis
         A non-empty list of features' names to include.
 
     :raises: Exception:
-        If the number of given feature columns is zero or if any of the given features is
-        not present as a column in the data frame.
+        If the number of given feature columns is zero or if any of the given features or
+        the group is not present as a column in the data frame.
 
     :return:
         A data frame with the 3 columns ``Feature`` (ordinal; name of the feature column
@@ -121,7 +121,7 @@ def transform_to_MAS_dataset(df: pd.DataFrame, group_col: str, feature_cols: lis
     if len(feature_cols) == 0:
         raise Exception('You must select one or more features.')
     
-    for col_feat in feature_cols:
+    for col_feat in feature_cols + [group_col]:
         if not col_feat in df.columns:
             raise Exception(f'The feature "{col_feat}" is not a column of the given data frame.')
 
