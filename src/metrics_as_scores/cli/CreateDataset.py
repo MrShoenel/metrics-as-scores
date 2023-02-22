@@ -41,10 +41,64 @@ your dataset so that it can be used by others, start the Bundle-workflow from th
 previous menu afterwards.
     """.strip()
 
-    def __init__(self) -> None:
+    def __init__(self, manifest: LocalDataset=None, org_df: pd.DataFrame=None) -> None:
         super().__init__()
         self.regex_id = r'^[a-z]+[a-z-_\d]*?[a-z\d]+?$'
+        self.manifest: LocalDataset = manifest
+        self.org_df: pd.DataFrame = org_df
+        self.dataset: Dataset = None if manifest is None and org_df is None else Dataset(ds=manifest, df=org_df)
     
+
+    @property
+    def dataset_dir(self) -> Path:
+        if self.manifest is None:
+            raise Exception('A manifest is required.')
+        return DATASETS_DIR.joinpath(f'./{self.manifest["id"]}')
+    
+
+    @property
+    def fits_dir(self) -> Path:
+        return self.dataset_dir.joinpath('./fits')
+    
+
+    @property
+    def densities_dir(self) -> Path:
+        return self.dataset_dir.joinpath('./densities')
+    
+
+    @property
+    def tests_dir(self) -> Path:
+        return self.dataset_dir.joinpath('./stat-tests')
+    
+
+    @property
+    def web_dir(self) -> Path:
+        return self.dataset_dir.joinpath('./web')
+    
+
+    @property
+    def path_manifest(self) -> Path:
+        return self.dataset_dir.joinpath('./manifest.json')
+    
+
+    @property
+    def path_df_data(self) -> Path:
+        return self.dataset_dir.joinpath('./org-data.csv')
+
+
+    @property
+    def path_test_ANOVA(self) -> Path:
+        return self.tests_dir.joinpath('./anova.csv')
+    
+
+    @property
+    def path_test_TukeyHSD(self) -> Path:
+        return self.tests_dir.joinpath('./tukeyhsd.csv')
+    
+
+    @property
+    def path_test_ks2samp(self) -> Path:
+        return self.tests_dir.joinpath('./ks2samp.csv')
 
     def _set_ideal_values(self, qtypes: list[str]) -> dict[str, Union[float,int]]:
         type_dict = {}
@@ -70,6 +124,7 @@ previous menu afterwards.
             ready = not self.q.confirm(message='Continue setting ideal values?', default=True).ask()
         
         return type_dict
+
 
     def _transform_dataset(self) -> pd.DataFrame:
         self.q.print('\n' + 10*'-')
@@ -99,14 +154,13 @@ previous menu afterwards.
 
         return transform_to_MAS_dataset(df=df, group_col=col_ctx, feature_cols=col_feats)
 
-        
-
 
     def _read_csv(self, path_like: str) -> pd.DataFrame:
         sep = self.q.text(message='What is the separator used?', default=',', validate=lambda s: s in [',', ';', ' ', '\t']).ask()
         dec = self.q.text(message='What is the decimal point?', default='.', validate=lambda s: s in ['.', ',']).ask()
         return pd.read_csv(filepath_or_buffer=path_like, sep=sep, decimal=dec)
-    
+
+
     def _read_excel(self, path_like: str) -> pd.DataFrame:
         sheet = self.q.text(message='Which sheet would you like to read?', default='0').ask()
         if isint(sheet):
@@ -114,11 +168,13 @@ previous menu afterwards.
         header = self.q.text('Zero-based index of header column?', default='0', validate=isint).ask()
         return pd.read_excel(io=path_like, sheet_name=sheet, header=header)
 
+
     def _is_feature_discrete(self, df: pd.DataFrame, col_data: str, col_type: str, use_type: str) -> bool:
         temp = df.loc[df[col_type] == use_type, :]
         vals = temp[col_data].to_numpy()
         # Check if all values are integer.
         return np.all(np.mod(vals, 1) == 0)
+
 
     def _create_manifest(self, transformed_df: pd.DataFrame=None) -> tuple[LocalDataset, pd.DataFrame]:
         jsd: LocalDataset = {}
@@ -227,26 +283,52 @@ is no best value for lines of code (size) of software.
 
         return (jsd, df)
 
-    def _run_statistical_tests(self, ds: Dataset, tests_dir: Path) -> None:
+
+    def _run_statistical_tests(self) -> None:
         self.q.print('We will now perform some statistical tests and summarize the results.')
         
         self.print_info(text_normal='Performing tests: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
-        anova = ds.analyze_ANOVA(qtypes=ds.quantity_types, contexts=list(ds.contexts(include_all_contexts=True)), unique_vals=True)
-        file_anova = str(tests_dir.joinpath('./anova.csv'))
+        anova = self.dataset.analyze_ANOVA(qtypes=self.dataset.quantity_types, contexts=list(self.dataset.contexts(include_all_contexts=True)), unique_vals=True)
+        file_anova = str(self.path_test_ANOVA)
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
 
         self.print_info(text_normal='Performing tests: ', text_vital='Two-Sample Kolmogorov-Smirnov (KS2) ...', arrow='\n')
-        ks2samp = ds.analyze_distr(qtypes=ds.quantity_types, use_ks_2samp=True)
-        file_ks2samp = str(tests_dir.joinpath('./ks2samp.csv'))
+        ks2samp = self.dataset.analyze_distr(qtypes=self.dataset.quantity_types, use_ks_2samp=True)
+        file_ks2samp = str(self.path_test_ks2samp)
         ks2samp.to_csv(file_ks2samp, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_ks2samp)
 
         self.print_info(text_normal='Performing tests: ', text_vital="Tukey's Honest Significance Test (TukeyHSD) ...", arrow='\n')
-        tukeyhsd = ds.analyze_TukeyHSD(qtypes=ds.quantity_types)
-        file_tukey = str(tests_dir.joinpath('./tukeyhsd.csv'))
+        tukeyhsd = self.dataset.analyze_TukeyHSD(qtypes=self.dataset.quantity_types)
+        file_tukey = str(self.path_test_TukeyHSD)
         tukeyhsd.to_csv(file_tukey, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_tukey)
+
+
+    def _make_dirs(self) -> None:
+        for dir in [self.dataset_dir, self.fits_dir, self.densities_dir, self.tests_dir, self.web_dir]:
+            if not dir.exists():
+                makedirs(str(dir.resolve()))
+    
+
+    def _init_dataset(self) -> None:
+        for file in ['./About.qmd', './_quarto.yml', './refs.bib', './web/about.html', './web/references.html']:
+            copyfile(src=str(default_ds.joinpath(file)), dst=str(self.dataset_dir.joinpath(file)))
+        
+        # We also need to write out variables for Quarto.
+        # We will write into the _quarto.yaml for better compatibility.
+        with open(file=str(self.dataset_dir.joinpath('./_quarto.yml')), mode='a', encoding='utf-8') as fp:
+            fp.write(f'\ntitle: {self.manifest["name"]}\n')
+            fp.write('\nauthor:')
+            for a in self.manifest['author']:
+                fp.write(f'\n  - {a}')
+    
+
+    def _save_manifest_and_data(self) -> None:
+        with open(file=self.path_manifest, mode='w', encoding='utf-8') as fp:
+            dump(obj=self.manifest, fp=fp, indent=2)
+        self.org_df.to_csv(path_or_buf=self.path_df_data, index=False)
 
 
     def create_own(self) -> None:
@@ -282,49 +364,30 @@ Metrics As Scores before proceeding with the creation process.
         if self.q.confirm(message='Would you like to transform a data frame first?', default=False).ask():
             transformed_df = self._transform_dataset()
 
-        manifest, df = self._create_manifest(transformed_df=transformed_df)
+        self.manifest, self.org_df = self._create_manifest(transformed_df=transformed_df)
+        self.dataset = Dataset(ds=self.manifest, df=self.org_df)
+        
         # Let's create a folder for this dataset (by ID) and out the files there.
-        dataset_dir = DATASETS_DIR.joinpath(f'./{manifest["id"]}')
-        fits_dir = dataset_dir.joinpath('./fits')
-        densities_dir = dataset_dir.joinpath('./densities')
-        tests_dir = dataset_dir.joinpath('./stat-tests')
-        web_dir = dataset_dir.joinpath('./web')
-        for dir in [dataset_dir, fits_dir, densities_dir, tests_dir, web_dir]:
-            if not dir.exists():
-                makedirs(str(dir.resolve()))
+        self._make_dirs()
         
         # Let's copy specific files from the default over to the new dataset:
-        for file in ['./About.qmd', './_quarto.yml', './refs.bib', './web/about.html', './web/references.html']:
-            copyfile(src=str(default_ds.joinpath(file)), dst=str(dataset_dir.joinpath(file)))
-        # We also need to write out variables for Quarto.
-        # We will write into the _quarto.yaml for better compat.
-        with open(file=str(dataset_dir.joinpath('./_quarto.yml')), mode='a', encoding='utf-8') as fp:
-            fp.write(f'\ntitle: {manifest["name"]}\n')
-            fp.write('\nauthor:')
-            for a in manifest['author']:
-                fp.write(f'\n  - {a}')
+        self._init_dataset()
 
-        
-        path_manifest = str(dataset_dir.joinpath('./manifest.json'))
-        path_data = str(dataset_dir.joinpath('./org-data.csv'))
-        
-        with open(file=path_manifest, mode='w', encoding='utf-8') as fp:
-            dump(obj=manifest, fp=fp, indent=2)
-        df.to_csv(path_or_buf=path_data, index=False)
+        # Let's write out the manifest and the dataset:
+        self._save_manifest_and_data()
 
         self.q.print('')
-        self.print_info(text_normal='Wrote manifest to: ', text_vital=path_manifest)
-        self.print_info(text_normal='Wrote original dataset to: ', text_vital=path_data)
+        self.print_info(text_normal='Wrote manifest to: ', text_vital=self.path_manifest)
+        self.print_info(text_normal='Wrote original dataset to: ', text_vital=self.path_df_data)
         self.q.print('\n' + 10*'-' + '\n')
 
-
-        dataset = Dataset(ds=manifest, df=df)
-        self._run_statistical_tests(ds=dataset, tests_dir=tests_dir)
+        # Let's run the statistical tests and write them out:
+        self._run_statistical_tests()
         self.q.print('\n' + 10*'-' + '\n')
 
 
         self.q.print(text=f'''
-Your dataset was created and initialized in: {str(dataset_dir.resolve())}
+Your dataset was created and initialized in: {str(self.dataset_dir.resolve())}
 
 In order to use your dataset, you need to pre-generate densities for the Web Application.
 If you would also like to fit parametric random variables and generate densities for those,
