@@ -7,7 +7,7 @@ from metrics_as_scores.__init__ import DATASETS_DIR, MAS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import isint, isnumeric, get_known_datasets
 from metrics_as_scores.distribution.distribution import Dataset, LocalDataset
-from metrics_as_scores.tools.funcs import natsort
+from metrics_as_scores.tools.funcs import natsort, transform_to_MAS_dataset
 from questionary import Choice
 from re import match
 from os import makedirs
@@ -96,22 +96,8 @@ previous menu afterwards.
         ], validate=lambda str_list: len(str_list) > 0).ask()
 
         self.print_info(text_normal='Converting data frame ', text_vital='...')
-        # Let's stack the data frame:
-        target_df = pd.DataFrame(dict(
-            Feature = [],
-            Group = [],
-            Value = []
-        ))
 
-        nrow = len(df.index)
-        for col_feat in col_feats:
-            target_df = pd.concat([target_df, pd.DataFrame(dict(
-                Feature = nrow * [col_feat],
-                Group = df[col_ctx],
-                Value = df[col_feat]
-            ))])
-        
-        return target_df
+        return transform_to_MAS_dataset(df=df, group_col=col_ctx, feature_cols=col_feats)
 
         
 
