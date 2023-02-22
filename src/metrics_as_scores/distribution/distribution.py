@@ -635,6 +635,29 @@ class Parametric(Density):
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.ppf(*(x, *self.dist_params)).reshape((x.size,))
+    
+    def compute_practical_domain(self, cutoff: float=0.9985) -> tuple[float, float]:
+        """
+        Overridden to exploit having available a PPF of a fitted random variable.
+        It can be used to find the practical domain instantaneously instead of
+        having to solve an optimization problem.
+
+        cutoff: ``float``
+            The percentage of values to include. The CDF is optimized to find some `x`
+            for which it peaks at the cutoff. For the lower bound, we subtract from
+            CDF the cutoff. Note that the default value for the cutoff was adjusted
+            here to extend a little beyond what is good for other types of densities.
+        
+        :rtype: tuple[float, float]
+
+        :return:
+            The practical domain, cut off for both directions. If this random variable
+            is unfit, returns :py:class:`Density`'s :py:meth:`compute_practical_domain()`.
+        """
+        if not self.is_fit:
+            return super().compute_practical_domain(cutoff=cutoff)
+        
+        return (self.ppf(1.0 - cutoff)[0], self.ppf(cutoff)[0])
 
 
 class Parametric_discrete(Parametric):
