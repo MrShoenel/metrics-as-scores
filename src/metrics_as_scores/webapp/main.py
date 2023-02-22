@@ -362,7 +362,7 @@ def update_plot_internal(contain_plot: bool=False):
     if is_ppf:
         input_own.step = 1. / 25.
     else:
-        input_own.step = (ub - lb) / 25.
+        input_own.step = abs(ub - lb) / 25.
 
     for ctx in contexts:
         density = densities[ctx]
