@@ -139,22 +139,72 @@ a never-terminating loop (except for when the user presses Ctr+c).</p>
 <p>This module contains the workflow for creating own datasets.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.CreateDataset.</span></span><span class="sig-name descname"><span class="pre">CreateDatasetWorkflow</span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/CreateDataset.html#CreateDatasetWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metrics_as_scores.cli.CreateDataset.</span></span><span class="sig-name descname"><span class="pre">CreateDatasetWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.LocalDataset" title="metrics_as_scores.distribution.distribution.LocalDataset"><span class="pre">LocalDataset</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">org_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics_as_scores/cli/CreateDataset.html#CreateDatasetWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#metrics_as_scores.cli.Workflow.Workflow" title="metrics_as_scores.cli.Workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a></p>
 <p>This workflow creates an own, local dataset from a single data source that can
 be read by Pandas from file or URL. The original dataset needs three columns:
 For a single sample, one column holds the numeric observation, one holds the
 ordinal type (name of feature), and one holds the group associated with it. A
 dataset can hold one or more features, but should hold at least two groups in
-order to compare distributions of a single sample type across groups.
-This workflow creates the entire dataset: The manifest JSON, the parametric fits,
+order to compare distributions of a single sample type across groups.</p>
+<p>This workflow creates the entire dataset: The manifest JSON, the parametric fits,
 the pre-generated distributions. When done, the dataset is installed, such that it
 can be discovered and used by the local Web-Application. If you wish to publish
 your dataset so that it can be used by others, start the Bundle-workflow from the
 previous menu afterwards.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/CreateDataset.html#CreateDatasetWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.LocalDataset" title="metrics_as_scores.distribution.distribution.LocalDataset"><span class="pre">LocalDataset</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">org_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/cli/CreateDataset.html#CreateDatasetWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.dataset_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dataset_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.dataset_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.fits_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fits_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.fits_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.densities_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">densities_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.densities_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.tests_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tests_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.tests_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.web_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">web_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.web_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_manifest">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_manifest</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_manifest" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_df_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_df_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_df_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_ANOVA">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_test_ANOVA</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_ANOVA" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_TukeyHSD">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_test_TukeyHSD</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_TukeyHSD" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_ks2samp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_test_ks2samp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#metrics_as_scores.cli.CreateDataset.CreateDatasetWorkflow.path_test_ks2samp" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

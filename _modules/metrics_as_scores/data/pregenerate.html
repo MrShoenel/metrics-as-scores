@@ -76,8 +76,9 @@
 <span class="sd">previously computed fits for random variables or empirical densities.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span>
@@ -226,6 +227,10 @@
                 <span class="k">if</span> <span class="n">context</span> <span class="o">!=</span> <span class="s1">&#39;__ALL__&#39;</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;colname_context&#39;</span><span class="p">]]</span> <span class="o">==</span> <span class="n">context</span><span class="p">)]</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;colname_data&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+                
+                <span class="c1"># Re-apply the transform to the data:</span>
+                <span class="k">if</span> <span class="n">best</span><span class="o">.</span><span class="n">transform_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">best</span><span class="o">.</span><span class="n">transform_value</span><span class="p">)</span>
                 
                 <span class="n">the_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Use_class</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="n">dist</span><span class="p">,</span> <span class="n">stat_tests</span><span class="o">=</span><span class="n">stat_tests_dict</span><span class="p">,</span> <span class="n">use_stat_test</span><span class="o">=</span><span class="n">use_test</span><span class="p">,</span> <span class="n">dist_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
                     <span class="n">compute_ranges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ideal_value</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">ideal_values</span><span class="p">[</span><span class="n">best</span><span class="o">.</span><span class="n">qtype</span><span class="p">],</span> <span class="n">dist_transform</span><span class="o">=</span><span class="n">dist_transform</span><span class="p">,</span>

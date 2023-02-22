@@ -76,6 +76,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">split</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">MutableMapping</span>
 <span class="kn">from</span> <span class="nn">nptyping</span> <span class="kn">import</span> <span class="n">Float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">Shape</span>
@@ -158,6 +159,52 @@
 <span class="sd">    Courtesy of https://stackoverflow.com/a/16090640/1785141</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">else</span> <span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="transform_to_MAS_dataset"><a class="viewcode-back" href="../../../metrics_as_scores.tools.html#metrics_as_scores.tools.funcs.transform_to_MAS_dataset">[docs]</a><span class="k">def</span> <span class="nf">transform_to_MAS_dataset</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">group_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">feature_cols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms a &quot;typical&quot; data frame into the format that is used by Metrics As Scores.</span>
+<span class="sd">    A typical data frame is one in which there is a column with the group, and a dedicated</span>
+<span class="sd">    column for each feature&#39;s observations. That kind of data frame, however, implies we</span>
+<span class="sd">    have the same amount of observations per feature. The format used by Metrics As Scores</span>
+<span class="sd">    stacks the observations and adds an extra ordinal column for the feature. This way,</span>
+<span class="sd">    we allow an arbitrary number of observations per feature.</span>
+
+<span class="sd">    df: ``pd.DataFrame``</span>
+<span class="sd">        The original data frame that has one or more feature columns and one group designated</span>
+<span class="sd">        group column.</span>
+<span class="sd">    </span>
+<span class="sd">    group_col: ``str``</span>
+<span class="sd">        The name of the group column.</span>
+<span class="sd">    </span>
+<span class="sd">    feature_cols: ``list[str]``</span>
+<span class="sd">        A non-empty list of features&#39; names to include.</span>
+
+<span class="sd">    :raises: Exception:</span>
+<span class="sd">        If the number of given feature columns is zero or if any of the given features or</span>
+<span class="sd">        the group is not present as a column in the data frame.</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        A data frame with the 3 columns ``Feature`` (ordinal; name of the feature column</span>
+<span class="sd">        from the original dataset), ``Group`` (ordinal, the ``group_col`` repeated ``n``</span>
+<span class="sd">        times, where ``n`` is the length of the given data frame), and ``Value`` (the</span>
+<span class="sd">        numeric observation).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;You must select one or more features.&#39;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">col_feat</span> <span class="ow">in</span> <span class="n">feature_cols</span> <span class="o">+</span> <span class="p">[</span><span class="n">group_col</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">col_feat</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The feature &quot;</span><span class="si">{</span><span class="n">col_feat</span><span class="si">}</span><span class="s1">&quot; is not a column of the given data frame.&#39;</span><span class="p">)</span>
+
+    <span class="n">nrow</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">([</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">Feature</span> <span class="o">=</span> <span class="n">nrow</span> <span class="o">*</span> <span class="p">[</span><span class="n">col_feat</span><span class="p">],</span>
+            <span class="n">Group</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">group_col</span><span class="p">],</span>
+            <span class="n">Value</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_feat</span><span class="p">]</span>
+        <span class="p">))</span> <span class="k">for</span> <span class="n">col_feat</span> <span class="ow">in</span> <span class="n">feature_cols</span>
+    <span class="p">]))</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

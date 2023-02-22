@@ -154,6 +154,39 @@ that handles out-of-bounds values explicitly. Also, we assume that <code class="
 <p>Courtesy of <a class="reference external" href="https://stackoverflow.com/a/16090640/1785141">https://stackoverflow.com/a/16090640/1785141</a></p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="metrics_as_scores.tools.funcs.transform_to_MAS_dataset">
+<span class="sig-prename descclassname"><span class="pre">metrics_as_scores.tools.funcs.</span></span><span class="sig-name descname"><span class="pre">transform_to_MAS_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/tools/funcs.html#transform_to_MAS_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.tools.funcs.transform_to_MAS_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms a “typical” data frame into the format that is used by Metrics As Scores.
+A typical data frame is one in which there is a column with the group, and a dedicated
+column for each feature’s observations. That kind of data frame, however, implies we
+have the same amount of observations per feature. The format used by Metrics As Scores
+stacks the observations and adds an extra ordinal column for the feature. This way,
+we allow an arbitrary number of observations per feature.</p>
+<dl class="simple">
+<dt>df: <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code></dt><dd><p>The original data frame that has one or more feature columns and one group designated
+group column.</p>
+</dd>
+<dt>group_col: <code class="docutils literal notranslate"><span class="pre">str</span></code></dt><dd><p>The name of the group column.</p>
+</dd>
+<dt>feature_cols: <code class="docutils literal notranslate"><span class="pre">list[str]</span></code></dt><dd><p>A non-empty list of features’ names to include.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exception:
+If the number of given feature columns is zero or if any of the given features or
+the group is not present as a column in the data frame.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data frame with the 3 columns <code class="docutils literal notranslate"><span class="pre">Feature</span></code> (ordinal; name of the feature column
+from the original dataset), <code class="docutils literal notranslate"><span class="pre">Group</span></code> (ordinal, the <code class="docutils literal notranslate"><span class="pre">group_col</span></code> repeated <code class="docutils literal notranslate"><span class="pre">n</span></code>
+times, where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the length of the given data frame), and <code class="docutils literal notranslate"><span class="pre">Value</span></code> (the
+numeric observation).</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-metrics_as_scores.tools.lazy">
 <span id="metrics-as-scores-tools-lazy-module"></span><h2>metrics_as_scores.tools.lazy module<a class="headerlink" href="#module-metrics_as_scores.tools.lazy" title="Permalink to this heading"></a></h2>
