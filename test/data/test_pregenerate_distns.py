@@ -79,6 +79,33 @@ def test_generate_parametric_fits():
     assert np.all((temp >= 0.0) & (temp <= 1.0))
 
 
+    # Let's try a simple dist transform, too:
+    transform_values_dict, data_dict = fpw._get_data_tuples(dist_transform=DistTransform.SUPREMUM, continuous=True)
+    transform_values_discrete_dict, data_discrete_dict = fpw._get_data_tuples(dist_transform=DistTransform.SUPREMUM, continuous=False)
+    res = generate_parametric_fits(
+        ds=ds,
+        num_jobs=2,
+        fitter_type=FitterPymoo,
+        dist_transform=DistTransform.SUPREMUM,
+        data_dict=data_dict,
+        transform_values_dict=transform_values_dict,
+        data_discrete_dict=data_discrete_dict,
+        transform_values_discrete_dict=transform_values_discrete_dict,
+        selected_rvs_c=[norm_gen],
+        selected_rvs_d=[])
+    with open(file=str(fits_dir.joinpath(f'./pregen_distns_{DistTransform.SUPREMUM.name}.pickle')), mode='wb') as fp:
+        dump(obj=res, file=fp)
+    generate_parametric(dataset=ds, densities_dir=fits_dir, fits_dir=fits_dir, clazz=Parametric, transform=DistTransform.SUPREMUM)
+    distns_dict = { item['grid_idx']: item for item in res }
+    dens_dict = fits_to_MAS_densities(dataset=ds, distns_dict=distns_dict, dist_transform=DistTransform.SUPREMUM, use_continuous=True)
+    
+    assert isinstance(dens_dict, dict)
+    r1 = dens_dict['Run1_Lot1']
+    assert abs(r1.range[0]) < 1e-200
+    assert r1.dist_transform == DistTransform.SUPREMUM
+    assert isinstance(r1.transform_value, float) and not np.isnan(r1.transform_value) and r1.transform_value > 0.0
+
+
     # Also test what happens if fits-file does not exist:
     import warnings
     warnings.filterwarnings("error")
