@@ -226,11 +226,7 @@ class Density(ABC):
         :return:
             A value in the range :math:`[0,1]`.
         """
-        if x < self.range[0]:
-            return 0.0
-        elif x > self.range[1]:
-            return 1.0
-        return self._cdf(x)
+        return np.clip(a=self._cdf(x), a_min=0.0, a_max=1.0)
     
 
     def compute_practical_domain(self, cutoff: float=0.995) -> tuple[float, float]:
