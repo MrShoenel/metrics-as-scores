@@ -112,20 +112,23 @@ global search has to be performed.'''.strip())
         return (transform_values_dict, data_dict)
 
 
-    def _fit_parametric(self, dist_transform: DistTransform) -> list[dict[str, Any]]:
+    def _fit_parametric(self, dist_transform: DistTransform, do_print: bool=True) -> list[dict[str, Any]]:
 
         # There are two steps to this:
         # 1) Get all data required
         # 2) Fit
         # Continuous:
         s = 'Performing distribution transforms for: '
-        self.print_info(text_normal=s, text_vital='continuous')
+        if do_print:
+            self.print_info(text_normal=s, text_vital='continuous')
         transform_values_dict, data_dict = self._get_data_tuples(dist_transform=dist_transform, continuous=True)
         # Discrete:
-        self.print_info(text_normal=s, text_vital='discrete')
+        if do_print:
+            self.print_info(text_normal=s, text_vital='discrete')
         transform_values_discrete_dict, data_discrete_dict = self._get_data_tuples(dist_transform=dist_transform, continuous=False)
 
-        self.print_info(text_normal='', text_vital='Starting fitting of distributions, in randomized order.')
+        if do_print:
+            self.print_info(text_normal='', text_vital='Starting fitting of distributions, in randomized order.')
         return generate_parametric_fits(
             ds=self.ds,
             num_jobs=self.num_cpus,
