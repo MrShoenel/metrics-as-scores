@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metrics-as-scores"
-version = "2.3.3"
+version = "2.4.0"
 description = "Interactive web application, tool- and analysis suite for approximating, exploring, understanding, and sampling from conditional distributions."
 authors = ["Sebastian Hönel <development@hoenel.net>"]
 license = "Dual-licensed under GNU General Public License v3 (GPLv3) and closed-source"
@@ -81,6 +81,7 @@ docs_clean_win = "docs\\make clean html"
 docs_apidoc_win = "sphinx-apidoc -o docs src\\metrics_as_scores --force"
 docs_make_win = "docs\\make html"
 docs = ["docs_clean_win", "docs_apidoc_win", "docs_make_win"]
+readme = "quarto render README.qmd --to gfm"
 poetry_build = "poetry build"
-peotry_install = "poetry install"
-prepare = ["peotry_install", "poetry_build", "peotry_install"]
+poetry_install = "poetry install"
+prepare = ["readme", "poetry_install", "poetry_build", "poetry_install"]
