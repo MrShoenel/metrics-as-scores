@@ -655,7 +655,7 @@ class Parametric(Density):
             is unfit, returns :py:class:`Density`'s :py:meth:`compute_practical_domain()`.
         """
         if not self.is_fit:
-            return super().compute_practical_domain(cutoff=cutoff)
+            return self.range
         
         return (self.ppf(1.0 - cutoff)[0], self.ppf(cutoff)[0])
 
