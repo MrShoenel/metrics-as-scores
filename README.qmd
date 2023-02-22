@@ -210,6 +210,13 @@ For each group, we can determine what might constitute a common/ideal value, and
 This is expressed in terms of a percentile (a standardized scale of `[0,1]`), which we call **score**.
 
 
+## Concrete Example Using the Iris Dataset
+
+The notebook [`notebooks/Example-create-own-dataset.ipynb`](https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-create-own-dataset.ipynb)
+holds a concrete example for creating/importing/using one's own dataset.
+Although all necessary steps can be achieved using the **TUI**, this notebook demonstrates a complete example of implementing this in code.
+
+
 ## Software Metrics Example
 
 Software metrics, when captured out of context, are meaningless [@gil2016software].
