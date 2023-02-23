@@ -312,7 +312,7 @@ def format_dataset(ds: KnownDataset) -> str:
 	- {ds["name"]} [@dataset_{ds["id"]}]. {format_file_size(num_bytes=ds["size_extracted"], digits=0)}. <{ds["info_url"]}>.
 	'''.strip()
 
-dm('\n'.join([format_dataset(ds) for ds in get_known_datasets()]))
+dm('\n'.join([format_dataset(ds) for ds in get_known_datasets(use_local_file=False)]))
 ```
 
 
