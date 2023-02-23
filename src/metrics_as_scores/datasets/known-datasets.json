@@ -1,29 +1,38 @@
 [
 	{
-		"name": "Metrics and Domains From the Qualitas.class corpus",
+		"name": "Metrics and Domains From the Qualitas.class Corpus",
 		"author": "Sebastian Hönel",
 		"id": "qcc",
 		"info_url": "https://doi.org/10.5281/zenodo.7633949",
-		"download": "https://zenodo.org/record/7655174/files/dataset.zip?download=1",
-		"size": 4322195829,
-		"size_extracted": 10046352180
+		"download": "https://zenodo.org/record/7669541/files/dataset.zip?download=1",
+		"size": 4322218821,
+		"size_extracted": 10046379192
 	},
 	{
-		"name": "ELISA Spectrophotometer Samples",
+		"name": "Elisa Spectrophotometer Positive Samples",
 		"author": "Sebastian Hönel",
 		"id": "elisa",
 		"info_url": "https://doi.org/10.5281/zenodo.7633989",
-		"download": "https://zenodo.org/record/7655179/files/dataset.zip?download=1",
-		"size": 166763519,
-		"size_extracted": 266100391
+		"download": "https://zenodo.org/record/7669514/files/dataset.zip?download=1",
+		"size": 166773602,
+		"size_extracted": 266119120
 	},
 	{
-		"name": "Price, weight, and other properties of over 1,200 ideal-cut and best-clarity diamonds",
+		"name": "Price, Weight, and Other Properties of Over 1,200 Ideal-Cut and Best-Clarity Diamonds",
 		"author": "Sebastian Hönel",
 		"id": "diamonds-ideal-if",
 		"info_url": "https://doi.org/10.5281/zenodo.7647596",
-		"download": "https://zenodo.org/record/7655192/files/dataset.zip?download=1",
-		"size": 316900638,
-		"size_extracted": 508262941
+		"download": "https://zenodo.org/record/7669530/files/dataset.zip?download=1",
+		"size": 316898247,
+		"size_extracted": 508145767
+	},
+	{
+		"name": "The Iris Flower Data Set",
+		"author": "Sebastian Hönel",
+		"id": "iris",
+		"info_url": "https://doi.org/10.5281/zenodo.7669645",
+		"download": "https://zenodo.org/record/7669664/files/dataset.zip?download=1",
+		"size": 89556895,
+		"size_extracted": 143408846
 	}
 ]
