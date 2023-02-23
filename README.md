@@ -343,13 +343,15 @@ The following is a curated list of known, publicly available datasets
 that can be used with Metrics As Scores. These datasets can be
 downloaded using the text-based user interface.
 
-- Metrics and Domains From the Qualitas.class corpus (Hönel 2023b). 10
+- Metrics and Domains From the Qualitas.class Corpus (Hönel 2023b). 10
   GB. <https://doi.org/10.5281/zenodo.7633949>.
-- ELISA Spectrophotometer Samples (Hönel 2023a). 266 MB.
+- Elisa Spectrophotometer Positive Samples (Hönel 2023a). 266 MB.
   <https://doi.org/10.5281/zenodo.7633989>.
-- Price, weight, and other properties of over 1,200 ideal-cut and
-  best-clarity diamonds (Hönel 2023c). 508 MB.
+- Price, Weight, and Other Properties of Over 1,200 Ideal-Cut and
+  Best-Clarity Diamonds (Hönel 2023c). 508 MB.
   <https://doi.org/10.5281/zenodo.7647596>.
+- The Iris Flower Data Set (Hönel 2023d). 143 MB.
+  <https://doi.org/10.5281/zenodo.7669645>.
 
 ------------------------------------------------------------------------
 
@@ -441,7 +443,7 @@ Spectrophotometer Positive Samples.” Zenodo.
 <div id="ref-dataset_qcc" class="csl-entry">
 
 ———. 2023b. “<span class="nocase">Metrics As Scores Dataset: Metrics and
-Domains From the Qualitas.class corpus</span>.” Zenodo.
+Domains From the Qualitas.class Corpus</span>.” Zenodo.
 <https://doi.org/10.5281/zenodo.7633949>.
 
 </div>
@@ -449,8 +451,15 @@ Domains From the Qualitas.class corpus</span>.” Zenodo.
 <div id="ref-dataset_diamonds-ideal-if" class="csl-entry">
 
 ———. 2023c. “<span class="nocase">Metrics As Scores Dataset: Price,
-weight, and other properties of over 1,200 ideal-cut and best- clarity
-diamonds</span>.” Zenodo. <https://doi.org/10.5281/zenodo.7647596>.
+Weight, and Other Properties of Over 1,200 Ideal-Cut and Best-Clarity
+Diamonds</span>.” Zenodo. <https://doi.org/10.5281/zenodo.7647596>.
+
+</div>
+
+<div id="ref-dataset_iris" class="csl-entry">
+
+———. 2023d. “Metrics As Scores Dataset: The Iris Flower Data Set.”
+Zenodo. <https://doi.org/10.5281/zenodo.7669664>.
 
 </div>
 
