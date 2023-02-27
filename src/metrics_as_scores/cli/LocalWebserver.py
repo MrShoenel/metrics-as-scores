@@ -14,6 +14,11 @@ from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import PathStatus, isint, get_local_datasets, required_files_folders_local_dataset, validate_local_dataset_files
 from metrics_as_scores.distribution.distribution import LocalDataset
 from questionary import Choice
+from traceback import TracebackException
+from subprocess import Popen, PIPE
+from sys import executable
+from os import environ
+from io import TextIOWrapper
 
 this_dir = Path(__file__).resolve().parent
 webapp_dir = this_dir.parent.joinpath('./webapp')
@@ -107,10 +112,12 @@ Metrics As Scores, using one of the locally available datasets.
             
             my_env = { **environ, 'PYTHONUNBUFFERED': '1' }
             proc = Popen(args=args, cwd=str(root_dir.resolve()), stdout=PIPE, stderr=PIPE, env=my_env)
+            stdout = TextIOWrapper(buffer=open(file=proc.stdout.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
+            stderr = TextIOWrapper(buffer=open(file=proc.stderr.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
             def read1(proc: Popen, std_out: bool=True):
                 while proc.returncode is None:
-                    strm = proc.stdout if std_out else proc.stderr
-                    line = strm.readline().decode(encoding='utf-8', errors='ignore').strip()
+                    strm = stdout if std_out else stderr
+                    line = strm.readline().strip()
                     if line == '':
                         break
                     self.q.print(text=line, style=None if std_out else self.style_mas)
