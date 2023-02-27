@@ -75,6 +75,3 @@ class MainWorkflow(Workflow):
             local_server.start_server()
         elif res == 'q':
             self.stop = True
-            
-
-
