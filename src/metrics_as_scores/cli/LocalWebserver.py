@@ -19,6 +19,7 @@ from subprocess import Popen, PIPE
 from sys import executable
 from os import environ
 from io import TextIOWrapper
+from time import sleep
 
 this_dir = Path(__file__).resolve().parent
 webapp_dir = this_dir.parent.joinpath('./webapp')
@@ -111,6 +112,7 @@ Metrics As Scores, using one of the locally available datasets.
             stdout = TextIOWrapper(buffer=open(file=proc.stdout.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
             stderr = TextIOWrapper(buffer=open(file=proc.stderr.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
             def read1(proc: Popen, std_out: bool=True):
+                sleep(3) # Let's give the process 3 seconds to crash.
                 while proc.returncode is None:
                     strm = stdout if std_out else stderr
                     line = strm.readline().strip()
@@ -130,7 +132,7 @@ Metrics As Scores, using one of the locally available datasets.
         except Exception as ex:
             self.q.print(f'\nCannot start the webserver: {str(ex)}: {"".join(TracebackException.from_exception(ex).format())}\n')
         finally:
-            if started_successfully.running:
+            if started_successfully.running and proc.poll() is None:
                 self._type_quit_to_exit()
             else:
                 self.q.print('\nIt was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.', style=self.style_err)
