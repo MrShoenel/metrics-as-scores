@@ -143,6 +143,14 @@ Metrics As Scores, using one of the locally available datasets.
                 pass # don't care.
     
     def start_server_internally(self) -> None:
+        """
+        Start an embedded Bokeh web server with the Metrics As Scores application.
+        This is an experimental feature. Its intended purpose is for development and
+        debugging, so use at your own risk.
+        The embedded application server may make Metrics As Scores and its text-based
+        user-interface unresponsive. Therefore, you may have to manually kill and re-
+        start the process.
+        """
         kwargs = {
             'generate_session_ids': True,
             'redirect_root': True,
@@ -188,7 +196,7 @@ Metrics As Scores, using one of the locally available datasets.
         if IS_MAS_LOCAL:
             r = self.askt(prompt='Choose Method of Running the Web-App:', options=[
                 ('Use External Process (works usually better)', 'proc'),
-                ('Run Internal Application Server (for debugging)', 'internal')
+                ('Run Embedded Application Server (experimental; use only for debugging)', 'internal')
             ])
 
         self.preload = self.askt(prompt='Would you like to pre-load the entire dataset into memory?', options=[
@@ -205,4 +213,5 @@ Metrics As Scores, using one of the locally available datasets.
         if r == 'proc':
             return self.start_server_process()
         else:
+            self.q.print('\nNote that the embedded webserver is an experimental feature that is intended to be used for development and debugging purposes only. It is prone to making the application hang on exit. Therefore, you may have to re-start the process manually.\n', style=self.style_mas)
             return self.start_server_internally()
