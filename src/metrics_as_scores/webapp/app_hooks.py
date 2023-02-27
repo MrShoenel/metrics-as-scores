@@ -52,7 +52,7 @@ def load_data(dataset_id: str, preload: bool=False):
             if preload:
                 print(f'Pre-loading data for {clazz.__name__}_{transf.name}')
                 data.cdfs[f'{clazz.__name__}_{transf.name}'].value
-    pass
+
 
 def on_server_loaded(server_context):
     """
@@ -69,4 +69,15 @@ def on_server_loaded(server_context):
         if arg.startswith('dataset='):
             dataset_id = arg.split('=')[1]
             break
-    load_data(dataset_id=dataset_id, preload='preload' in argv)
+    
+    had_ex: Exception = None
+    try:
+        load_data(dataset_id=dataset_id, preload='preload' in argv)
+    except Exception as ex:
+        had_ex = ex
+    finally:
+        if isinstance(had_ex, Exception):
+            from sys import exit
+            from traceback import TracebackException
+            print(''.join(TracebackException.from_exception(had_ex).format()))
+            exit(-10)
