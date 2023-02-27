@@ -84,13 +84,9 @@ Metrics As Scores, using one of the locally available datasets.
         return port, use_ds
     
     def _type_quit_to_exit(self, internal: bool=False) -> None:
-        self.q.text(message=f'{"Close the browser and type e" if internal else "E"}nter "q" to shut down the application:', validate=lambda q: q.lower().startswith('q')).ask()
+        self.q.text(message=f'\n{"Close the browser and type e" if internal else "E"}nter "q" to shut down the application:', validate=lambda q: q.lower().startswith('q')).ask()
     
     def start_server_process(self) -> None:
-        from subprocess import Popen, PIPE
-        from sys import executable
-        from os import environ
-
         class State():
             def __init__(self, running: bool) -> None:
                 self.running = running
@@ -130,16 +126,19 @@ Metrics As Scores, using one of the locally available datasets.
                         success_semaphore.release()
             Thread(target=lambda: read1(proc=proc)).start()
             Thread(target=lambda: read1(proc=proc, std_out=False)).start()
-        finally:
             success_semaphore.acquire()
+        except Exception as ex:
+            self.q.print(f'\nCannot start the webserver: {str(ex)}: {"".join(TracebackException.from_exception(ex).format())}\n')
+        finally:
             if started_successfully.running:
                 self._type_quit_to_exit()
-                try:
-                    proc.kill()
-                except:
-                    pass # don't care.
             else:
                 self.q.print('\nIt was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.', style=self.style_err)
+            
+            try:
+                proc.kill()
+            except:
+                pass # don't care.
     
     def start_server_internally(self) -> None:
         kwargs = {
