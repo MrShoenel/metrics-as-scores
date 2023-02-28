@@ -16,7 +16,6 @@ from metrics_as_scores.distribution.distribution import LocalDataset
 from questionary import Choice
 from traceback import TracebackException
 from subprocess import Popen, PIPE
-from sys import executable
 from os import environ
 from io import TextIOWrapper
 from time import sleep
@@ -96,9 +95,8 @@ Metrics As Scores, using one of the locally available datasets.
         started_successfully = State(running=False)
         success_semaphore = Semaphore(value=0)
         try:
-            bokeh = Path(executable).parent.joinpath('./bokeh')
             args = [
-                str(bokeh), 'serve',
+                'bokeh', 'serve',
                 str(webapp_dir),
                 '--port', f'{self.port}',
                 '--show',
