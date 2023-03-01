@@ -24,13 +24,14 @@ Metrics As Scores
       class="toc-section-number">1.3.3</span> Running Tests</a>
 - <a href="#example-usage" id="toc-example-usage"><span
   class="toc-section-number">2</span> Example Usage</a>
+  - <a href="#concrete-example-using-the-qualitas.class-corpus-dataset"
+    id="toc-concrete-example-using-the-qualitas.class-corpus-dataset"><span
+    class="toc-section-number">2.1</span> Concrete Example Using the
+    Qualitas.class Corpus Dataset</a>
   - <a href="#concrete-example-using-the-iris-dataset"
     id="toc-concrete-example-using-the-iris-dataset"><span
-    class="toc-section-number">2.1</span> Concrete Example Using the Iris
+    class="toc-section-number">2.2</span> Concrete Example Using the Iris
     Dataset</a>
-  - <a href="#software-metrics-example"
-    id="toc-software-metrics-example"><span
-    class="toc-section-number">2.2</span> Software Metrics Example</a>
   - <a href="#diamonds-example" id="toc-diamonds-example"><span
     class="toc-section-number">2.3</span> Diamonds Example</a>
 - <a href="#datasets" id="toc-datasets"><span
@@ -52,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.4.1`.
+The current version is `v2.4.2`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -226,6 +227,36 @@ what might constitute a common/ideal value, and how distant the sample
 is from that value. This is expressed in terms of a percentile (a
 standardized scale of `[0,1]`), which we call **score**.
 
+## Concrete Example Using the Qualitas.class Corpus Dataset
+
+The notebook
+[`notebooks/Example-webapp-qcc.ipynb`](https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-webapp-qcc.ipynb)
+holds a concrete example for using the web application to interactively
+obtain **scores**. In this example, we create a hypothetical application
+that ought to be in the application domain *SDK*. Using a concrete
+metric, *Number of Packages*, we find out that our hypothetical new SDK
+application scores poorly for what it is intended to be.
+
+This example illustrates the point that software metrics, when captured
+out of context, are meaningless (Gil and Lalouche 2016). For example,
+typical values for complexity metrics are vastly different, depending on
+the type of application. We find that, for example, applications of type
+SDK have a much lower *expected* complexity compared to Games (`1.9`
+vs. `3.1`) (Hönel et al. 2022). Software metrics are often used in
+software quality models. However, without knowledge of the application’s
+context (here: domain), the deduced quality of these models is at least
+misleading, if not completely off. This becomes apparent if we examine
+how an application’s complexity scores across certain domains.
+
+Since there are many software metrics that are captured simultaneously,
+we can also compare domains in their entirety: How many metrics are
+statistically significantly different from each other? Is there a set of
+domains that are not distinguishable from each other? Are there metrics
+that are always different across domains and must be used with care? In
+this example, we use a known and downloadable dataset (Hönel 2023b). It
+is based on software metrics and application domains of the
+“Qualitas.class corpus” (Terra et al. 2013; Tempero et al. 2010).
+
 ## Concrete Example Using the Iris Dataset
 
 The notebook
@@ -233,30 +264,6 @@ The notebook
 holds a concrete example for creating/importing/using one’s own dataset.
 Although all necessary steps can be achieved using the **TUI**, this
 notebook demonstrates a complete example of implementing this in code.
-
-## Software Metrics Example
-
-Software metrics, when captured out of context, are meaningless (Gil and
-Lalouche 2016). For example, typical values for complexity metrics are
-vastly different, depending on the type of application. We find that,
-for example, applications of type SDK have a much lower *expected*
-complexity compared to Games (`1.9` vs. `3.1`) (Hönel et al. 2022).
-
-Software metrics are often used in software quality models. However,
-without knowledge of the application’s context (here: domain), the
-deduced quality of these models is at least misleading, if not
-completely off. This becomes apparent if we examine how an application’s
-complexity scores across certain domains.
-
-Since there are many software metrics that are captured simultaneously,
-we can also compare domains in their entirety: How many metrics are
-statistically significantly different from each other? Is there a set of
-domains that are not distinguishable from each other? Are there metrics
-that are always different across domains and must be used with care?
-
-This example is available as a downloadable dataset (Hönel 2023b). It is
-based on software metrics and application domains of the “Qualitas.class
-corpus” (Terra et al. 2013; Tempero et al. 2010).
 
 ## Diamonds Example
 
