@@ -15,7 +15,7 @@ from metrics_as_scores.cli.helpers import PathStatus, isint, get_local_datasets,
 from metrics_as_scores.distribution.distribution import LocalDataset
 from questionary import Choice
 from traceback import TracebackException
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from os import environ
 from io import TextIOWrapper
 from time import sleep
@@ -106,26 +106,27 @@ Metrics As Scores, using one of the locally available datasets.
                 args.append('preload')
             
             my_env = { **environ, 'PYTHONUNBUFFERED': '1' }
-            proc = Popen(args=args, cwd=str(root_dir.resolve()), stdout=PIPE, stderr=PIPE, env=my_env)
-            stdout = TextIOWrapper(buffer=open(file=proc.stdout.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
-            stderr = TextIOWrapper(buffer=open(file=proc.stderr.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
-            def read1(proc: Popen, std_out: bool=True):
+            proc = Popen(args=args, cwd=str(root_dir.resolve()), stdout=PIPE, stderr=STDOUT, env=my_env)
+            stdout_and_err = TextIOWrapper(buffer=open(file=proc.stdout.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
+            def read1(proc: Popen):
                 sleep(3) # Let's give the process 3 seconds to crash.
-                while proc.returncode is None:
-                    strm = stdout if std_out else stderr
-                    line = strm.readline().strip()
+                while proc.returncode is None and not stdout_and_err.closed:
+                    line = stdout_and_err.readline().strip()
                     if line == '':
-                        break
-                    self.q.print(text=line, style=None if std_out else self.style_mas)
-                    if 'bokeh app running at' in line.lower():
-                        started_successfully.running = True
-                        success_semaphore.release()
-                        break
+                        sleep(1)
+                        print('sleeping')
+                        continue # Ignore empty lines
+                    self.q.print(text=line)
+
                     if 'cannot start bokeh server' in line.lower():
                         started_successfully.running = False
                         success_semaphore.release()
+                        break # join this thread
+                    if 'bokeh app running at' in line.lower():
+                        started_successfully.running = True
+                        success_semaphore.release()
+                        # no break, keep on reading and piping
             Thread(target=lambda: read1(proc=proc)).start()
-            Thread(target=lambda: read1(proc=proc, std_out=False)).start()
             success_semaphore.acquire()
         except Exception as ex:
             self.q.print(f'\nCannot start the webserver: {str(ex)}: {"".join(TracebackException.from_exception(ex).format())}\n')
