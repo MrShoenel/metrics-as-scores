@@ -127,7 +127,7 @@ plot = figure(sizing_mode='stretch_width', height=640,
 
 
 for idx, ctx in enumerate(contexts):
-    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All contexts combined]' if ctx == '__ALL__' else ctx)
+    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
 
 # Also add a vertical line for own quantity
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
@@ -142,14 +142,14 @@ def update_own_line():
 
 
 
-plot.legend.title = 'Context'
+plot.legend.title = f'Group [{ds.ds["colname_context"]}]'
 plot.legend.location = 'top_right'
 plot.legend.click_policy = 'hide'
 
 
 # Table for transformation values
 tbl_transf_cols = [
-    TableColumn(field='context', title='Context'),
+    TableColumn(field='context', title=f'Group [{ds.ds["colname_context"]}]'),
     TableColumn(field='transf_value', title='Used Transformation Value'),
     TableColumn(field='qtype_value', title='Quantity\'s Value (not transformed)'),
     TableColumn(field='own_value', title='Corresponding Score'),
@@ -274,8 +274,8 @@ def update_plot_internal(contain_plot: bool=False):
     is_discrete = 'discrete' in sd
     is_kde = 'KDE' in sd
 
-    # The E(C)CDF is already cut off.
-    cbg_cutoff.disabled = is_ecdf
+    # The E(C)CDF and EPMF are already cut off.
+    cbg_cutoff.disabled = is_empirical
     if cbg_cutoff.disabled:
         # We also should uncheck it, since it's not possible.
         cbg_cutoff.active = []
@@ -328,7 +328,7 @@ def update_plot_internal(contain_plot: bool=False):
             return d.range
         return d._range_data
 
-    if not is_ecdf and selected_cutoff:
+    if not is_empirical and selected_cutoff:
         # This will cut off values falsely indicated by the smoothness.
         lb = max(lb, min(map(lambda _dens: range_data(_dens)[0], densities.values())))
         ub = min(ub, max(map(lambda _dens: range_data(_dens)[1], densities.values())))
@@ -455,7 +455,7 @@ def update_plot_internal(contain_plot: bool=False):
     if has_own and is_discrete:
         use_v = np.rint(v)
     tbl_transf_src.data = {
-        'context': list(map(lambda ctx: '[All contexts combined]' if ctx == '__ALL__' else ctx, contexts)),
+        'context': list(map(lambda ctx: '[All groups combined]' if ctx == '__ALL__' else ctx, contexts)),
         'transf_value': list(map(lambda context: tbl_format(None if not densities[context].transform_value is None and np.isnan(densities[context].transform_value) else densities[context].transform_value), contexts)),
         'qtype_value': list(map(lambda context: tbl_format(np.abs(densities[context].transform_value - use_v) if has_own and selected_autotransf and densities[context].transform_value is not None else use_v), contexts)),
         'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(contexts))]),
