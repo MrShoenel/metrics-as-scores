@@ -42,6 +42,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html">Metrics As Scores
+
+
+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#example-usage">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#datasets">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#personalizing-the-web-application">Personalizing the Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#references">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">metrics_as_scores</a></li>
 </ul>
 
@@ -86,6 +95,11 @@
 <span class="kn">from</span> <span class="nn">metrics_as_scores.cli.helpers</span> <span class="kn">import</span> <span class="n">PathStatus</span><span class="p">,</span> <span class="n">isint</span><span class="p">,</span> <span class="n">get_local_datasets</span><span class="p">,</span> <span class="n">required_files_folders_local_dataset</span><span class="p">,</span> <span class="n">validate_local_dataset_files</span>
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.distribution</span> <span class="kn">import</span> <span class="n">LocalDataset</span>
 <span class="kn">from</span> <span class="nn">questionary</span> <span class="kn">import</span> <span class="n">Choice</span>
+<span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">TracebackException</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">STDOUT</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">TextIOWrapper</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 
 <span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">webapp_dir</span> <span class="o">=</span> <span class="n">this_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./webapp&#39;</span><span class="p">)</span>
@@ -151,24 +165,20 @@
         <span class="k">return</span> <span class="n">port</span><span class="p">,</span> <span class="n">use_ds</span>
     
     <span class="k">def</span> <span class="nf">_type_quit_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">internal</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;Close the browser and type e&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;E&quot;</span><span class="si">}</span><span class="s1">nter &quot;q&quot; to shut down the application:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="s2">&quot;Close the browser and type e&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;E&quot;</span><span class="si">}</span><span class="s1">nter &quot;q&quot; to shut down the application:&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
     
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server_process"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_process">[docs]</a>    <span class="k">def</span> <span class="nf">start_server_process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
-        <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">executable</span>
-        <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
-
         <span class="k">class</span> <span class="nc">State</span><span class="p">():</span>
             <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">running</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="n">running</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">started_successfully</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="n">running</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="n">running</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">success_semaphore</span> <span class="o">=</span> <span class="n">Semaphore</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">bokeh</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;./bokeh&#39;</span><span class="p">)</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">bokeh</span><span class="p">),</span> <span class="s1">&#39;serve&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bokeh&#39;</span><span class="p">,</span> <span class="s1">&#39;serve&#39;</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">webapp_dir</span><span class="p">),</span>
                 <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--show&#39;</span><span class="p">,</span>
@@ -178,35 +188,50 @@
                 <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;preload&#39;</span><span class="p">)</span>
             
             <span class="n">my_env</span> <span class="o">=</span> <span class="p">{</span> <span class="o">**</span><span class="n">environ</span><span class="p">,</span> <span class="s1">&#39;PYTHONUNBUFFERED&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span> <span class="p">}</span>
-            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">)</span>
-            <span class="k">def</span> <span class="nf">read1</span><span class="p">(</span><span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">std_out</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-                <span class="k">while</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">strm</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="n">std_out</span> <span class="k">else</span> <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span>
-                    <span class="n">line</span> <span class="o">=</span> <span class="n">strm</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">)</span>
+            <span class="n">stdout_and_err</span> <span class="o">=</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">buffer</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">write_through</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">read1</span><span class="p">(</span><span class="n">proc</span><span class="p">:</span> <span class="n">Popen</span><span class="p">):</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># Let&#39;s give the process 3 seconds to crash.</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">should_stop</span> <span class="ow">and</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stdout_and_err</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">stdout_and_err</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-                        <span class="k">break</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">std_out</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="s1">&#39;bokeh app running at&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-                        <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">success_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-                        <span class="k">break</span>
+                        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="k">continue</span> <span class="c1"># Ignore empty lines</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="s1">&#39;cannot start bokeh server&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-                        <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">state</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="n">success_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                        <span class="k">break</span> <span class="c1"># join this thread</span>
+                    <span class="k">if</span> <span class="s1">&#39;bokeh app running at&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">state</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">success_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                        <span class="c1"># no break, keep on reading and piping</span>
             <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">read1</span><span class="p">(</span><span class="n">proc</span><span class="o">=</span><span class="n">proc</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">read1</span><span class="p">(</span><span class="n">proc</span><span class="o">=</span><span class="n">proc</span><span class="p">,</span> <span class="n">std_out</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="k">finally</span><span class="p">:</span>
             <span class="n">success_semaphore</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">started_successfully</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Cannot start the webserver: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TracebackException</span><span class="o">.</span><span class="n">from_exception</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">())</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">running</span> <span class="ow">and</span> <span class="n">proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_type_quit_to_exit</span><span class="p">()</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="k">pass</span> <span class="c1"># don&#39;t care.</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">It was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">It was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span>
+            
+            <span class="n">state</span><span class="o">.</span><span class="n">should_stop</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span> <span class="c1"># don&#39;t care.</span></div>
     
 <div class="viewcode-block" id="LocalWebserverWorkflow.start_server_internally"><a class="viewcode-back" href="../../../metrics_as_scores.cli.html#metrics_as_scores.cli.LocalWebserver.LocalWebserverWorkflow.start_server_internally">[docs]</a>    <span class="k">def</span> <span class="nf">start_server_internally</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start an embedded Bokeh web server with the Metrics As Scores application.</span>
+<span class="sd">        This is an experimental feature. Its intended purpose is for development and</span>
+<span class="sd">        debugging, so use at your own risk.</span>
+<span class="sd">        The embedded application server may make Metrics As Scores and its text-based</span>
+<span class="sd">        user-interface unresponsive. Therefore, you may have to manually kill and re-</span>
+<span class="sd">        start the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;generate_session_ids&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s1">&#39;redirect_root&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
@@ -252,7 +277,7 @@
         <span class="k">if</span> <span class="n">IS_MAS_LOCAL</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Choose Method of Running the Web-App:&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
                 <span class="p">(</span><span class="s1">&#39;Use External Process (works usually better)&#39;</span><span class="p">,</span> <span class="s1">&#39;proc&#39;</span><span class="p">),</span>
-                <span class="p">(</span><span class="s1">&#39;Run Internal Application Server (for debugging)&#39;</span><span class="p">,</span> <span class="s1">&#39;internal&#39;</span><span class="p">)</span>
+                <span class="p">(</span><span class="s1">&#39;Run Embedded Application Server (experimental; use only for debugging)&#39;</span><span class="p">,</span> <span class="s1">&#39;internal&#39;</span><span class="p">)</span>
             <span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">preload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Would you like to pre-load the entire dataset into memory?&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span>
@@ -269,6 +294,7 @@
         <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;proc&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_process</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Note that the embedded webserver is an experimental feature that is intended to be used for development and debugging purposes only. It is prone to making the application hang on exit. Therefore, you may have to re-start the process manually.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_mas</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_server_internally</span><span class="p">()</span></div></div>
 </pre></div>
 

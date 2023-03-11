@@ -42,6 +42,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html">Metrics As Scores
+
+
+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#example-usage">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#datasets">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#personalizing-the-web-application">Personalizing the Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme_link.html#references">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">metrics_as_scores</a></li>
 </ul>
 
@@ -103,7 +112,9 @@
 
 
         <span class="n">known_ds</span> <span class="o">=</span> <span class="p">{</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span> <span class="n">ds</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">get_known_datasets</span><span class="p">()</span> <span class="p">}</span>
-        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Enter the ID of the dataset to download: &#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">known_ds</span><span class="p">)</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">askt</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">([</span>
+            <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">known_ds</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">]),</span> <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Select the dataset you wish to download:&#39;</span><span class="p">)</span>
         <span class="n">local_ds</span> <span class="o">=</span> <span class="p">{</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span> <span class="n">ds</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">get_local_datasets</span><span class="p">()</span> <span class="p">}</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">local_ds</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The dataset with ID &quot;</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s1">&quot; is already installed, aborting.&#39;</span><span class="p">,</span> <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">style_err</span><span class="p">)</span>

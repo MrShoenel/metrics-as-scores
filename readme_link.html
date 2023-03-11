@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metrics As Scores &mdash; Metrics As Scores  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="metrics_as_scores" href="modules.html" />
+    <link rel="prev" title="Welcome to Metrics As Scores’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Metrics As Scores
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metrics As Scores
+
+
+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#text-based-user-interface-tui">Text-based User Interface (TUI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#web-application">Web Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-setup">Development Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-a-virtual-environment">Setting Up a Virtual Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-packages">Installing Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#example-usage">Example Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#concrete-example-using-the-qualitas-class-corpus-dataset">Concrete Example Using the Qualitas.class Corpus Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concrete-example-using-the-iris-dataset">Concrete Example Using the Iris Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#diamonds-example">Diamonds Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#datasets">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#use-your-own">Use Your Own</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#known-datasets">Known Datasets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#personalizing-the-web-application">Personalizing the Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">metrics_as_scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Metrics As Scores</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Metrics As Scores
+
+
+</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/readme_link.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metrics-as-scores">
+<h1>Metrics As Scores
+<a class="reference external" href="https://zenodo.org/badge/latestdoi/524333119"><img alt="DOI" src="https://zenodo.org/badge/524333119.svg" /></a>
+<a class="reference external" href="https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579"><img alt="status" src="https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg" /></a>
+<a class="reference external" href="https://codecov.io/github/MrShoenel/metrics-as-scores"><img alt="codecov" src="https://codecov.io/github/MrShoenel/metrics-as-scores/branch/master/graph/badge.svg?token=HO1GYXVEUQ" /></a><a class="headerlink" href="#metrics-as-scores" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a href="#usage" id="toc-usage"><span
+class="toc-section-number">1</span> Usage</a></p>
+<ul>
+<li><p><a href="#text-based-user-interface-tui"
+id="toc-text-based-user-interface-tui"><span
+class="toc-section-number">1.1</span> Text-based User Interface
+(TUI)</a></p></li>
+<li><p><a href="#web-application" id="toc-web-application"><span
+class="toc-section-number">1.2</span> Web Application</a></p></li>
+<li><p><a href="#development-setup" id="toc-development-setup"><span
+class="toc-section-number">1.3</span> Development Setup</a></p>
+<ul>
+<li><p><a href="#setting-up-a-virtual-environment"
+id="toc-setting-up-a-virtual-environment"><span
+class="toc-section-number">1.3.1</span> Setting Up a Virtual
+Environment</a></p></li>
+<li><p><a href="#installing-packages" id="toc-installing-packages"><span
+class="toc-section-number">1.3.2</span> Installing Packages</a></p></li>
+<li><p><a href="#running-tests" id="toc-running-tests"><span
+class="toc-section-number">1.3.3</span> Running Tests</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a href="#example-usage" id="toc-example-usage"><span
+class="toc-section-number">2</span> Example Usage</a></p>
+<ul>
+<li><p><a href="#concrete-example-using-the-qualitasclass-corpus-dataset"
+id="toc-concrete-example-using-the-qualitasclass-corpus-dataset"><span
+class="toc-section-number">2.1</span> Concrete Example Using the
+Qualitas.class Corpus Dataset</a></p></li>
+<li><p><a href="#concrete-example-using-the-iris-dataset"
+id="toc-concrete-example-using-the-iris-dataset"><span
+class="toc-section-number">2.2</span> Concrete Example Using the Iris
+Dataset</a></p></li>
+<li><p><a href="#diamonds-example" id="toc-diamonds-example"><span
+class="toc-section-number">2.3</span> Diamonds Example</a></p></li>
+</ul>
+</li>
+<li><p><a href="#datasets" id="toc-datasets"><span
+class="toc-section-number">3</span> Datasets</a></p>
+<ul>
+<li><p><a href="#use-your-own" id="toc-use-your-own"><span
+class="toc-section-number">3.1</span> Use Your Own</a></p></li>
+<li><p><a href="#known-datasets" id="toc-known-datasets"><span
+class="toc-section-number">3.2</span> Known Datasets</a></p></li>
+</ul>
+</li>
+<li><p><a href="#personalizing-the-web-application"
+id="toc-personalizing-the-web-application"><span
+class="toc-section-number">4</span> Personalizing the Web
+Application</a></p></li>
+<li><p><a href="#references" id="toc-references">References</a></p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>Please Note</strong>: <em><strong>Metrics As Scores</strong></em> (<code class="docutils literal notranslate"><span class="pre">MAS</span></code>) changed considerably
+between versions
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8"><strong><code class="docutils literal notranslate"><span class="pre">v1.0.8</span></code></strong></a>
+and <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong>.</p>
+<p>The current version is <code class="docutils literal notranslate"><span class="pre">v2.5.0</span></code>.</p>
+<p>From version <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong> it has the following new features:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#text-based-user-interface-tui"><span class="xref myst">Textual User Interface (TUI)</span></a></p></li>
+<li><p>Proper documentation and testing</p></li>
+<li><p>New version on PyPI. Install the package and run the command line
+interface by typing <strong><code class="docutils literal notranslate"><span class="pre">mas</span></code></strong>!</p></li>
+</ul>
+<p><a class="reference external" href="https://user-images.githubusercontent.com/5049151/219892077-58854478-b761-4a3d-9faf-2fe46c122cf5.webm">Metrics As Scores
+Demo.</a></p>
+<hr class="docutils" />
+<p>Contains the data and scripts needed for the application
+<strong><code class="docutils literal notranslate"><span class="pre">Metrics</span> <span class="pre">as</span> <span class="pre">Scores</span></code></strong>, check out <a class="reference external" href="https://metrics-as-scores.ml/">https://metrics-as-scores.ml/</a>.</p>
+<p>This package accompanies the paper entitled “<em>Contextual
+Operationalization of Metrics As Scores: Is My Metric Value Good?</em>”
+(Hönel et al. 2022). It seeks to answer the question whether or not the
+domain a software metric was captured in, matters. It enables the user
+to compare domains and to understand their differences. In order to
+answer the question of whether a metric value is actually good, we need
+to transform it into a <strong>score</strong>. Scores are normalized <strong>and
+rectified</strong> distances, that can be compared in an apples-to-apples
+manner, across domains. The same metric value might be good in one
+domain, while it is not in another. To borrow an example from the domain
+of software: It is much more acceptable (or common) to have large
+applications (in terms of lines of code) in the domains of games and
+databases than it is for the domains of IDEs and SDKs. Given an <em>ideal</em>
+value for a metric (which may also be user-defined), we can transform
+observed metric values to distances from that value and then use the
+cumulative distribution function to map distances to scores.</p>
+</section>
+<hr class="docutils" />
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<p>You may install Metrics As Scores directly from PyPI. For users that
+wish to
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md"><strong>contribute</strong></a>
+to Metrics As Scores, a <a class="reference internal" href="#development-setup"><span class="xref myst">development setup</span></a> is
+recommended. In either case, after the installation, <a class="reference internal" href="#text-based-user-interface-tui"><span class="xref myst"><strong>you have access
+to the text-based user interface</strong></span></a>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Installation from PyPI:</span>
+pip<span class="w"> </span>install<span class="w"> </span>metrics-as-scores
+</pre></div>
+</div>
+<p>You can <strong>bring up the TUI</strong> simply by typing the following after
+installing or cloning the repo (see next section for more details):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mas
+</pre></div>
+</div>
+<section id="text-based-user-interface-tui">
+<h2>Text-based User Interface (TUI)<a class="headerlink" href="#text-based-user-interface-tui" title="Permalink to this heading"></a></h2>
+<p>Metrics As Scores features a text-based command line user interface
+(TUI). It offers a couple of workflows/wizards, that help you to work
+and interact with the application. There is no need to modify any source
+code, if you want to do one of the following:</p>
+<ul class="simple">
+<li><p>Show Installed Datasets</p></li>
+<li><p>Show List of Known Datasets Available Online That Can Be Downloaded</p></li>
+<li><p>Download and install a known or existing dataset</p></li>
+<li><p>Create Own Dataset to be used with Metrics-As-Scores</p></li>
+<li><p>Fit Parametric Distributions for Own Dataset</p></li>
+<li><p>Pre-generate distributions for usage in the
+<a class="reference internal" href="#web-application"><span class="xref myst"><strong>Web-Application</strong></span></a></p></li>
+<li><p>Bundle Own dataset so it can be published</p></li>
+<li><p>Run local, interactive Web-Application using a selected dataset</p></li>
+</ul>
+<p><img alt="Metrics As Scores Text-based User Interface(TUI)." src="_images/TUI.png" /></p>
+</section>
+<section id="web-application">
+<h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this heading"></a></h2>
+<p>Metrics As Scores’ main feature is perhaps the Web Application. It can
+be run directly and locally from the TUI using a selected dataset (you
+may download a known dataset or use your own). The Web Application
+allows to visually inspect each <em>feature</em> across all the defined
+<em>groups</em>. It feates the PDF/PMF, CDF and CCDF, as well as the PPF for
+each feature in each group. It offers five different principal types of
+densities: Parametric, Parametric (discrete), Empirical, Empirical
+(discrete), and (approximate) Kernel Density Estimation. The Web
+Application includes a detailed <a class="reference external" href="https://metrics-as-scores.ml/#help">Help
+section</a> that should answer most of
+your questions.</p>
+<p><img alt="Metrics As Scores Interactive Web." src="_images/WebApp.png" /></p>
+</section>
+<section id="development-setup">
+<h2>Development Setup<a class="headerlink" href="#development-setup" title="Permalink to this heading"></a></h2>
+<p>This project was developed using and requires Python <code class="docutils literal notranslate"><span class="pre">&gt;=3.10</span></code>. Steps:</p>
+<ol class="arabic simple">
+<li><p>Clone the Repository,</p></li>
+<li><p>Set up a virtual environment,</p></li>
+<li><p>Install packages.</p></li>
+</ol>
+<section id="setting-up-a-virtual-environment">
+<h3>Setting Up a Virtual Environment<a class="headerlink" href="#setting-up-a-virtual-environment" title="Permalink to this heading"></a></h3>
+<p>It is recommended to use a virtual environment. To use a virtual
+environment, follow these steps (Windows specific; activation of the
+environment might differ).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>virtualenv<span class="w"> </span>--python<span class="o">=</span>C:/Python310/python.exe<span class="w"> </span>venv<span class="w"> </span><span class="c1"># Use specific Python version for virtual environment</span>
+venv/Scripts/activate
+</pre></div>
+</div>
+<p>Here is a Linux example that assumes you have Python <code class="docutils literal notranslate"><span class="pre">3.10</span></code> installed
+(this may also require installing <code class="docutils literal notranslate"><span class="pre">python3.10-venv</span></code> and/or
+<code class="docutils literal notranslate"><span class="pre">python3.10-dev</span></code>):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3.10<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w"> </span><span class="c1"># Linux</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-packages">
+<h3>Installing Packages<a class="headerlink" href="#installing-packages" title="Permalink to this heading"></a></h3>
+<p>The project is managed with <code class="docutils literal notranslate"><span class="pre">Poetry</span></code>. To install the required packages,
+simply run the following.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>venv/Scripts/activate
+<span class="c1"># First install Poetry using pip:</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;pip<span class="w"> </span>install<span class="w"> </span>poetry
+<span class="c1"># Install the projects and its dependencies</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;<span class="w"> </span>poetry<span class="w"> </span>install
+</pre></div>
+</div>
+<p>The same in Linux:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w"> </span><span class="c1"># Linux</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>poetry
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>poetry<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="running-tests">
+<h3>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this heading"></a></h3>
+<p>Tests are run using <code class="docutils literal notranslate"><span class="pre">poethepoet</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Runs the tests and prints coverage</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;poe<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p>You can also generate coverage reports:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Writes reports to the local directory htmlcov</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;poe<span class="w"> </span>cov
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="example-usage">
+<h1>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h1>
+<p><em>Metrics As Scores</em> can be thought of an <em>interactive</em>, <em>multiple-ANOVA</em>
+analysis and explorer. The analysis of variance (ANOVA; John M. Chambers
+(2017)) is usually used to analyze the differences among <em>hypothesized</em>
+group means for a single <em>feature</em>. An ANOVA might be used to estimate
+the goodness-of-fit of a statistical model. Beyond ANOVA, <code class="docutils literal notranslate"><span class="pre">MAS</span></code> seeks to
+answer the question of whether a sample of a certain quantity (feature)
+is more or less common across groups. For each group, we can determine
+what might constitute a common/ideal value, and how distant the sample
+is from that value. This is expressed in terms of a percentile (a
+standardized scale of <code class="docutils literal notranslate"><span class="pre">[0,1]</span></code>), which we call <strong>score</strong>.</p>
+<section id="concrete-example-using-the-qualitas-class-corpus-dataset">
+<h2>Concrete Example Using the Qualitas.class Corpus Dataset<a class="headerlink" href="#concrete-example-using-the-qualitas-class-corpus-dataset" title="Permalink to this heading"></a></h2>
+<p>The notebook
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-webapp-qcc.ipynb"><code class="docutils literal notranslate"><span class="pre">notebooks/Example-webapp-qcc.ipynb</span></code></a>
+holds a concrete example for using the web application to interactively
+obtain <strong>scores</strong>. In this example, we create a hypothetical application
+that ought to be in the application domain <em>SDK</em>. Using a concrete
+metric, <em>Number of Packages</em>, we find out that our hypothetical new SDK
+application scores poorly for what it is intended to be.</p>
+<p>This example illustrates the point that software metrics, when captured
+out of context, are meaningless (Gil and Lalouche 2016). For example,
+typical values for complexity metrics are vastly different, depending on
+the type of application. We find that, for example, applications of type
+SDK have a much lower <em>expected</em> complexity compared to Games (<code class="docutils literal notranslate"><span class="pre">1.9</span></code>
+vs. <code class="docutils literal notranslate"><span class="pre">3.1</span></code>) (Hönel et al. 2022). Software metrics are often used in
+software quality models. However, without knowledge of the application’s
+context (here: domain), the deduced quality of these models is at least
+misleading, if not completely off. This becomes apparent if we examine
+how an application’s complexity scores across certain domains.</p>
+<p>Since there are many software metrics that are captured simultaneously,
+we can also compare domains in their entirety: How many metrics are
+statistically significantly different from each other? Is there a set of
+domains that are not distinguishable from each other? Are there metrics
+that are always different across domains and must be used with care? In
+this example, we use a known and downloadable dataset (Hönel 2023b). It
+is based on software metrics and application domains of the
+“Qualitas.class corpus” (Terra et al. 2013; Tempero et al. 2010).</p>
+</section>
+<section id="concrete-example-using-the-iris-dataset">
+<h2>Concrete Example Using the Iris Dataset<a class="headerlink" href="#concrete-example-using-the-iris-dataset" title="Permalink to this heading"></a></h2>
+<p>The notebook
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-create-own-dataset.ipynb"><code class="docutils literal notranslate"><span class="pre">notebooks/Example-create-own-dataset.ipynb</span></code></a>
+holds a concrete example for creating/importing/using one’s own dataset.
+Although all necessary steps can be achieved using the <strong>TUI</strong>, this
+notebook demonstrates a complete example of implementing this in code.</p>
+</section>
+<section id="diamonds-example">
+<h2>Diamonds Example<a class="headerlink" href="#diamonds-example" title="Permalink to this heading"></a></h2>
+<p>The diamonds dataset (Wickham 2016) holds prices of over 50,000 round
+cut diamonds. It contains a number attributes for each diamond, such as
+its price, length, depth, or weight. The dataset, however, features
+three quality attributes: The quality of the cut, the clarity, and the
+color. Suppose we are interested in examining properties of diamonds of
+the highest quality only, across colors. Therefore, we select only those
+diamonds from the dataset that have an <em>ideal</em> cut and the best (<em>IF</em>)
+clarity. Now only the color quality gives a context to each diamonds and
+its attributes (i.e., diamonds are now <em>grouped</em> by color).</p>
+<p>This constellation now allows us to examine differences across
+differently colored diamonds. For example, there are considerable
+differences in price. We find that only the group of diamonds of the
+best color is significantly different from the other groups. This
+example is available as a downloadable dataset (Hönel 2023c).</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="datasets">
+<h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this heading"></a></h1>
+<p>Metrics As Scores can use existing and own datasets. Please keep reading
+to learn how.</p>
+<section id="use-your-own">
+<h2>Use Your Own<a class="headerlink" href="#use-your-own" title="Permalink to this heading"></a></h2>
+<p>Metrics As Scores has a built-in wizard that lets you import your own
+dataset! There is another wizard that bundles your dataset so that it
+can be shared with others. You may <a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/CONTRIBUTING.md"><strong>contribute your
+dataset</strong></a>
+so we can add it to the curated list of known datasets (see next
+section). If you do not have an own dataset, you can use the built-in
+wizard to download any of the known datasets, too!</p>
+<p>Note that Metrics As Scores supports you with all tools necessary to
+create a publishable dataset. For example, it carries out the common
+statistical tests:</p>
+<ul class="simple">
+<li><p>ANOVA (John M. Chambers 2017): Analysis of variance of your data
+across the available groups.</p></li>
+<li><p>Tukey’s Honest Significance Test (TukeyHSD; Tukey (1949)): This test
+is used to gain insights into the results of an ANOVA test. While the
+former only allows obtaining the amount of corroboration for the null
+hypothesis, TukeyHSD performs all pairwise comparisons (for all
+possible combinations of any two groups).</p></li>
+<li><p>Two-sample T-test: Compares the means of two samples to give an
+indication whether or not they appear to come from the same
+distribution. Again, this is useful for comparing groups. Tukey’s test
+is used to gain insights into the results of an ANOVA test. While the
+former only allows obtaining the amount of corroboration for the null
+hypothesis, TukeyHSD performs all pairwise comparisons (for all
+possible combinations of any two groups).</p></li>
+</ul>
+<p>It also creates an <strong>automatic report</strong> based on these tests that you
+can simply render into a PDF using Quarto.</p>
+<p>A publishable dataset must contain parametric fits and pre-generated
+densities (please check the wizard for these two). Metrics As Scores can
+fit approximately <strong>120</strong> continuous and discrete random variables using
+<code class="docutils literal notranslate"><span class="pre">Pymoo</span></code> (Blank and Deb 2020). Note that Metrics As Scores also
+automatically carries out a number of goodness-of-fit tests. The type of
+test also depends on the data (for example, not each test is valid for
+discrete data, such as the KS two-sample test). These tests are then
+used to select some best fitting random variable for display in the web
+application.</p>
+<ul class="simple">
+<li><p>Cramér-von Mises- (Cramér 1928) and Kolmogorov–Smirnov one-sample
+(Stephens 1974) tests: After fitting a distribution, the sample is
+tested against the fitted parametric distribution. Since the fitted
+distribution cannot usually accommodate all of the sample’s
+subtleties, the test will indicate whether the fit is acceptable or
+not.</p></li>
+<li><p>Cramér-von Mises- (Anderson 1962), Kolmogorov–Smirnov-, and
+Epps–Singleton (Epps and Singleton 1986) two-sample tests: After
+fitting, we create a second sample by uniformly sampling from the
+<code class="docutils literal notranslate"><span class="pre">PPF</span></code>. Then, both samples can be used in these tests. The
+Epps–Singleton test is also applicable for discrete distributions.</p></li>
+</ul>
+</section>
+<section id="known-datasets">
+<h2>Known Datasets<a class="headerlink" href="#known-datasets" title="Permalink to this heading"></a></h2>
+<p>The following is a curated list of known, publicly available datasets
+that can be used with Metrics As Scores. These datasets can be
+downloaded using the text-based user interface.</p>
+<ul class="simple">
+<li><p>Metrics and Domains From the Qualitas.class Corpus (Hönel 2023b). 10
+GB. <a class="reference external" href="https://doi.org/10.5281/zenodo.7633949">https://doi.org/10.5281/zenodo.7633949</a>.</p></li>
+<li><p>Elisa Spectrophotometer Positive Samples (Hönel 2023a). 266 MB.
+<a class="reference external" href="https://doi.org/10.5281/zenodo.7633989">https://doi.org/10.5281/zenodo.7633989</a>.</p></li>
+<li><p>Price, Weight, and Other Properties of Over 1,200 Ideal-Cut and
+Best-Clarity Diamonds (Hönel 2023c). 508 MB.
+<a class="reference external" href="https://doi.org/10.5281/zenodo.7647596">https://doi.org/10.5281/zenodo.7647596</a>.</p></li>
+<li><p>The Iris Flower Data Set (Hönel 2023d). 143 MB.
+<a class="reference external" href="https://doi.org/10.5281/zenodo.7669645">https://doi.org/10.5281/zenodo.7669645</a>.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="personalizing-the-web-application">
+<h1>Personalizing the Web Application<a class="headerlink" href="#personalizing-the-web-application" title="Permalink to this heading"></a></h1>
+<p>The web application <em>“<a class="reference external" href="https://metrics-as-scores.ml/">Metrics As
+Scores</a>”</em> is located in the directory
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/"><code class="docutils literal notranslate"><span class="pre">src/metrics_as_scores/webapp/</span></code></a>.
+The app itself has three vertical blocks: a header, the interactive
+part, and a footer. Header and footer can be easily edited by modifing
+the files
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/header.html"><code class="docutils literal notranslate"><span class="pre">src/metrics_as_scores/webapp/header.html</span></code></a>
+and
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/footer.html"><code class="docutils literal notranslate"><span class="pre">src/metrics_as_scores/webapp/footer.html</span></code></a>.</p>
+<p>Note that when you create your own dataset, you get to add sections to
+the header and footer using two HTML fragments. This is recommended over
+modifying the web application directly.</p>
+<p>If you want to change the title of the application, you will have to
+modify the file
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/main.py"><code class="docutils literal notranslate"><span class="pre">src/metrics_as_scores/webapp/main.py</span></code></a>
+at the very end:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Change this line to your desired title.</span>
+<span class="n">curdoc</span><span class="p">()</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Metrics As Scores&quot;</span>
+</pre></div>
+</div>
+<p><strong>Important</strong>: If you modify the web application, you must always
+maintain two links: one to <a class="reference external" href="https://metrics-as-scores.ml/">https://metrics-as-scores.ml/</a> and one to
+this repository, that is,
+<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores">https://github.com/MrShoenel/metrics-as-scores</a>.</p>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-anderson1962" class="csl-entry">
+<p>Anderson, T. W. 1962. “<span class="nocase">On the Distribution of the
+Two-Sample Cramer-von Mises Criterion</span>.” <em>The Annals of
+Mathematical Statistics</em> 33 (3): 1148–59.
+<a class="reference external" href="https://doi.org/10.1214/aoms/1177704477">https://doi.org/10.1214/aoms/1177704477</a>.</p>
+</div>
+<div id="ref-pymoo2020" class="csl-entry">
+<p>Blank, Julian, and Kalyanmoy Deb. 2020. “Pymoo: Multi-Objective
+Optimization in Python.” <em>IEEE Access</em> 8: 89497–509.
+<a class="reference external" href="https://doi.org/10.1109/ACCESS.2020.2990567">https://doi.org/10.1109/ACCESS.2020.2990567</a>.</p>
+</div>
+<div id="ref-cramer1928" class="csl-entry">
+<p>Cramér, Harald. 1928. “On the Composition of Elementary Errors.”
+<em>Scandinavian Actuarial Journal</em> 1928 (1): 13–74.
+<a class="reference external" href="https://doi.org/10.1080/03461238.1928.10416862">https://doi.org/10.1080/03461238.1928.10416862</a>.</p>
+</div>
+<div id="ref-epps1986" class="csl-entry">
+<p>Epps, T. W., and Kenneth J. Singleton. 1986. “An Omnibus Test for the
+Two-Sample Problem Using the Empirical Characteristic Function.”
+<em>Journal of Statistical Computation and Simulation</em> 26 (3-4): 177–203.
+<a class="reference external" href="https://doi.org/10.1080/00949658608810963">https://doi.org/10.1080/00949658608810963</a>.</p>
+</div>
+<div id="ref-gil2016software" class="csl-entry">
+<p>Gil, Joseph Yossi, and Gal Lalouche. 2016. “When Do Software Complexity
+Metrics Mean Nothing? - When Examined Out of Context.” <em>J. Object
+Technol.</em> 15 (1): 2:1–25. <a class="reference external" href="https://doi.org/10.5381/jot.2016.15.5.a2">https://doi.org/10.5381/jot.2016.15.5.a2</a>.</p>
+</div>
+<div id="ref-dataset_elisa" class="csl-entry">
+<p>Hönel, Sebastian. 2023a. “Metrics As Scores Dataset: Elisa
+Spectrophotometer Positive Samples.” Zenodo.
+<a class="reference external" href="https://doi.org/10.5281/zenodo.7633989">https://doi.org/10.5281/zenodo.7633989</a>.</p>
+</div>
+<div id="ref-dataset_qcc" class="csl-entry">
+<p>———. 2023b. “<span class="nocase">Metrics As Scores Dataset: Metrics and
+Domains From the Qualitas.class Corpus</span>.” Zenodo.
+<a class="reference external" href="https://doi.org/10.5281/zenodo.7633949">https://doi.org/10.5281/zenodo.7633949</a>.</p>
+</div>
+<div id="ref-dataset_diamonds-ideal-if" class="csl-entry">
+<p>———. 2023c. “<span class="nocase">Metrics As Scores Dataset: Price,
+Weight, and Other Properties of Over 1,200 Ideal-Cut and Best-Clarity
+Diamonds</span>.” Zenodo. <a class="reference external" href="https://doi.org/10.5281/zenodo.7647596">https://doi.org/10.5281/zenodo.7647596</a>.</p>
+</div>
+<div id="ref-dataset_iris" class="csl-entry">
+<p>———. 2023d. “Metrics As Scores Dataset: The Iris Flower Data Set.”
+Zenodo. <a class="reference external" href="https://doi.org/10.5281/zenodo.7669664">https://doi.org/10.5281/zenodo.7669664</a>.</p>
+</div>
+<div id="ref-honel2022qrs" class="csl-entry">
+<p>Hönel, Sebastian, Morgan Ericsson, Welf Löwe, and Anna Wingkvist. 2022.
+“Contextual Operationalization of Metrics as Scores: Is My Metric Value
+Good?” In <em>22nd IEEE International Conference on Software Quality,
+Reliability and Security, QRS 2022, Guangzhou, China, December 5-9,
+2022</em>, 333–43. IEEE. <a class="reference external" href="https://doi.org/10.1109/QRS57517.2022.00042">https://doi.org/10.1109/QRS57517.2022.00042</a>.</p>
+</div>
+<div id="ref-chambers2017" class="csl-entry">
+<p>John M. Chambers, Richard M. Heiberger, Anne E. Freeny. 2017. “Analysis
+of Variance; Designed Experiments.” In <em>Statistical Models in S</em>, edited
+by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
+<a class="reference external" href="https://doi.org/10.1201/9780203738535">https://doi.org/10.1201/9780203738535</a>.</p>
+</div>
+<div id="ref-stephens1974" class="csl-entry">
+<p>Stephens, M. A. 1974. “EDF Statistics for Goodness of Fit and Some
+Comparisons.” <em>Journal of the American Statistical Association</em> 69
+(347): 730–37. <a class="reference external" href="https://doi.org/10.1080/01621459.1974.10480196">https://doi.org/10.1080/01621459.1974.10480196</a>.</p>
+</div>
+<div id="ref-tempero2010qualitas" class="csl-entry">
+<p>Tempero, Ewan D., Craig Anslow, Jens Dietrich, Ted Han, Jing Li, Markus
+Lumpe, Hayden Melton, and James Noble. 2010. “The Qualitas Corpus: A
+Curated Collection of Java Code for Empirical Studies.” In <em>17th Asia
+Pacific Software Engineering Conference, APSEC 2010, Sydney, Australia,
+November 30 - December 3, 2010</em>, edited by Jun Han and Tran Dan Thu,
+336–45. IEEE Computer Society. <a class="reference external" href="https://doi.org/10.1109/APSEC.2010.46">https://doi.org/10.1109/APSEC.2010.46</a>.</p>
+</div>
+<div id="ref-terra2013qcc" class="csl-entry">
+<p>Terra, Ricardo, Luis Fernando Miranda, Marco Túlio Valente, and Roberto
+da Silva Bigonha. 2013. “Qualitas.class Corpus: A Compiled Version of
+the Qualitas Corpus.” <em>ACM SIGSOFT Softw. Eng. Notes</em> 38 (5): 1–4.
+<a class="reference external" href="https://doi.org/10.1145/2507288.2507314">https://doi.org/10.1145/2507288.2507314</a>.</p>
+</div>
+<div id="ref-tukey1949anova" class="csl-entry">
+<p>Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
+Variance.” <em>Biometrics</em> 5 (2): 99–114.
+<a class="reference external" href="http://www.jstor.org/stable/3001913">http://www.jstor.org/stable/3001913</a>.</p>
+</div>
+<div id="ref-ggplot2" class="csl-entry">
+<p>Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant
+Graphics for Data Analysis</em>. Springer-Verlag New York.
+<a class="reference external" href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.</p>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Metrics As Scores’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="metrics_as_scores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sebastian Hönel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
