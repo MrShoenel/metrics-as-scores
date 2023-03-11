@@ -90,9 +90,10 @@ Metrics As Scores, using one of the locally available datasets.
         class State():
             def __init__(self, running: bool) -> None:
                 self.running = running
+                self.should_stop: bool = False
 
         proc: Popen = None
-        started_successfully = State(running=False)
+        state = State(running=False)
         success_semaphore = Semaphore(value=0)
         try:
             args = [
@@ -110,7 +111,7 @@ Metrics As Scores, using one of the locally available datasets.
             stdout_and_err = TextIOWrapper(buffer=open(file=proc.stdout.fileno(), mode='rb', buffering=0), write_through=True, encoding='utf-8', errors='ignore')
             def read1(proc: Popen):
                 sleep(3) # Let's give the process 3 seconds to crash.
-                while proc.returncode is None and not stdout_and_err.closed:
+                while not state.should_stop and proc.returncode is None and not stdout_and_err.closed:
                     line = stdout_and_err.readline().strip()
                     if line == '':
                         sleep(1)
@@ -118,11 +119,11 @@ Metrics As Scores, using one of the locally available datasets.
                     self.q.print(text=line)
 
                     if 'cannot start bokeh server' in line.lower():
-                        started_successfully.running = False
+                        state.running = False
                         success_semaphore.release()
                         break # join this thread
                     if 'bokeh app running at' in line.lower():
-                        started_successfully.running = True
+                        state.running = True
                         success_semaphore.release()
                         # no break, keep on reading and piping
             Thread(target=lambda: read1(proc=proc)).start()
@@ -130,11 +131,12 @@ Metrics As Scores, using one of the locally available datasets.
         except Exception as ex:
             self.q.print(f'\nCannot start the webserver: {str(ex)}: {"".join(TracebackException.from_exception(ex).format())}\n')
         finally:
-            if started_successfully.running and proc.poll() is None:
+            if state.running and proc.poll() is None:
                 self._type_quit_to_exit()
             else:
                 self.q.print('\nIt was not possible to start the web application. Please read the error message and server log above. Most often, the port is already in use.', style=self.style_err)
             
+            state.should_stop = True
             try:
                 proc.kill()
             except:
