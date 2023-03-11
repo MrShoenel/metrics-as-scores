@@ -44,7 +44,7 @@ from metrics_as_scores.webapp import data
 ds: Dataset = data.ds
 if ds is None:
     dummy_manifest: LocalDataset = dict(
-        name = '', desc = '', author = '',
+        name = '', desc = '', author = '', colname_context = '',
         qtypes = dict(QTY1 = 'continuous'), contexts = [],
         desc_qtypes = dict(QTY1 = ''))
     ds = Dataset(ds=dummy_manifest, df=pd.DataFrame())
@@ -113,6 +113,8 @@ cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
 btn_contain = Button(label='Contain Plot')
 # Toggle Legend button
 btn_toggle_legend = Button(label='Toggle Legend')
+# Toggle Table Button
+btn_toggle_table = Button(label='Toggle Table')
 
 
 
@@ -537,6 +539,11 @@ def btn_toggle_legend_click(*args):
     plot.legend.visible = not plot.legend.visible
 
 
+def btn_toggle_table_click(*args):
+    """ :meta private: """
+    tbl_transf.visible = not tbl_transf.visible
+
+
 def input_own_change(attr, old, new):
     """ :meta private: """
     update_plot()
@@ -556,6 +563,7 @@ dd_denstype.on_click(dd_denstype_click)
 btn_contain.on_click(btn_contain_click)
 input_own.on_change('value', input_own_change)
 btn_toggle_legend.on_click(btn_toggle_legend_click)
+btn_toggle_table.on_click(btn_toggle_table_click)
 
 
 html_about = web_dir.joinpath('./about.html')
@@ -586,10 +594,10 @@ input_row1 = row([
     dd_scores, dd_denstype, throbber, status
 ])
 input_row2 = row([
-    dd_transf, input_own, cbg_autotrans
+    dd_transf, input_own, column(cbg_autotrans, cbg_cutoff)
 ])
 input_row3 = row([
-    btn_contain, btn_toggle_legend, cbg_cutoff
+    btn_contain, btn_toggle_legend, btn_toggle_table
 ])
 
 plot_row = row([column(tbl_transf, plot)], sizing_mode='stretch_both')
