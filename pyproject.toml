@@ -52,6 +52,7 @@ nptyping = "^2.4.1"
 pytest-cov = "^4.0.0"
 poethepoet = "^0.18.1"
 wget = "^3.2"
+myst-parser = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
