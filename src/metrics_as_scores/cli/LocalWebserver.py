@@ -114,7 +114,6 @@ Metrics As Scores, using one of the locally available datasets.
                     line = stdout_and_err.readline().strip()
                     if line == '':
                         sleep(1)
-                        print('sleeping')
                         continue # Ignore empty lines
                     self.q.print(text=line)
 
