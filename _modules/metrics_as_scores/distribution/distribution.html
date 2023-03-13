@@ -886,6 +886,43 @@
         
         <span class="k">return</span> <span class="n">vals</span></div>
     
+<div class="viewcode-block" id="Dataset.num_observations"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.num_observations">[docs]</a>    <span class="k">def</span> <span class="nf">num_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of observations for each quantity type in each context.</span>
+
+<span class="sd">        :rtype: ``Iterable[tuple[str, str, int]]``</span>
+<span class="sd">            The first element is the context, the second the quantity type, and the</span>
+<span class="sd">            third is the number of observations.</span>
+
+<span class="sd">        :return: Returns an iterable generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ctx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="p">(</span><span class="n">include_all_contexts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">qtype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity_types</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">qtype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">,</span> <span class="n">unique_vals</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Dataset.has_sufficient_observations"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.has_sufficient_observations">[docs]</a>    <span class="k">def</span> <span class="nf">has_sufficient_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_if_not</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to check whether each quantity type in each context has at least</span>
+<span class="sd">        two observations.</span>
+
+<span class="sd">        raise_if_not: ``bool``</span>
+<span class="sd">            If set to `True`, will raise an exception instead of returning `False` in</span>
+<span class="sd">            case there are insufficiently many observations. The exception is more</span>
+<span class="sd">            informative as it includes the the context and quantity type.</span>
+<span class="sd">        </span>
+<span class="sd">        :rtype: ``bool``</span>
+
+<span class="sd">        :return: A boolean indicating whether this Dataset has sufficiently many observations</span>
+<span class="sd">            for each and every quantity type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">qtype</span><span class="p">,</span> <span class="n">num_obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_observations</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">num_obs</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">raise_if_not</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The quantity type &quot;</span><span class="si">{</span><span class="n">qtype</span><span class="si">}</span><span class="s1">&quot; in context &quot;</span><span class="si">{</span><span class="n">ctx</span><span class="si">}</span><span class="s1">&quot; has insufficient (</span><span class="si">{</span><span class="n">num_obs</span><span class="si">}</span><span class="s1">) observation(s).&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+    
 <div class="viewcode-block" id="Dataset.transform"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.transform">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span> <span class="n">dist_transform</span><span class="p">:</span> <span class="n">DistTransform</span><span class="o">=</span><span class="n">DistTransform</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="n">continuous_value</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Shape</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>

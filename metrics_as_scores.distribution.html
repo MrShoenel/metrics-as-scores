@@ -843,6 +843,44 @@ very large. It is only applied if the number is smaller than the data’s size.<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.num_observations">
+<span class="sig-name descname"><span class="pre">num_observations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.num_observations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.num_observations" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the number of observations for each quantity type in each context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Iterable[tuple[str,</span> <span class="pre">str,</span> <span class="pre">int]]</span></code>
+The first element is the context, the second the quantity type, and the
+third is the number of observations.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns an iterable generator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.has_sufficient_observations">
+<span class="sig-name descname"><span class="pre">has_sufficient_observations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raise_if_not</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.has_sufficient_observations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.has_sufficient_observations" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to check whether each quantity type in each context has at least
+two observations.</p>
+<dl class="simple">
+<dt>raise_if_not: <code class="docutils literal notranslate"><span class="pre">bool</span></code></dt><dd><p>If set to <cite>True</cite>, will raise an exception instead of returning <cite>False</cite> in
+case there are insufficiently many observations. The exception is more
+informative as it includes the the context and quantity type.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating whether this Dataset has sufficiently many observations
+for each and every quantity type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="metrics_as_scores.distribution.distribution.Dataset.transform">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data:</span> <span class="pre">~nptyping.base_meta_classes.NDArray[~nptyping.base_meta_classes.Shape[*],</span> <span class="pre">~numpy.float64],</span> <span class="pre">dist_transform:</span> <span class="pre">~metrics_as_scores.distribution.distribution.DistTransform</span> <span class="pre">=</span> <span class="pre">DistTransform.NONE,</span> <span class="pre">continuous_value:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">nptyping.base_meta_classes.NDArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/metrics_as_scores/distribution/distribution.html#Dataset.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metrics_as_scores.distribution.distribution.Dataset.transform" title="Permalink to this definition"></a></dt>
 <dd><p>Transforms a distribution using an ideal value. The resulting data, therefore,
