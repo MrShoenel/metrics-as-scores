@@ -129,7 +129,7 @@ def transform_to_MAS_dataset(df: pd.DataFrame, group_col: str, feature_cols: lis
     return pd.concat(list([
         pd.DataFrame(dict(
             Feature = nrow * [col_feat],
-            Group = df[group_col],
+            Group = df[group_col].astype(str),
             Value = df[col_feat]
         )) for col_feat in feature_cols
     ])).dropna()
