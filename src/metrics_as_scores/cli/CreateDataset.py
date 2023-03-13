@@ -132,7 +132,7 @@ previous menu afterwards.
             'CSV', 'Excel'
         ], prompt='What kind of file do you want to read?', rtype=str)
 
-        path = self.q.text(message='Absolute file path or URL to original file:', validate=lambda s: len(s) > 0).ask().strip()
+        path = self.q.text(message='Absolute file path or URL to original file:', validate=lambda s: len(s) > 0).ask().strip().strip('"\'')
         df: pd.DataFrame = None
         if file_type == 'CSV':
             df = self._read_csv(path_like=path)
