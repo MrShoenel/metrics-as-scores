@@ -149,7 +149,9 @@ your questions.
 
 ## Development Setup
 
-This project was developed using and requires Python `>=3.10`. Steps:
+This project was developed using and requires Python `>=3.10`. The
+development documentation can be found at
+<https://mrshoenel.github.io/metrics-as-scores/>. Steps:
 
 1.  Clone the Repository,
 2.  Set up a virtual environment,
