@@ -366,6 +366,14 @@ Metrics As Scores before proceeding with the creation process.
 
         self.manifest, self.org_df = self._create_manifest(transformed_df=transformed_df)
         self.dataset = Dataset(ds=self.manifest, df=self.org_df)
+
+        # Let's attempt to ascertain that the dataset has sufficiently many observations:
+        try:
+            self.dataset.has_sufficient_observations(raise_if_not=True)
+        except Exception as ex:
+            self.q.print(text=str(ex), style=self.style_err)
+            self.q.print(text='The dataset does not contain sufficiently many observations and cannot be used as-is with Metrics As Scores. At least two observations per feature and group are required.')
+            return
         
         # Let's create a folder for this dataset (by ID) and out the files there.
         self._make_dirs()
