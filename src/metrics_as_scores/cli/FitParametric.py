@@ -70,7 +70,7 @@ select distributions unless you have a specific reason to do so,
 because fitting a continuous distribution is comparatively cheap and
 fast.'''.strip())
         recommend_ignore = [norminvgauss_gen, gausshyper_gen, genhyperbolic_gen, geninvgauss_gen, invgauss_gen, studentized_range_gen]
-        return self.q.checkbox(message='Select continuous random variables:', choices=[Choice(title=type(rv).__name__, value=type(rv), checked=not type(rv) in recommend_ignore) for rv in Continuous_RVs]).ask()
+        return self.q.checkbox(message='Select continuous random variables:', choices=[Choice(title=f'{type(rv).__name__} [{rv.name}]', value=type(rv), checked=not type(rv) in recommend_ignore) for rv in Continuous_RVs]).ask()
 
 
     def _select_discrete_rvs(self) -> Iterable[type[rv_discrete]]:
