@@ -805,6 +805,43 @@ class Dataset:
         
         return vals
     
+    def num_observations(self) -> Iterable[tuple[str, str, int]]:
+        """
+        Returns the number of observations for each quantity type in each context.
+
+        :rtype: ``Iterable[tuple[str, str, int]]``
+            The first element is the context, the second the quantity type, and the
+            third is the number of observations.
+
+        :return: Returns an iterable generator.
+        """
+        for ctx in self.contexts(include_all_contexts=False):
+            for qtype in self.quantity_types:
+                yield (ctx, qtype, self.data(qtype=qtype, context=ctx, unique_vals=False).shape[0])
+    
+    def has_sufficient_observations(self, raise_if_not: bool=True) -> bool:
+        """
+        Helper method to check whether each quantity type in each context has at least
+        two observations.
+
+        raise_if_not: ``bool``
+            If set to `True`, will raise an exception instead of returning `False` in
+            case there are insufficiently many observations. The exception is more
+            informative as it includes the the context and quantity type.
+        
+        :rtype: ``bool``
+
+        :return: A boolean indicating whether this Dataset has sufficiently many observations
+            for each and every quantity type.
+        """
+        for ctx, qtype, num_obs in self.num_observations():
+            if num_obs < 2:
+                if raise_if_not:
+                    raise Exception(f'The quantity type "{qtype}" in context "{ctx}" has insufficient ({num_obs}) observation(s).')
+                else:
+                    return False
+        return True
+    
     @staticmethod
     def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE, continuous_value: bool=True) -> tuple[float, NDArray[Shape["*"], Float]]:
         r"""
