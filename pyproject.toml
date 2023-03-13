@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metrics-as-scores"
-version = "2.5.0"
+version = "2.5.1"
 description = "Interactive web application, tool- and analysis suite for approximating, exploring, understanding, and sampling from conditional distributions."
 authors = ["Sebastian Hönel <development@hoenel.net>"]
 license = "Dual-licensed under GNU General Public License v3 (GPLv3) and closed-source"
