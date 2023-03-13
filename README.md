@@ -521,7 +521,7 @@ the Qualitas Corpus.” *ACM SIGSOFT Softw. Eng. Notes* 38 (5): 1–4.
 
 Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
 Variance.” *Biometrics* 5 (2): 99–114.
-<http://www.jstor.org/stable/3001913>.
+<https://doi.org/10.2307/3001913>.
 
 </div>
 
