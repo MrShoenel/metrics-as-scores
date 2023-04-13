@@ -1,5 +1,12 @@
-from pathlib import Path
+"""
+This module contains top-level function that are used in highly parallel
+scenarios for pre-generating densities for own datasets, either from
+previously computed fits for random variables or empirical densities.
+"""
+
+import numpy as np
 import pandas as pd
+from pathlib import Path
 from typing import Union
 from warnings import warn
 from os.path import exists
@@ -149,12 +156,15 @@ def fits_to_MAS_densities(
                     data = data[(data[dataset.ds['colname_context']] == context)]
                 data = data[dataset.ds['colname_data']].to_numpy()
                 
+                # Re-apply the transform to the data:
+                if best.transform_value is not None:
+                    data = np.abs(data - best.transform_value)
+                
                 the_dict[key] = Use_class(dist=dist, stat_tests=stat_tests_dict, use_stat_test=use_test, dist_params=params, range=(data.min(), data.max()),
                     compute_ranges=True, ideal_value=dataset.ideal_values[best.qtype], dist_transform=dist_transform,
                     transform_value=best.transform_value, qtype=qtype, context=context)
     
     return the_dict
-
 
 
 def generate_empirical(
@@ -188,7 +198,6 @@ def generate_empirical(
     with open(file=dens_file, mode='wb') as fp:
         dump(obj=temp, file=fp)
     print(f'Finished generating Densities for {clazz.__name__} with transform {transform.name}.')
-
 
 
 def generate_parametric(
@@ -232,7 +241,6 @@ def generate_parametric(
     with open(file=dens_file, mode='wb') as f:
         dump(temp, f)
     print(f'Finished generating parametric Densities for {clazz.__name__} with transform {transform.name}.')
-
 
 
 def generate_empirical_discrete(

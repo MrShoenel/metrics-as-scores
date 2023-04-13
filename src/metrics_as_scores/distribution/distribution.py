@@ -1,6 +1,11 @@
+"""
+This module contains the base class for all densities as used in the web
+application, as well as all of its concrete implementations. Also, it
+contains enumerations and typings that describe datasets.
+"""
+
 import pandas as pd
 import numpy as np
-import pickle
 from abc import ABC
 from typing import Callable, Iterable, Literal, Union, TypedDict
 from typing_extensions import Self
@@ -33,7 +38,7 @@ class DistTransform(StrEnum):
     """Do not apply any transform."""
 
     EXPECTATION = 'E[X] (expectation)'
-    """
+    r"""
     Compute the expectation of the random variable.
     This is similar to :math:`\mathbb{E}[X]=\int_{-\infty}^{\infty}x*f_X(x) dx` for a
     continuous random variable.
@@ -60,7 +65,6 @@ class DistTransform(StrEnum):
     """
     The supremum is the highest observed value of some empirical random variable.
     """
-
 
 
 class JsonDataset(TypedDict):
@@ -100,7 +104,6 @@ class KnownDataset(JsonDataset):
     download: str
     size: int
     size_extracted: int
-
 
 
 class Density(ABC):
@@ -223,11 +226,7 @@ class Density(ABC):
         :return:
             A value in the range :math:`[0,1]`.
         """
-        if x < self.range[0]:
-            return 0.0
-        elif x > self.range[1]:
-            return 1.0
-        return self._cdf(x)
+        return np.clip(a=self._cdf(x), a_min=0.0, a_max=1.0)
     
 
     def compute_practical_domain(self, cutoff: float=0.995) -> tuple[float, float]:
@@ -307,9 +306,8 @@ class Density(ABC):
         return self.cdf(x)
 
 
-
 class KDE_integrate(Density):
-    """
+    r"""
     The purpose of this class is to use an empirical (typically Gaussian) PDF and to
     also provide a smooth CDF that is obtained by integrating the PDF:
     :math:`F_X(x)=\int_{-\infty}^{x} f_X(t) dt`.
@@ -347,7 +345,6 @@ class KDE_integrate(Density):
         self._ppf = cdf_to_ppf(cdf=self.cdf, x=self._data, y_left=np.min(self._data), y_right=np.max(self._data), cdf_samples=cdf_samples)
         self.ppf = np.vectorize(self._ppf)
         return self
-
 
 
 class KDE_approx(Density):
@@ -413,7 +410,6 @@ class KDE_approx(Density):
         return self.stat_test.tests['ks_2samp_jittered']['stat']
 
 
-
 class Empirical(Density):
     """
     This kind of density does not apply any smoothing for CDF, but rather uses a
@@ -438,7 +434,6 @@ class Empirical(Density):
     
     def _ppf_from_ecdf(self, q: NDArray[Shape["*"], Float]) -> NDArray[Shape["*"], Float]:
         return self._ppf_interp(q)
-
 
 
 class Empirical_discrete(Empirical):
@@ -502,7 +497,6 @@ class Empirical_discrete(Empirical):
         return Empirical_discrete(data=np.asarray([np.nan]), dist_transform=dist_transform)
 
 
-
 class Parametric(Density):
     """
     This density encapsulates a parameterized and previously fitted random variable.
@@ -531,6 +525,14 @@ class Parametric(Density):
             Whether or not to compute the practical domain of the data and the practical range
             of the PDF. Both of these use optimization to find the results.
         """
+        if not isinstance(stat_tests, dict) or isinstance(stat_tests, StatisticalTest):
+            raise Exception(f'This class requires a dictionary of statistical tests, not an instance of {StatisticalTest.__name__}.')
+        for (key, val) in stat_tests.items():
+            if not key.endswith('_pval') and not key.endswith('_stat'):
+                raise Exception(f'Key not allowed: "{key}".')
+            if not isinstance(val, float):
+                raise Exception(f'Value for key "{key}" is not numeric.')
+
         self.dist: Union[rv_generic, rv_continuous] = dist
         self.stat_tests = stat_tests
         self._use_stat_test = use_stat_test
@@ -541,28 +543,7 @@ class Parametric(Density):
         if compute_ranges:
             self.practical_domain
             self.practical_range_pdf
-    
 
-    def _min_max(self, x: float) -> float:
-        """
-        Used to safely vectorize a CDF, such that it returns `0.0` for when
-        `x` lies before our range, and `1.0` if `x` lies beyond our range.
-
-        x: ``float``
-            The `x` to obtain the CDF's `y` for.
-        
-        :return:
-            A value in the range :math:`[0,1]`.
-        """
-        if not self.is_fit:
-            # Let the CDF handle this.
-            return self._cdf(x)
-
-        if x < self.range[0]:
-            return 0.0
-        elif x > self.range[1]:
-            return 1.0
-        return self._cdf(x)
     
     @staticmethod
     def unfitted(dist_transform: DistTransform) -> 'Parametric':
@@ -592,14 +573,14 @@ class Parametric(Density):
         """Shortcut getter for the p-value of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return p-value for non-fitted random variable.')
-        return self.stat_tests.tests[self.use_stat_test]['pval']
+        return self.stat_tests[f'{self.use_stat_test}_pval']
     
     @property
     def stat(self) -> float:
         """Shortcut getter for the test statistic of the selected statistical test."""
         if not self.is_fit:
             raise Exception('Cannot return statistical test statistic for non-fitted random variable.')
-        return self.stat_tests.tests[self.use_stat_test]['pval']
+        return self.stat_tests[f'{self.use_stat_test}_stat']
     
     @property
     def is_fit(self) -> bool:
@@ -654,7 +635,29 @@ class Parametric(Density):
         if not self.is_fit:
             return np.zeros((x.size,))
         return self.dist.ppf(*(x, *self.dist_params)).reshape((x.size,))
+    
+    def compute_practical_domain(self, cutoff: float=0.9985) -> tuple[float, float]:
+        """
+        Overridden to exploit having available a PPF of a fitted random variable.
+        It can be used to find the practical domain instantaneously instead of
+        having to solve an optimization problem.
 
+        cutoff: ``float``
+            The percentage of values to include. The CDF is optimized to find some `x`
+            for which it peaks at the cutoff. For the lower bound, we subtract from
+            CDF the cutoff. Note that the default value for the cutoff was adjusted
+            here to extend a little beyond what is good for other types of densities.
+        
+        :rtype: tuple[float, float]
+
+        :return:
+            The practical domain, cut off for both directions. If this random variable
+            is unfit, returns :py:class:`Density`'s :py:meth:`compute_practical_domain()`.
+        """
+        if not self.is_fit:
+            return self.range
+        
+        return (self.ppf(1.0 - cutoff)[0], self.ppf(cutoff)[0])
 
 
 class Parametric_discrete(Parametric):
@@ -693,7 +696,6 @@ class Parametric_discrete(Parametric):
         """
         from scipy.stats._continuous_distns import norm_gen
         return Parametric_discrete(dist=norm_gen(), dist_params=None, range=(np.nan, np.nan), stat_tests={}, dist_transform=dist_transform)
-
 
 
 class Dataset:
@@ -802,6 +804,43 @@ class Dataset:
             vals = rng.choice(a=vals, size=sub_sample, replace=False)
         
         return vals
+    
+    def num_observations(self) -> Iterable[tuple[str, str, int]]:
+        """
+        Returns the number of observations for each quantity type in each context.
+
+        :rtype: ``Iterable[tuple[str, str, int]]``
+            The first element is the context, the second the quantity type, and the
+            third is the number of observations.
+
+        :return: Returns an iterable generator.
+        """
+        for ctx in self.contexts(include_all_contexts=False):
+            for qtype in self.quantity_types:
+                yield (ctx, qtype, self.data(qtype=qtype, context=ctx, unique_vals=False).shape[0])
+    
+    def has_sufficient_observations(self, raise_if_not: bool=True) -> bool:
+        """
+        Helper method to check whether each quantity type in each context has at least
+        two observations.
+
+        raise_if_not: ``bool``
+            If set to `True`, will raise an exception instead of returning `False` in
+            case there are insufficiently many observations. The exception is more
+            informative as it includes the the context and quantity type.
+        
+        :rtype: ``bool``
+
+        :return: A boolean indicating whether this Dataset has sufficiently many observations
+            for each and every quantity type.
+        """
+        for ctx, qtype, num_obs in self.num_observations():
+            if num_obs < 2:
+                if raise_if_not:
+                    raise Exception(f'The quantity type "{qtype}" in context "{ctx}" has insufficient ({num_obs}) observation(s).')
+                else:
+                    return False
+        return True
     
     @staticmethod
     def transform(data: NDArray[Shape["*"], Float], dist_transform: DistTransform=DistTransform.NONE, continuous_value: bool=True) -> tuple[float, NDArray[Shape["*"], Float]]:

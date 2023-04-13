@@ -1,4 +1,8 @@
-from pathlib import Path
+"""
+This module contains the workflow for listing known datasets that are
+available online and may be downloaded.
+"""
+
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, format_file_size, KNOWN_DATASETS_FILE
 from metrics_as_scores.distribution.distribution import KnownDataset

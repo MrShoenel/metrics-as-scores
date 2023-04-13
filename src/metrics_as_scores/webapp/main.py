@@ -44,7 +44,7 @@ from metrics_as_scores.webapp import data
 ds: Dataset = data.ds
 if ds is None:
     dummy_manifest: LocalDataset = dict(
-        name = '', desc = '', author = '',
+        name = '', desc = '', author = '', colname_context = '',
         qtypes = dict(QTY1 = 'continuous'), contexts = [],
         desc_qtypes = dict(QTY1 = ''))
     ds = Dataset(ds=dummy_manifest, df=pd.DataFrame())
@@ -113,6 +113,8 @@ cbg_autotrans = CheckboxGroup(labels=cbg_autotrans_items, active=[0])
 btn_contain = Button(label='Contain Plot')
 # Toggle Legend button
 btn_toggle_legend = Button(label='Toggle Legend')
+# Toggle Table Button
+btn_toggle_table = Button(label='Toggle Table')
 
 
 
@@ -127,7 +129,7 @@ plot = figure(sizing_mode='stretch_width', height=640,
 
 
 for idx, ctx in enumerate(contexts):
-    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All contexts combined]' if ctx == '__ALL__' else ctx)
+    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
 
 # Also add a vertical line for own quantity
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
@@ -142,14 +144,14 @@ def update_own_line():
 
 
 
-plot.legend.title = 'Context'
+plot.legend.title = f'Group [{ds.ds["colname_context"]}]'
 plot.legend.location = 'top_right'
 plot.legend.click_policy = 'hide'
 
 
 # Table for transformation values
 tbl_transf_cols = [
-    TableColumn(field='context', title='Context'),
+    TableColumn(field='context', title=f'Group [{ds.ds["colname_context"]}]'),
     TableColumn(field='transf_value', title='Used Transformation Value'),
     TableColumn(field='qtype_value', title='Quantity\'s Value (not transformed)'),
     TableColumn(field='own_value', title='Corresponding Score'),
@@ -274,8 +276,8 @@ def update_plot_internal(contain_plot: bool=False):
     is_discrete = 'discrete' in sd
     is_kde = 'KDE' in sd
 
-    # The E(C)CDF is already cut off.
-    cbg_cutoff.disabled = is_ecdf
+    # The E(C)CDF and EPMF are already cut off.
+    cbg_cutoff.disabled = is_empirical
     if cbg_cutoff.disabled:
         # We also should uncheck it, since it's not possible.
         cbg_cutoff.active = []
@@ -328,7 +330,7 @@ def update_plot_internal(contain_plot: bool=False):
             return d.range
         return d._range_data
 
-    if not is_ecdf and selected_cutoff:
+    if not is_empirical and selected_cutoff:
         # This will cut off values falsely indicated by the smoothness.
         lb = max(lb, min(map(lambda _dens: range_data(_dens)[0], densities.values())))
         ub = min(ub, max(map(lambda _dens: range_data(_dens)[1], densities.values())))
@@ -362,7 +364,7 @@ def update_plot_internal(contain_plot: bool=False):
     if is_ppf:
         input_own.step = 1. / 25.
     else:
-        input_own.step = (ub - lb) / 25.
+        input_own.step = abs(ub - lb) / 25.
 
     for ctx in contexts:
         density = densities[ctx]
@@ -455,7 +457,7 @@ def update_plot_internal(contain_plot: bool=False):
     if has_own and is_discrete:
         use_v = np.rint(v)
     tbl_transf_src.data = {
-        'context': list(map(lambda ctx: '[All contexts combined]' if ctx == '__ALL__' else ctx, contexts)),
+        'context': list(map(lambda ctx: '[All groups combined]' if ctx == '__ALL__' else ctx, contexts)),
         'transf_value': list(map(lambda context: tbl_format(None if not densities[context].transform_value is None and np.isnan(densities[context].transform_value) else densities[context].transform_value), contexts)),
         'qtype_value': list(map(lambda context: tbl_format(np.abs(densities[context].transform_value - use_v) if has_own and selected_autotransf and densities[context].transform_value is not None else use_v), contexts)),
         'own_value': list([tbl_format(v=v) for v in own_values]) if has_own else list([tbl_format(v=None) for _ in range(len(contexts))]),
@@ -537,6 +539,11 @@ def btn_toggle_legend_click(*args):
     plot.legend.visible = not plot.legend.visible
 
 
+def btn_toggle_table_click(*args):
+    """ :meta private: """
+    tbl_transf.visible = not tbl_transf.visible
+
+
 def input_own_change(attr, old, new):
     """ :meta private: """
     update_plot()
@@ -556,6 +563,7 @@ dd_denstype.on_click(dd_denstype_click)
 btn_contain.on_click(btn_contain_click)
 input_own.on_change('value', input_own_change)
 btn_toggle_legend.on_click(btn_toggle_legend_click)
+btn_toggle_table.on_click(btn_toggle_table_click)
 
 
 html_about = web_dir.joinpath('./about.html')
@@ -586,10 +594,10 @@ input_row1 = row([
     dd_scores, dd_denstype, throbber, status
 ])
 input_row2 = row([
-    dd_transf, input_own, cbg_autotrans
+    dd_transf, input_own, column(cbg_autotrans, cbg_cutoff)
 ])
 input_row3 = row([
-    btn_contain, btn_toggle_legend, cbg_cutoff
+    btn_contain, btn_toggle_legend, btn_toggle_table
 ])
 
 plot_row = row([column(tbl_transf, plot)], sizing_mode='stretch_both')

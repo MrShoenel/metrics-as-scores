@@ -1,3 +1,8 @@
+"""
+This module contains the workflow for generating densities from own datasets.
+These are required so that the own dataset can be used in the web application.
+"""
+
 import pandas as pd
 from pathlib import Path
 from os import cpu_count

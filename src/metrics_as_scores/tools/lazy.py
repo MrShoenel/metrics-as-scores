@@ -1,3 +1,10 @@
+"""
+This module contains a single class, :py:class:`SelfResetLazy`. It is used to
+lazily load pre-generated densities in the web application. Since these files
+can get large quickly, the :py:class:`SelfResetLazy` allows to free memory if
+its loaded value has expired.
+"""
+
 from concurrent.futures import Future, ThreadPoolExecutor
 from threading import Semaphore, Timer
 from typing import Any, Callable, TypeVar, Generic, Union
@@ -10,9 +17,10 @@ T = TypeVar('T')
 
 class SelfResetLazy(Generic[T]):
     """
-    Similar to :py:class:`Lazy`, this class also automatically destroys its value
-    after some timeout, so that subsequent requests to it force the factory to
-    produce a new instance.
+    This class lazily loads and automatically destroys its value after some timeout,
+    so that subsequent requests to it force the factory to produce a new instance.
+    All of its semantics are thread-safe (except for the explicitly named volatile
+    members).
     """
     def __init__(self, fn_create_val: Callable[[], T], fn_destroy_val: Callable[[T], Any]=None, reset_after: float=None) -> None:
         """

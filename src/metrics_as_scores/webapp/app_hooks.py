@@ -18,7 +18,7 @@ def unpickle(file: str):
         with open(file=file, mode='rb') as f:
             return load(f)
     except Exception as e:
-        raise Exception('The webapp relies on precomputed results. Please generate them using the file pregenerate.py before running this webapp.') from e
+        raise Exception('The webapp requires pre-generated densities. You can generate these for your own datasets by using the corresponding wizard of the TUI before running this webapp.') from e
 
 
 def load_data(dataset_id: str, preload: bool=False):
@@ -52,7 +52,7 @@ def load_data(dataset_id: str, preload: bool=False):
             if preload:
                 print(f'Pre-loading data for {clazz.__name__}_{transf.name}')
                 data.cdfs[f'{clazz.__name__}_{transf.name}'].value
-    pass
+
 
 def on_server_loaded(server_context):
     """
@@ -69,4 +69,15 @@ def on_server_loaded(server_context):
         if arg.startswith('dataset='):
             dataset_id = arg.split('=')[1]
             break
-    load_data(dataset_id=dataset_id, preload='preload' in argv)
+    
+    had_ex: Exception = None
+    try:
+        load_data(dataset_id=dataset_id, preload='preload' in argv)
+    except Exception as ex:
+        had_ex = ex
+    finally:
+        if isinstance(had_ex, Exception):
+            from sys import exit
+            from traceback import TracebackException
+            print(''.join(TracebackException.from_exception(had_ex).format()))
+            exit(-10)

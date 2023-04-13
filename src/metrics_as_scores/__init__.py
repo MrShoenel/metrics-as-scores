@@ -1,3 +1,9 @@
+"""
+This is the core package of Metrics As Scores. All functionality is to be found
+in sub-packages and -modules. Metrics As Scores, currently, consists of only a
+single main package (this might change in the future).
+"""
+
 from sys import path
 from pathlib import Path
 from metrics_as_scores.__version__ import IS_MAS_LOCAL

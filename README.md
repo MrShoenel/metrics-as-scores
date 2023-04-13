@@ -24,11 +24,16 @@ Metrics As Scores
       class="toc-section-number">1.3.3</span> Running Tests</a>
 - <a href="#example-usage" id="toc-example-usage"><span
   class="toc-section-number">2</span> Example Usage</a>
-  - <a href="#software-metrics-example"
-    id="toc-software-metrics-example"><span
-    class="toc-section-number">2.1</span> Software Metrics Example</a>
+  - <a href="#concrete-example-using-the-qualitas.class-corpus-dataset"
+    id="toc-concrete-example-using-the-qualitas.class-corpus-dataset"><span
+    class="toc-section-number">2.1</span> Concrete Example Using the
+    Qualitas.class Corpus Dataset</a>
+  - <a href="#concrete-example-using-the-iris-dataset"
+    id="toc-concrete-example-using-the-iris-dataset"><span
+    class="toc-section-number">2.2</span> Concrete Example Using the Iris
+    Dataset</a>
   - <a href="#diamonds-example" id="toc-diamonds-example"><span
-    class="toc-section-number">2.2</span> Diamonds Example</a>
+    class="toc-section-number">2.3</span> Diamonds Example</a>
 - <a href="#datasets" id="toc-datasets"><span
   class="toc-section-number">3</span> Datasets</a>
   - <a href="#use-your-own" id="toc-use-your-own"><span
@@ -48,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.3.0`.
+The current version is `v2.5.1`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -144,7 +149,9 @@ your questions.
 
 ## Development Setup
 
-This project was developed using and requires Python `>=3.10`. Steps:
+This project was developed using and requires Python `>=3.10`. The
+development documentation can be found at
+<https://mrshoenel.github.io/metrics-as-scores/>. Steps:
 
 1.  Clone the Repository,
 2.  Set up a virtual environment,
@@ -222,29 +229,43 @@ what might constitute a common/ideal value, and how distant the sample
 is from that value. This is expressed in terms of a percentile (a
 standardized scale of `[0,1]`), which we call **score**.
 
-## Software Metrics Example
+## Concrete Example Using the Qualitas.class Corpus Dataset
 
-Software metrics, when captured out of context, are meaningless (Gil and
-Lalouche 2016). For example, typical values for complexity metrics are
-vastly different, depending on the type of application. We find that,
-for example, applications of type SDK have a much lower *expected*
-complexity compared to Games (`1.9` vs. `3.1`) (Hönel et al. 2022).
+The notebook
+[`notebooks/Example-webapp-qcc.ipynb`](https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-webapp-qcc.ipynb)
+holds a concrete example for using the web application to interactively
+obtain **scores**. In this example, we create a hypothetical application
+that ought to be in the application domain *SDK*. Using a concrete
+metric, *Number of Packages*, we find out that our hypothetical new SDK
+application scores poorly for what it is intended to be.
 
-Software metrics are often used in software quality models. However,
-without knowledge of the application’s context (here: domain), the
-deduced quality of these models is at least misleading, if not
-completely off. This becomes apparent if we examine how an application’s
-complexity scores across certain domains.
+This example illustrates the point that software metrics, when captured
+out of context, are meaningless (Gil and Lalouche 2016). For example,
+typical values for complexity metrics are vastly different, depending on
+the type of application. We find that, for example, applications of type
+SDK have a much lower *expected* complexity compared to Games (`1.9`
+vs. `3.1`) (Hönel et al. 2022). Software metrics are often used in
+software quality models. However, without knowledge of the application’s
+context (here: domain), the deduced quality of these models is at least
+misleading, if not completely off. This becomes apparent if we examine
+how an application’s complexity scores across certain domains.
 
 Since there are many software metrics that are captured simultaneously,
 we can also compare domains in their entirety: How many metrics are
 statistically significantly different from each other? Is there a set of
 domains that are not distinguishable from each other? Are there metrics
-that are always different across domains and must be used with care?
+that are always different across domains and must be used with care? In
+this example, we use a known and downloadable dataset (Hönel 2023b). It
+is based on software metrics and application domains of the
+“Qualitas.class corpus” (Terra et al. 2013; Tempero et al. 2010).
 
-This example is available as a downloadable dataset (Hönel 2023b). It is
-based on software metrics and application domains of the “Qualitas.class
-corpus” (Terra et al. 2013; Tempero et al. 2010).
+## Concrete Example Using the Iris Dataset
+
+The notebook
+[`notebooks/Example-create-own-dataset.ipynb`](https://github.com/MrShoenel/metrics-as-scores/blob/master/notebooks/Example-create-own-dataset.ipynb)
+holds a concrete example for creating/importing/using one’s own dataset.
+Although all necessary steps can be achieved using the **TUI**, this
+notebook demonstrates a complete example of implementing this in code.
 
 ## Diamonds Example
 
@@ -331,13 +352,15 @@ The following is a curated list of known, publicly available datasets
 that can be used with Metrics As Scores. These datasets can be
 downloaded using the text-based user interface.
 
-- Metrics and Domains From the Qualitas.class corpus (Hönel 2023b). 10
+- Metrics and Domains From the Qualitas.class Corpus (Hönel 2023b). 10
   GB. <https://doi.org/10.5281/zenodo.7633949>.
-- ELISA Spectrophotometer Samples (Hönel 2023a). 266 MB.
+- Elisa Spectrophotometer Positive Samples (Hönel 2023a). 266 MB.
   <https://doi.org/10.5281/zenodo.7633989>.
-- Price, weight, and other properties of over 1,200 ideal-cut and
-  best-clarity diamonds (Hönel 2023c). 508 MB.
+- Price, Weight, and Other Properties of Over 1,200 Ideal-Cut and
+  Best-Clarity Diamonds (Hönel 2023c). 508 MB.
   <https://doi.org/10.5281/zenodo.7647596>.
+- The Iris Flower Data Set (Hönel 2023d). 143 MB.
+  <https://doi.org/10.5281/zenodo.7669645>.
 
 ------------------------------------------------------------------------
 
@@ -429,7 +452,7 @@ Spectrophotometer Positive Samples.” Zenodo.
 <div id="ref-dataset_qcc" class="csl-entry">
 
 ———. 2023b. “<span class="nocase">Metrics As Scores Dataset: Metrics and
-Domains From the Qualitas.class corpus</span>.” Zenodo.
+Domains From the Qualitas.class Corpus</span>.” Zenodo.
 <https://doi.org/10.5281/zenodo.7633949>.
 
 </div>
@@ -437,8 +460,15 @@ Domains From the Qualitas.class corpus</span>.” Zenodo.
 <div id="ref-dataset_diamonds-ideal-if" class="csl-entry">
 
 ———. 2023c. “<span class="nocase">Metrics As Scores Dataset: Price,
-weight, and other properties of over 1,200 ideal-cut and best- clarity
-diamonds</span>.” Zenodo. <https://doi.org/10.5281/zenodo.7647596>.
+Weight, and Other Properties of Over 1,200 Ideal-Cut and Best-Clarity
+Diamonds</span>.” Zenodo. <https://doi.org/10.5281/zenodo.7647596>.
+
+</div>
+
+<div id="ref-dataset_iris" class="csl-entry">
+
+———. 2023d. “Metrics As Scores Dataset: The Iris Flower Data Set.”
+Zenodo. <https://doi.org/10.5281/zenodo.7669664>.
 
 </div>
 
@@ -493,7 +523,7 @@ the Qualitas Corpus.” *ACM SIGSOFT Softw. Eng. Notes* 38 (5): 1–4.
 
 Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
 Variance.” *Biometrics* 5 (2): 99–114.
-<http://www.jstor.org/stable/3001913>.
+<https://doi.org/10.2307/3001913>.
 
 </div>
 

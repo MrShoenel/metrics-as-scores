@@ -1,6 +1,10 @@
-from metrics_as_scores.cli.helpers import format_file_size, get_known_datasets, get_local_datasets, isint, isnumeric, KNOWN_DATASETS_FILE
+from metrics_as_scores.cli.helpers import format_file_size, get_known_datasets, get_local_datasets, isint, isnumeric, required_files_folders_local_dataset, validate_local_dataset_files, PathStatus, KNOWN_DATASETS_FILE
 from metrics_as_scores.__init__ import DATASETS_DIR, MAS_DIR
 from urllib.request import urlopen
+from shutil import copyfile, copytree, rmtree
+from uuid import uuid4
+from pathlib import Path
+from os import makedirs
 
 
 
@@ -22,10 +26,6 @@ def test_isnumeric():
 
 
 def test_local_datasets():
-    from shutil import copyfile, copytree, rmtree
-    from uuid import uuid4
-    from pathlib import Path
-
     src_default = MAS_DIR.joinpath('./datasets/_default')
     dst_default = DATASETS_DIR.joinpath('./_default')
 
@@ -40,8 +40,30 @@ def test_local_datasets():
             copytree(src=str(src_default), dst=str(dst_default), dirs_exist_ok=False)
     
     # Also make a temporary dataset:
-    dst_temp = DATASETS_DIR.joinpath(f'./{str(uuid4())}')
+    temp_id = str(uuid4())
+    dst_temp = DATASETS_DIR.joinpath(f'./{temp_id}')
     copytree(src=str(src_default), dst=str(dst_temp), dirs_exist_ok=False)
+    # Create a dir as a file and a file as a dir:
+    makedirs(name=str(dst_temp.joinpath('./org-data.csv')), exist_ok=False)
+    dst_temp.joinpath('./fits').touch(exist_ok=False)
+    # There is no manifest, so the validator should find that:
+    dirs, files = validate_local_dataset_files(*required_files_folders_local_dataset(local_ds_id=temp_id))
+    for d in dirs:
+        if 'web' in str(d): # Only 'web' should exist at this point.
+            assert dirs[d] == PathStatus.OK
+        elif 'fits' in str(d):
+            assert dirs[d] == PathStatus.NOT_A_DIRECTORY
+        else:
+            assert dirs[d] == PathStatus.DOESNT_EXIST
+    for f in files:
+        if 'refs.bib' in str(f) or 'about.html' in str(f) or 'references.html' in str(f):
+            assert files[f] == PathStatus.OK
+        elif 'org-data.csv' in str(f):
+            assert files[f] == PathStatus.NOT_A_FILE
+        else:
+            assert files[f] == PathStatus.DOESNT_EXIST
+
+
     # There is no manifest in this one, let's copy one:
     this_dir = Path(__file__).parent
     qcc_manifest_file = this_dir.parent.joinpath('./data/qcc-manifest.json')

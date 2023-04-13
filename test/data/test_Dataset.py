@@ -1,16 +1,20 @@
 import numpy as np
 import pandas as pd
+from re import escape
 from pytest import raises
 from json import load
 from pathlib import Path
-from metrics_as_scores.distribution.distribution import Dataset, JsonDataset, KnownDataset, LocalDataset, DistTransform
-from metrics_as_scores.cli.helpers import get_known_datasets, get_local_datasets, isnumeric
+from metrics_as_scores.distribution.distribution import Dataset, LocalDataset, DistTransform
+from metrics_as_scores.cli.helpers import isnumeric
+from metrics_as_scores.tools.funcs import transform_to_MAS_dataset
 
 
 this_dir = Path(__file__).parent
 qcc_manifest_file = this_dir.joinpath('./qcc-manifest.json')
 elisa_manifest_file = this_dir.joinpath('./elisa-manifest.json')
 elisa_data_file = this_dir.joinpath('./elisa-org-data.csv')
+mdhaber_manifest_file = this_dir.joinpath('./mdhaber-manifest.json')
+mdhaber_data_file = this_dir.joinpath('./mdhaber-org-data.csv')
 
 
 def get_elisa() -> Dataset:
@@ -94,6 +98,8 @@ def test_Dataset_data():
 
 def test_Dataset_transform():
     ds = get_elisa()
+    assert ds.has_sufficient_observations()
+
     data = ds.data(qtype='Lot1')
     data_d = np.rint(10.0 * data)
 
@@ -146,3 +152,17 @@ def test_Dataset_stat_tests():
     with raises(Exception, match='Requires one or more quantity types.'):
         ds.analyze_distr(qtypes=[])
 
+
+def test_mdhaber_dataset():
+    mdhaber_manifest: LocalDataset = None
+    with open(file=str(mdhaber_manifest_file), mode='r', encoding='utf-8') as fp:
+        mdhaber_manifest = load(fp=fp)
+    
+    df = transform_to_MAS_dataset(df=pd.read_csv(str(mdhaber_data_file), index_col=False), group_col='ID', feature_cols=['Feature 1', 'Feature 2'])
+    ds = Dataset(ds=mdhaber_manifest, df=df)
+
+    assert False == ds.has_sufficient_observations(raise_if_not=False)
+
+    with raises(Exception, match=escape(f'The quantity type "Feature 1" in context "1" has insufficient (1) observation(s).')):
+        # It should throw using the first feature in the first context already
+        ds.has_sufficient_observations(raise_if_not=True)

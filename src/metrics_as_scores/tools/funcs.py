@@ -1,4 +1,11 @@
+"""
+This module contains few functions that are required in multiple other modules
+and classes of Metrics As Scores.
+"""
+
 import numpy as np
+import pandas as pd
+from re import split
 from collections.abc import MutableMapping
 from nptyping import Float, NDArray, Shape
 from numpy import abs, cumsum, linspace, max, min, square, sum, vectorize, interp
@@ -73,11 +80,56 @@ def cdf_to_ppf(cdf: Callable[[float], float], x: NDArray[Shape["*"], Float], cdf
     return Interpolator(xp=y_vals, fp=x_vals, left=y_left, right=y_right)
 
 
-from re import split
 def natsort(s: str) -> int:
     """
     Natural string sorting.
 
     Courtesy of https://stackoverflow.com/a/16090640/1785141
     """
-    return [int(t) if t.isdigit() else t.lower() for t in split('(\d+)', f'{s}')]
+    return [int(t) if t.isdigit() else t.lower() for t in split(r'(\d+)', f'{s}')]
+
+
+def transform_to_MAS_dataset(df: pd.DataFrame, group_col: str, feature_cols: list[str]) -> pd.DataFrame:
+    """
+    Transforms a "typical" data frame into the format that is used by Metrics As Scores.
+    A typical data frame is one in which there is a column with the group, and a dedicated
+    column for each feature's observations. That kind of data frame, however, implies we
+    have the same amount of observations per feature. The format used by Metrics As Scores
+    stacks the observations and adds an extra ordinal column for the feature. This way,
+    we allow an arbitrary number of observations per feature.
+
+    df: ``pd.DataFrame``
+        The original data frame that has one or more feature columns and one group designated
+        group column.
+    
+    group_col: ``str``
+        The name of the group column.
+    
+    feature_cols: ``list[str]``
+        A non-empty list of features' names to include.
+
+    :raises: Exception:
+        If the number of given feature columns is zero or if any of the given features or
+        the group is not present as a column in the data frame.
+
+    :return:
+        A data frame with the 3 columns ``Feature`` (ordinal; name of the feature column
+        from the original dataset), ``Group`` (ordinal, the ``group_col`` repeated ``n``
+        times, where ``n`` is the length of the given data frame), and ``Value`` (the
+        numeric observation).
+    """
+    if len(feature_cols) == 0:
+        raise Exception('You must select one or more features.')
+    
+    for col_feat in feature_cols + [group_col]:
+        if not col_feat in df.columns:
+            raise Exception(f'The feature "{col_feat}" is not a column of the given data frame.')
+
+    nrow = len(df.index)
+    return pd.concat(list([
+        pd.DataFrame(dict(
+            Feature = nrow * [col_feat],
+            Group = df[group_col].astype(str),
+            Value = df[col_feat]
+        )) for col_feat in feature_cols
+    ])).dropna()

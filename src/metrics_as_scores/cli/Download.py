@@ -1,3 +1,7 @@
+"""
+This module contains the workflow for downloading known datasets.
+"""
+
 from metrics_as_scores.__init__ import DATASETS_DIR
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.helpers import get_known_datasets, get_local_datasets, KNOWN_DATASETS_FILE
@@ -27,7 +31,9 @@ Known datasets are loaded from: {KNOWN_DATASETS_FILE}
 
 
         known_ds = { ds['id']: ds for ds in get_known_datasets() }
-        id = self.q.text(message='Enter the ID of the dataset to download: ', validate=lambda s: s in known_ds).ask()
+        id = self.askt(options=list([
+            (f'{ds["name"]} [{ds["id"]}]', ds['id']) for ds in known_ds.values()
+        ]), prompt='Select the dataset you wish to download:')
         local_ds = { ds['id']: ds for ds in get_local_datasets() }
         if id in local_ds:
             self.q.print(text=f'The dataset with ID "{id}" is already installed, aborting.', style = self.style_err)

@@ -1,3 +1,8 @@
+"""
+This module contains the main workflow (the main menu) that grants access
+to all other workflows.
+"""
+
 from metrics_as_scores.cli.Workflow import Workflow
 from metrics_as_scores.cli.LocalWebserver import LocalWebserverWorkflow
 from metrics_as_scores.cli.CreateDataset import CreateDatasetWorkflow
@@ -31,6 +36,7 @@ class MainWorkflow(Workflow):
         """
 
         # The main options/Functions for M-a-S:
+        self.q.print('')
         res = self.askt(options=[
             ('Show Installed Datasets', 'show_local'),
             ('Show List of Known Datasets Available Online That Can Be Downloaded', 'show_known'),
@@ -69,6 +75,3 @@ class MainWorkflow(Workflow):
             local_server.start_server()
         elif res == 'q':
             self.stop = True
-            
-
-
