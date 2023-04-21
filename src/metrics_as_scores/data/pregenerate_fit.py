@@ -166,13 +166,7 @@ def fit(
         ret_dict.update(dict(params = params))
 
         dist = RV()
-        def temp_cdf(x: NDArray[Shape["*"], Float]):
-            x = np.asarray(x).copy()
-            min_ = np.min(data)
-            max_ = np.max(data)
-            x[x < min_] = min_
-            x[x > max_] = max_
-            return dist.cdf(*(x, *params_tuple))
+        temp_cdf = lambda x: dist.cdf(*(x, *params_tuple))
         temp_ppf = lambda x: dist.ppf(*(x, *params_tuple))
 
         data_st = data if not unique_vals else np.rint(data) # Remove jitter for test

@@ -118,7 +118,7 @@ def fits_to_MAS_densities(
 
     contexts = list(dataset.contexts(include_all_contexts=True))
     the_type = 'continuous' if use_continuous else 'discrete'
-    use_test = 'ks_2samp_ordinary' if use_continuous else 'epps_singleton_2samp_jittered'
+    use_test = 'ks_1samp_ordinary' if use_continuous else 'epps_singleton_2samp_jittered'
     use_stat = f'stat_tests_tests_{use_test}_stat'
     use_vars = Continuous_RVs_dict if use_continuous else Discrete_RVs_dict
     Use_class = Parametric if use_continuous else Parametric_discrete

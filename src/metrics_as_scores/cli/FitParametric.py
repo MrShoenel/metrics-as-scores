@@ -13,6 +13,7 @@ from metrics_as_scores.distribution.distribution import DistTransform, LocalData
 from metrics_as_scores.distribution.fitting import Fitter, FitterPymoo, Continuous_RVs, Discrete_Problems
 from metrics_as_scores.data.pregenerate_fit import get_data_tuple
 from metrics_as_scores.data.pregenerate_distns import generate_parametric_fits
+from metrics_as_scores.tools.funcs import flatten_dict
 from questionary import Choice
 from pickle import dump
 from os import cpu_count
@@ -210,3 +211,10 @@ many cores you would like to use.
             res = self._fit_parametric(dist_transform=dist_transform)
             with open(file=str(result_file), mode='wb') as fp:
                 dump(obj=res, file=fp)
+            
+            # Also, let's dump a CSV with all results.
+            result_file = self.fits_dir.joinpath(f'./pregen_distns_{dist_transform.name}.csv')
+            df = pd.DataFrame([flatten_dict(d=d) for d in res])
+            df.to_csv(path_or_buf=str(result_file), index=False)
+
+
