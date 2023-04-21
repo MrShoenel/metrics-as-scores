@@ -104,19 +104,36 @@ Therefore, the operationalization of software metrics as scores ought to be cond
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
 The main purpose of the Metrics As Scores tool- and analysis suite for Python is to approximate or estimate, enable the exploration of, and sample from context-dependent distributions.
-Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as Kernel density estimates.
+Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
-When obtaining any of these types of distributions for a univariate sample, the following statistical tests are carried out automatically (if applicable): Cramér--von Mises- [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér-von Mises- [@Anderson1962], Kolmogorov–Smirnov-, and Epps–Singleton [@Epps1986] two-sample tests.
-Currently, the following non-parametric transforms are supported for all distributions: The expectation $\mathbb{E}\left[\mathcal{X}\right]\tight{=}\int_{-\infty}^{\infty}\,x\,f_{\mathcal{X}}(x)\,dx$, the mode $\hat{x}\tight{=}\mathrm{arg\,\!max}_{x\tight{\in}\mathcal{X}}\,f_{\mathcal{X}}(x)$, the median, and observed infimum/supremum.
-The latter two transforms are useful for attaching an explicit meaning of smaller/larger is better.
+<!--
+-->
+Metrics As Scores carries out a number of statistical tests for fitted distributions.
+The results for each test are stored in a separate spreadsheet after the fitting process and may be used to further investigate how well certain distributions fit and what the alternatives may are.
+The carried out tests are: Cramér--von Mises [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér--von Mises [@Anderson1962], Kolmogorov--Smirnov, and Epps--Singleton [@Epps1986] two-sample tests.
+The second sample required for the two-sample test is obtained by uniformly sampling from the fitted distribution's PPF.
+The best-fitting distribution is selected for pre-generating densities that are used by the web application, such that only the single best fit is used for visualization.
+The Epps--Singleton two-sample test is compatible with discrete data and is used for discrete distributions.
+For continuous data, the one-sample Kolmogorov--Smirnov test is used.
+
+
+Metrics As Scores supports to transform samples into distances using ideal values that are computed non-parametrically.
+In order to obtain a discrete ideal value (e.g., when transforming a discrete sample in order to fit a discrete probability distribution), the expectation (mean), median, infimum, and supremum can be obtained in a straightforward way and then rounded.
+A discrete value for the mode (most common value) is determined using `scipy`.
+When a continuous ideal value is required, we first estimate a kernel density $f_{\mathcal{X}}$ using a Gaussian kernel.
+Then, the expectation is obtained as $\mathbb{E}\left[\mathcal{X}\right]\tight{=}\int_{-\infty}^{\infty}\,t\,f_{\mathcal{X}}(t)\,dt$.
+The mode of a sample $X$ is obtained by solving $\hat{x}\tight{=}\mathrm{arg\,\!max}_{x\tight{\in}\mathcal{X}}\,f_{\mathcal{X}}(x)$.
+In order to approximate the median, we obtain a large sample from the kernel density and compute its median using `numpy` [@numpy].
+
 
 In order to understand whether or not the available groups in the data matter before obtaining any of these distributions, Metrics As Scores supports additional tools for generating and outputting results for three other statistical tests.
-The ANOVA test is used to analyze differences among sample means (which, e.g., stem from the same feature in different groups; @chambers2017statistical).
-Tukey's Honest Significance Test (TukeyHSD) is used to gain insights into the results of an ANOVA test. While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons (for all possible combinations of any two groups) [@Tukey1949].
-Lastly, the two-sample T-test compares the means of two samples to give an indication of whether or not they appear to come from the same distribution.
+The ANOVA test is used to analyze differences among sample means (which, e.g., stem from the same feature in different groups).
+Tukey's Honest Significance Test [abbr. "TukeyHSD", @Tukey1949] is used to gain insights into the results of an ANOVA test.
+While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons (for all possible combinations of any two groups).
+Lastly, Welch's two-sample t-test (which does not assume equal population variances) compares the means of two samples to give an indication of whether or not they appear to come from the same distribution [@welch1947].
 
 
-Metrics As Scores includes a scientifc template for generating a report for a dataset that exploits the results of these analyses (for example, see @dataset_qcc).
+Metrics As Scores includes a scientific template for generating a report for a dataset that exploits the results of these analyses [for example, see @dataset_qcc].
 Users are encouraged to import their own datasets and have Metrics As Scores conduct all necessary analyses, generate a report, and bundle a publishable dataset.
 The application comes with a rich text-based user interface, which offers wizards that allow for completely code-free interactions.
 These interactions include, for example, showing installed datasets, downloading of known datasets from a curated list, creating own datasets, automatically attempting to fit more than $120$ random variables, report creation and bundling of own datasets, pre-generating densities for the interactive web application, and running the web application with a locally available dataset.
