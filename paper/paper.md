@@ -142,21 +142,22 @@ The interactive application is built using Bokeh [@bokeh] and allows for customi
 <!-- A list of key references, including to other software addressing related needs. Note that the references should include full names of venues, e.g., journals and conferences, not abbreviations only understood in the context of a specific discipline. -->
 
 
+
+# Applications
+
+The Metrics As Scores tool- and analysis suite and interactive application have been used to study the "Qualitas.class corpus" of software metrics [@terra2013qualitas].
+The results of studying the software metrics of the corpus show that the context (application domain) software metrics were captured in is always of importance and must not be neglected.
+In addition, some of the software metrics in the corpus are \emph{never} similar across application domains and must be applied with great care when used in quality models [@honel2022mas].
+The Metrics As Scores-approach enables these and similar insights and supports decision-makers in selecting and comparing scores.
+
+
+
 # Acknowledgments
 <!-- Acknowledgement of any financial support. -->
 
 The authors would like to sincerely express their gratitude towards the reviewers of the Journal of Open Source Software for their invaluable comments.
 
 This work is supported by the [Linnaeus University Centre for Data Intensive Sciences and Applications (DISA)](https://lnu.se/forskning/sok-forskning/linnaeus-university-centre-for-data-intensive-sciences-and-applications) High-Performance Computing Center.
-
-
-# Applications
-
-The Metrics As Scores tool- and analysis suite and interactive application have been used to study the ``Qualitas.class corpus'' of software metrics [@terra2013qualitas].
-The results of studying the software metrics of the corpus show that the context (application domain) software metrics were captured in is always of importance and must not be neglected.
-In addition, some of the software metrics in the corpus are \emph{never} similar across application domains and must be applied with great care when used in quality models [@honel2022mas].
-The Metrics As Scores-approach enables these and similar insights and supports decision-makers in selecting and comparing scores.
-
 
 
 # References
