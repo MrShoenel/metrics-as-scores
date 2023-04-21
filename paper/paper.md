@@ -63,7 +63,7 @@ However, without the aggregation that is done in a quality model, raw data and s
 It is, therefore, difficult to answer the question "is my metric value good?".
 
 
-With Metrics As Scores we present an approach that, given some \emph{ideal} value, can transform any feature into a score, given an observation of sufficiently many relevant values.
+With Metrics As Scores we present an approach that, given some \emph{ideal} value, can transform any quantity into a score, given a sample of sufficiently many relevant values.
 While such ideal values for software metrics were previously attempted to be derived from, e.g., experience or surveys [@benlarbi2000thresh], benchmarks [@alves2010thresh], or by setting practical values [@grady1992practical], with Metrics As Scores we suggest deriving ideal values additionally in non-parametric, statistical ways.
 To do so, data first needs to be captured in a \emph{relevant} context (group).
 A feature value might be good in one context, while it is less so in another.
