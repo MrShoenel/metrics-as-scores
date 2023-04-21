@@ -56,7 +56,7 @@ This is expressed in terms of a percentile (a standardized scale of $\left[0,1\r
 Considering all available features among the existing groups furthermore allows to assess how different the groups are from each other, or whether they are indistinguishable from one another.
 
 
-The name \emph{Metrics As Scores} was derived from its initial application: Examining differences of software metrics across application domains [@honel2022mas].
+The name \emph{Metrics As Scores} was derived from its initial application: examining differences of software metrics across application domains [@honel2022mas].
 A software metric is an aggregation of a raw quantity according to some well-defined standard, method, or calculation.
 In software processes, such aggregations are often counts of events or certain properties [@carleton1999].
 However, without the aggregation that is done in a quality model, raw data and software metrics are rarely of great value to analysts and decision-makers. This is because quality models are conceived to establish a connection between software metrics and certain quality goals [@kaner2004software].
@@ -105,7 +105,7 @@ Therefore, the operationalization of software metrics as scores ought to be cond
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
 The main purpose of the Metrics As Scores tool- and analysis suite for Python is to approximate or estimate, enable the exploration of, and sample from context-dependent distributions.
-Three principal types of distributions are supported: Empirical and Parametric (both continuous and discrete), as well as kernel density estimates.
+Three principal types of distributions are supported: empirical and Parametric (both continuous and discrete), as well as kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
 <!--
 -->
