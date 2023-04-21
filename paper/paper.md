@@ -95,7 +95,7 @@ Raw features are seldomly useful as, e.g., indicators of quality.
 Only the transformation to scores allows for an apples-to-apples comparison of different quantities (features) across contexts (groups).
 This is particularly true for software metrics, which often cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematical sound way to do so [@ulan2018jointprobs].
 <!-- -->
-While some have attempted to associate blank software metrics with quality (e.g, @basili1996validation), most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
+While some have attempted to associate blank software metrics with quality [e.g., @basili1996validation], most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
 <!-- -->
 Furthermore, none of the existing approaches that attempted to associate software metrics with quality paid great attention to the fact that software metrics have different distributions and, therefore, different statistical properties across application domains.
 Therefore, the operationalization of software metrics as scores ought to be conditional on the application domain.
