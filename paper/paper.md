@@ -68,7 +68,7 @@ While such ideal values for software metrics were previously attempted to be der
 To do so, data first needs to be captured in a \emph{relevant} context (group).
 A feature value might be good in one context, while it is less so in another.
 Therefore, we suggest generalizing and contextualizing the approach taken by @UlanLEW21, in which a score is defined to always have a range of $[0,1]$ and linear behavior.
-This means that scores can now also be compared and that a unit change in any score is equally valuable among scores.
+This means that scores can now also be compared and that a fixed increment in any score is equally valuable among scores.
 This is not the case for raw features, otherwise.
 
 
