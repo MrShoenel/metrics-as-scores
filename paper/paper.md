@@ -48,8 +48,8 @@ title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive Applicatio
 <!-- Mention (if applicable) a representative set of past or ongoing research projects using the software and recent scholarly publications enabled by it. -->
 <!-- Short introduction into the problem, then -->
 
-\emph{Metrics As Scores} can be thought of as an interactive, \emph{multiple} analysis of variance (ANOVA; @chambers2017statistical).
-An ANOVA might be used to estimate the goodness-of-fit of a statistical model.
+\emph{Metrics As Scores} can be thought of as an interactive, \emph{multiple} analysis of variance [abbr. "ANOVA", @chambers2017statistical].
+An ANOVA might be used to estimate the *goodness-of-fit* of a statistical model.
 Beyond ANOVA, which is used to analyze the differences among hypothesized group means for a single feature, Metrics As Scores seeks to answer the question of whether a sample of a certain quantity (feature) is more or less common across groups.
 For each group, we can determine what might constitute a good/bad, acceptable/alarming, or common/extreme value, and how distant the sample is from that value.
 This is expressed in terms of a percentile (a standardized scale of $\left[0,1\right]$), which we call \textbf{\emph{score}}.
@@ -60,7 +60,7 @@ The name \emph{Metrics As Scores} was derived from its initial application: Exam
 A software metric is an aggregation of a raw quantity according to some well-defined standard, method, or calculation.
 In software processes, such aggregations are often counts of events or certain properties [@carleton1999].
 However, without the aggregation that is done in a quality model, raw data and software metrics are rarely of great value to analysts and decision-makers. This is because quality models are conceived to establish a connection between software metrics and certain quality goals [@kaner2004software].
-It is, therefore, difficult to answer the question ``is my metric value good?''.
+It is, therefore, difficult to answer the question "is my metric value good?".
 
 
 With Metrics As Scores we present an approach that, given some \emph{ideal} value, can transform any feature into a score, given an observation of sufficiently many relevant values.
@@ -76,8 +76,9 @@ Metrics As Scores consists of a tool- and analysis suite and an interactive appl
 The operationalization of raw data or features as scores lies in gathering values that are context-specific (group-typical), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
 Metrics As Scores enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
 More than $120$ different parametric distributions (approx. $20$ of which are discrete) are fitted through a common interface.
+Those distributions are part of the `scipy` package for the Python programming language, which Metrics As Scores makes extensive use of [@scipy].
 While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, Metrics As Scores solves a mixed-variable global optimization problem using a genetic algorithm and Pymoo [@pymoo].
-Additionally to that, empirical distributions (continuous and discrete) and smooth approximate Kernel density estimates are available. Applicable statistical tests, such as the Cramér--von Mises- or Epps--Singleton-tests, are automatically performed.
+Additionally to that, empirical distributions (continuous and discrete) and smooth approximate kernel density estimates are available. Applicable statistical tests for assessing the goodness-of-fit are automatically performed.
 <!-- -->
 These tests are used to select some best-fitting random variable in the interactive web application.
 
@@ -89,12 +90,12 @@ These tests are used to select some best-fitting random variable in the interact
 
 <!-- A Statement of need section that clearly illustrates the research purpose of the software and places it in the context of related work. -->
 
-Metrics As Scores is a supplement to existing analyses that enables the exploration of differences among groups in a novel way.
+Metrics As Scores is a supplement to existing analyses that enables the exploration of differences among groups in a novel, mostly interactive way.
 Raw features are seldomly useful as, e.g., indicators of quality.
 Only the transformation to scores allows for an apples-to-apples comparison of different quantities (features) across contexts (groups).
 This is particularly true for software metrics, which often cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematical sound way to do so [@ulan2018jointprobs].
 <!-- -->
-While some have attempted to associate blank software metrics with quality (e.g, @basili1996validation), most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators fo reliability and complexity [@chidamber1994metrics].
+While some have attempted to associate blank software metrics with quality (e.g, @basili1996validation), most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
 <!-- -->
 Furthermore, none of the existing approaches that attempted to associate software metrics with quality paid great attention to the fact that software metrics have different distributions and, therefore, different statistical properties across application domains.
 Therefore, the operationalization of software metrics as scores ought to be conditional on the application domain.
@@ -143,13 +144,13 @@ These interactions include, for example, showing installed datasets, downloading
 # MAS -- The Interactive Application
 <!-- Here, we will introduce the actual application. Also, the application hosted under https://metrics-as-scores.ml/ is *an* actual application of the QCC. -->
 
-![Main plot area of the application ``Metrics As Scores''. Using the Qualitas.class corpus, software metrics values of own applications can be scored against the corpus' groups (application domains). Shown are the CCDFs (scores) of the fitted parametric distributions for the metric TLOC transformed using the infimum (per domain). Available online: <https://metrics-as-scores.ml/>.](MAS.png){#fig:mas}
+![Main plot area of the application "Metrics As Scores". Using the Qualitas.class corpus, software metrics values of own applications can be scored against the corpus' groups (application domains). Shown are the CCDFs (scores) of the fitted parametric distributions for the metric TLOC transformed using the infimum (per domain). Available online: <https://metrics-as-scores.ml/>.](MAS.png){#fig:mas}
 
 The interactive application is partially shown in Figure \ref{fig:mas}. Not shown are the header, UI controls, a tabular with numerical data for the current selection, and the footer which contains help.
 The application supports all transforms, continuous and discrete distributions, obtaining scores for own features/sampling from inverse CDFs (PPFs), and grouping of features into discrete/continuous.
 The main tool, the plot, allows the user to zoom, pan, select, enable/disable contexts, and manually hover the graphs to obtain precise $x$/$y$-values.
 The web application can be launched with any of the available datasets (manually created or downloaded).
-The interactive application is built using Bokeh [@bokeh] and allows for customization using a few steps described in the software's manual.
+The interactive application is built using Bokeh and allows for customization using a few steps described in the software's manual [@bokeh].
 
 
 
