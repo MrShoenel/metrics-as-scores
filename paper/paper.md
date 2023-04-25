@@ -52,7 +52,7 @@ title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive Applicatio
 An ANOVA might be used to estimate the *goodness-of-fit* of a statistical model.
 Beyond ANOVA, which is used to analyze the differences among hypothesized group means for a single feature, Metrics As Scores seeks to answer the question of whether a sample of a certain quantity (feature) is more or less common across groups.
 For each group, we can determine what might constitute a good/bad, acceptable/alarming, or common/extreme value, and how distant the sample is from that value.
-This is expressed in terms of a percentile (a standardized scale of $\left[0,1\right]$), which we call \textbf{\emph{score}}.
+This is expressed in terms of a percentile (a standardized scale of $\left[0,1\right]$), which we call ***score***.
 Considering all available features among the existing groups furthermore allows to assess how different the groups are from each other, or whether they are indistinguishable from one another.
 
 
