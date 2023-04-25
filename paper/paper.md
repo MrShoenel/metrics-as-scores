@@ -119,6 +119,7 @@ For continuous data, the one-sample Kolmogorov--Smirnov test is used.
 
 
 Metrics As Scores supports to transform samples into distances using ideal values that are computed non-parametrically.
+Given a sample $X$ from an arbitrary population and an ideal value $i_X$, the corresponding distance, $D$, is obtained as $D=\lvert X-i_X \rvert$.
 In order to obtain a discrete ideal value (e.g., when transforming a discrete sample in order to fit a discrete probability distribution), the expectation (mean), median, infimum, and supremum can be obtained in a straightforward way and then rounded.
 A discrete value for the mode (most common value) is determined using `scipy`.
 When a continuous ideal value is required, we first estimate a kernel density $f_{\mathcal{X}}$ using a Gaussian kernel.
