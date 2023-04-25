@@ -170,6 +170,22 @@ The Metrics As Scores-approach enables these and similar insights and supports d
 
 
 
+# Related Work
+
+Metrics As Scores finds itself among other visualization tools related to statistical analysis and learning.
+Some existing tools support a visual and interactive approach to exploring the results of an ANOVA.
+In @sturm2005anova, the goal is to enable a what-if analysis by allowing to assume arbitrary groups in the data.
+@fox2009hyptests provide a package for `R` to visually test hypotheses of linear models (as is ANOVA).
+A number of packages for creating non-interactive ANOVA visualizations exists [e.g., @rpkg2023granova].
+To the best of our knowledge, however, Metrics As Scores is the first application to enable the interactive exploration of differences among groups.
+It appears that it is also the first tool to allow the transformation of quantities into scores and to produce and aggregate group-related results derived from these.
+
+
+
+
+
+
+
 # Acknowledgments
 <!-- Acknowledgement of any financial support. -->
 
