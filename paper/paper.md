@@ -59,7 +59,7 @@ Considering all available features among the existing groups furthermore allows 
 The name \emph{Metrics As Scores} was derived from its initial application: examining differences of software metrics across application domains [@honel2022mas].
 A software metric is an aggregation of a raw quantity according to some well-defined standard, method, or calculation.
 In software processes, such aggregations are often counts of events or certain properties [@carleton1999].
-However, without the aggregation that is done in a quality model, raw data and software metrics are rarely of great value to analysts and decision-makers. This is because quality models are conceived to establish a connection between software metrics and certain quality goals [@kaner2004software].
+However, without the aggregation that is done in a quality model, raw data (samples) and software metrics are rarely of great value to analysts and decision-makers. This is because quality models are conceived to establish a connection between software metrics and certain quality goals [@kaner2004software].
 It is, therefore, difficult to answer the question "is my metric value good?".
 
 
@@ -73,7 +73,7 @@ This is not the case for raw features, otherwise.
 
 
 Metrics As Scores consists of a tool- and analysis suite and an interactive application that allows researchers to explore and understand differences in scores across groups.
-The operationalization of raw data or features as scores lies in gathering values that are context-specific (group-typical), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
+The operationalization of features as scores lies in gathering values that are context-specific (group-typical), determining an ideal value non-parametrically or by user preference, and then transforming the observed values into distances.
 Metrics As Scores enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
 More than $120$ different parametric distributions (approx. $20$ of which are discrete) are fitted through a common interface.
 Those distributions are part of the `scipy` package for the Python programming language, which Metrics As Scores makes extensive use of [@scipy].
@@ -105,7 +105,7 @@ Therefore, the operationalization of software metrics as scores ought to be cond
 # MAS -- The Tool- and Analysis Suite
 <!-- Here, we go into detail about distribution fitting and statistical tests. -->
 The main purpose of the Metrics As Scores tool- and analysis suite for Python is to approximate or estimate, enable the exploration of, and sample from context-dependent distributions.
-Three principal types of distributions are supported: empirical and Parametric (both continuous and discrete), as well as kernel density estimates.
+Three principal types of distributions are supported: empirical and parametric (both continuous and discrete), as well as kernel density estimates.
 These are all unified using the class `Density`, which provides access to the PDF/PMF, CDF/CCDF (for scores), and the PPF.
 <!--
 -->
@@ -119,6 +119,7 @@ For continuous data, the one-sample Kolmogorov--Smirnov test is used.
 
 
 Metrics As Scores supports to transform samples into distances using ideal values that are computed non-parametrically.
+Given a sample $X$ from an arbitrary population and an ideal value $i_X$, the corresponding distance, $D$, is obtained as $D=\lvert X-i_X \rvert$.
 In order to obtain a discrete ideal value (e.g., when transforming a discrete sample in order to fit a discrete probability distribution), the expectation (mean), median, infimum, and supremum can be obtained in a straightforward way and then rounded.
 A discrete value for the mode (most common value) is determined using `scipy`.
 When a continuous ideal value is required, we first estimate a kernel density $f_{\mathcal{X}}$ using a Gaussian kernel.
