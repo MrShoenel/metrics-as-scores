@@ -52,7 +52,7 @@ title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive Applicatio
 An ANOVA might be used to estimate the *goodness-of-fit* of a statistical model.
 Beyond ANOVA, which is used to analyze the differences among hypothesized group means for a single feature, Metrics As Scores seeks to answer the question of whether a sample of a certain quantity (feature) is more or less common across groups.
 For each group, we can determine what might constitute a good/bad, acceptable/alarming, or common/extreme value, and how distant the sample is from that value.
-This is expressed in terms of a percentile (a standardized scale of $\left[0,1\right]$), which we call \textbf{\emph{score}}.
+This is expressed in terms of a percentile (a standardized scale of $\left[0,1\right]$), which we call ***score***.
 Considering all available features among the existing groups furthermore allows to assess how different the groups are from each other, or whether they are indistinguishable from one another.
 
 
@@ -95,7 +95,7 @@ Raw features are seldomly useful as, e.g., indicators of quality.
 Only the transformation to scores allows for an apples-to-apples comparison of different quantities (features) across contexts (groups).
 This is particularly true for software metrics, which often cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematical sound way to do so [@ulan2018jointprobs].
 <!-- -->
-While some have attempted to associate blank software metrics with quality (e.g, @basili1996validation), most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
+While some have attempted to associate blank software metrics with quality [e.g., @basili1996validation], most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
 <!-- -->
 Furthermore, none of the existing approaches that attempted to associate software metrics with quality paid great attention to the fact that software metrics have different distributions and, therefore, different statistical properties across application domains.
 Therefore, the operationalization of software metrics as scores ought to be conditional on the application domain.
@@ -167,6 +167,22 @@ The Metrics As Scores tool- and analysis suite and interactive application have 
 The results of studying the software metrics of the corpus show that the context (application domain) software metrics were captured in is always of importance and must not be neglected.
 In addition, some of the software metrics in the corpus are \emph{never} similar across application domains and must be applied with great care when used in quality models [@honel2022mas].
 The Metrics As Scores-approach enables these and similar insights and supports decision-makers in selecting and comparing scores.
+
+
+
+# Related Work
+
+Metrics As Scores finds itself among other visualization tools related to statistical analysis and learning.
+Some existing tools support a visual and interactive approach to exploring the results of an ANOVA.
+In @sturm2005anova, the goal is to enable a what-if analysis by allowing to assume arbitrary groups in the data.
+@fox2009hyptests provide a package for `R` to visually test hypotheses of linear models (as is ANOVA).
+A number of packages for creating non-interactive ANOVA visualizations exists [e.g., @rpkg2023granova].
+To the best of our knowledge, however, Metrics As Scores is the first application to enable the interactive exploration of differences among groups.
+It appears that it is also the first tool to allow the transformation of quantities into scores and to produce and aggregate group-related results derived from these.
+
+
+
+
 
 
 
