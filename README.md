@@ -1,38 +1,50 @@
-# Metrics As Scores
+Metrics As Scores
 [![DOI](https://zenodo.org/badge/524333119.svg)](https://zenodo.org/badge/latestdoi/524333119)
 [![status](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579/status.svg)](https://joss.theoj.org/papers/eb549efe6c0111490395496c68717579)
 [![codecov](https://codecov.io/github/MrShoenel/metrics-as-scores/branch/master/graph/badge.svg?token=HO1GYXVEUQ)](https://codecov.io/github/MrShoenel/metrics-as-scores)
+================
 
-- [<span class="toc-section-number">1</span> Usage](#usage)
-  - [<span class="toc-section-number">1.1</span> Text-based User
-    Interface (TUI)](#text-based-user-interface-tui)
-  - [<span class="toc-section-number">1.2</span> Web
-    Application](#web-application)
-  - [<span class="toc-section-number">1.3</span> Development
-    Setup](#development-setup)
-    - [<span class="toc-section-number">1.3.1</span> Setting Up a
-      Virtual Environment](#setting-up-a-virtual-environment)
-    - [<span class="toc-section-number">1.3.2</span> Installing
-      Packages](#installing-packages)
-    - [<span class="toc-section-number">1.3.3</span> Running
-      Tests](#running-tests)
-- [<span class="toc-section-number">2</span> Example
-  Usage](#example-usage)
-  - [<span class="toc-section-number">2.1</span> Concrete Example Using
-    the Qualitas.class Corpus
-    Dataset](#concrete-example-using-the-qualitas.class-corpus-dataset)
-  - [<span class="toc-section-number">2.2</span> Concrete Example Using
-    the Iris Dataset](#concrete-example-using-the-iris-dataset)
-  - [<span class="toc-section-number">2.3</span> Diamonds
-    Example](#diamonds-example)
-- [<span class="toc-section-number">3</span> Datasets](#datasets)
-  - [<span class="toc-section-number">3.1</span> Use Your
-    Own](#use-your-own)
-  - [<span class="toc-section-number">3.2</span> Known
-    Datasets](#known-datasets)
-- [<span class="toc-section-number">4</span> Personalizing the Web
-  Application](#personalizing-the-web-application)
-- [References](#references)
+- <a href="#usage" id="toc-usage"><span
+  class="toc-section-number">1</span> Usage</a>
+  - <a href="#text-based-user-interface-tui"
+    id="toc-text-based-user-interface-tui"><span
+    class="toc-section-number">1.1</span> Text-based User Interface
+    (TUI)</a>
+  - <a href="#web-application" id="toc-web-application"><span
+    class="toc-section-number">1.2</span> Web Application</a>
+  - <a href="#development-setup" id="toc-development-setup"><span
+    class="toc-section-number">1.3</span> Development Setup</a>
+    - <a href="#setting-up-a-virtual-environment"
+      id="toc-setting-up-a-virtual-environment"><span
+      class="toc-section-number">1.3.1</span> Setting Up a Virtual
+      Environment</a>
+    - <a href="#installing-packages" id="toc-installing-packages"><span
+      class="toc-section-number">1.3.2</span> Installing Packages</a>
+    - <a href="#running-tests" id="toc-running-tests"><span
+      class="toc-section-number">1.3.3</span> Running Tests</a>
+- <a href="#example-usage" id="toc-example-usage"><span
+  class="toc-section-number">2</span> Example Usage</a>
+  - <a href="#concrete-example-using-the-qualitas.class-corpus-dataset"
+    id="toc-concrete-example-using-the-qualitas.class-corpus-dataset"><span
+    class="toc-section-number">2.1</span> Concrete Example Using the
+    Qualitas.class Corpus Dataset</a>
+  - <a href="#concrete-example-using-the-iris-dataset"
+    id="toc-concrete-example-using-the-iris-dataset"><span
+    class="toc-section-number">2.2</span> Concrete Example Using the Iris
+    Dataset</a>
+  - <a href="#diamonds-example" id="toc-diamonds-example"><span
+    class="toc-section-number">2.3</span> Diamonds Example</a>
+- <a href="#datasets" id="toc-datasets"><span
+  class="toc-section-number">3</span> Datasets</a>
+  - <a href="#use-your-own" id="toc-use-your-own"><span
+    class="toc-section-number">3.1</span> Use Your Own</a>
+  - <a href="#known-datasets" id="toc-known-datasets"><span
+    class="toc-section-number">3.2</span> Known Datasets</a>
+- <a href="#personalizing-the-web-application"
+  id="toc-personalizing-the-web-application"><span
+  class="toc-section-number">4</span> Personalizing the Web
+  Application</a>
+- <a href="#references" id="toc-references">References</a>
 
 ------------------------------------------------------------------------
 
@@ -41,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.5.3`.
+The current version is `v2.5.4`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -389,142 +401,6 @@ this repository, that is,
 # References
 
 <div id="refs" class="references csl-bib-body hanging-indent">
-
-<div id="ref-anderson1962" class="csl-entry">
-
-Anderson, T. W. 1962. “<span class="nocase">On the Distribution of the
-Two-Sample Cramer-von Mises Criterion</span>.” *The Annals of
-Mathematical Statistics* 33 (3): 1148–59.
-<https://doi.org/10.1214/aoms/1177704477>.
-
-</div>
-
-<div id="ref-pymoo2020" class="csl-entry">
-
-Blank, Julian, and Kalyanmoy Deb. 2020. “Pymoo: Multi-Objective
-Optimization in Python.” *IEEE Access* 8: 89497–509.
-<https://doi.org/10.1109/ACCESS.2020.2990567>.
-
-</div>
-
-<div id="ref-cramer1928" class="csl-entry">
-
-Cramér, Harald. 1928. “On the Composition of Elementary Errors.”
-*Scandinavian Actuarial Journal* 1928 (1): 13–74.
-<https://doi.org/10.1080/03461238.1928.10416862>.
-
-</div>
-
-<div id="ref-epps1986" class="csl-entry">
-
-Epps, T. W., and Kenneth J. Singleton. 1986. “An Omnibus Test for the
-Two-Sample Problem Using the Empirical Characteristic Function.”
-*Journal of Statistical Computation and Simulation* 26 (3-4): 177–203.
-<https://doi.org/10.1080/00949658608810963>.
-
-</div>
-
-<div id="ref-gil2016software" class="csl-entry">
-
-Gil, Joseph Yossi, and Gal Lalouche. 2016. “When Do Software Complexity
-Metrics Mean Nothing? - When Examined Out of Context.” *J. Object
-Technol.* 15 (1): 2:1–25. <https://doi.org/10.5381/jot.2016.15.5.a2>.
-
-</div>
-
-<div id="ref-dataset_elisa" class="csl-entry">
-
-Hönel, Sebastian. 2023a. “Metrics As Scores Dataset: Elisa
-Spectrophotometer Positive Samples.” Zenodo.
-<https://doi.org/10.5281/zenodo.7633989>.
-
-</div>
-
-<div id="ref-dataset_qcc" class="csl-entry">
-
-———. 2023b. “<span class="nocase">Metrics As Scores Dataset: Metrics and
-Domains From the Qualitas.class Corpus</span>.” Zenodo.
-<https://doi.org/10.5281/zenodo.7633949>.
-
-</div>
-
-<div id="ref-dataset_diamonds-ideal-if" class="csl-entry">
-
-———. 2023c. “<span class="nocase">Metrics As Scores Dataset: Price,
-Weight, and Other Properties of Over 1,200 Ideal-Cut and Best-Clarity
-Diamonds</span>.” Zenodo. <https://doi.org/10.5281/zenodo.7647596>.
-
-</div>
-
-<div id="ref-dataset_iris" class="csl-entry">
-
-———. 2023d. “Metrics As Scores Dataset: The Iris Flower Data Set.”
-Zenodo. <https://doi.org/10.5281/zenodo.7669664>.
-
-</div>
-
-<div id="ref-honel2022qrs" class="csl-entry">
-
-Hönel, Sebastian, Morgan Ericsson, Welf Löwe, and Anna Wingkvist. 2022.
-“Contextual Operationalization of Metrics as Scores: Is My Metric Value
-Good?” In *22nd IEEE International Conference on Software Quality,
-Reliability and Security, QRS 2022, Guangzhou, China, December 5-9,
-2022*, 333–43. IEEE. <https://doi.org/10.1109/QRS57517.2022.00042>.
-
-</div>
-
-<div id="ref-chambers2017" class="csl-entry">
-
-John M. Chambers, Richard M. Heiberger, Anne E. Freeny. 2017. “Analysis
-of Variance; Designed Experiments.” In *Statistical Models in S*, edited
-by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
-<https://doi.org/10.1201/9780203738535>.
-
-</div>
-
-<div id="ref-stephens1974" class="csl-entry">
-
-Stephens, M. A. 1974. “EDF Statistics for Goodness of Fit and Some
-Comparisons.” *Journal of the American Statistical Association* 69
-(347): 730–37. <https://doi.org/10.1080/01621459.1974.10480196>.
-
-</div>
-
-<div id="ref-tempero2010qualitas" class="csl-entry">
-
-Tempero, Ewan D., Craig Anslow, Jens Dietrich, Ted Han, Jing Li, Markus
-Lumpe, Hayden Melton, and James Noble. 2010. “The Qualitas Corpus: A
-Curated Collection of Java Code for Empirical Studies.” In *17th Asia
-Pacific Software Engineering Conference, APSEC 2010, Sydney, Australia,
-November 30 - December 3, 2010*, edited by Jun Han and Tran Dan Thu,
-336–45. IEEE Computer Society. <https://doi.org/10.1109/APSEC.2010.46>.
-
-</div>
-
-<div id="ref-terra2013qcc" class="csl-entry">
-
-Terra, Ricardo, Luis Fernando Miranda, Marco Túlio Valente, and Roberto
-da Silva Bigonha. 2013. “Qualitas.class Corpus: A Compiled Version of
-the Qualitas Corpus.” *ACM SIGSOFT Softw. Eng. Notes* 38 (5): 1–4.
-<https://doi.org/10.1145/2507288.2507314>.
-
-</div>
-
-<div id="ref-tukey1949anova" class="csl-entry">
-
-Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
-Variance.” *Biometrics* 5 (2): 99–114.
-<https://doi.org/10.2307/3001913>.
-
-</div>
-
-<div id="ref-ggplot2" class="csl-entry">
-
-Wickham, Hadley. 2016. *<span class="nocase">ggplot2</span>: Elegant
-Graphics for Data Analysis*. Springer-Verlag New York.
-<https://ggplot2.tidyverse.org>.
-
-</div>
 
 <div id="ref-anderson1962" class="csl-entry">
 
