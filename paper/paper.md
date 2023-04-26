@@ -77,7 +77,7 @@ The operationalization of features as scores lies in gathering values that are c
 Metrics As Scores enables this procedure by unifying the way of obtaining probability densities/masses and conducting appropriate statistical tests.
 More than $120$ different parametric distributions (approx. $20$ of which are discrete) are fitted through a common interface.
 Those distributions are part of the `scipy` package for the Python programming language, which Metrics As Scores makes extensive use of [@scipy].
-While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, Metrics As Scores solves a mixed-variable global optimization problem using a genetic algorithm and Pymoo [@pymoo].
+While fitting continuous distributions is straightforward using maximum likelihood estimation, many discrete distributions have integral parameters. For these, Metrics As Scores solves a mixed-variable global optimization problem using a genetic algorithm in Pymoo [@pymoo].
 Additionally to that, empirical distributions (continuous and discrete) and smooth approximate kernel density estimates are available. Applicable statistical tests for assessing the goodness-of-fit are automatically performed.
 <!-- -->
 These tests are used to select some best-fitting random variable in the interactive web application.
@@ -93,7 +93,7 @@ These tests are used to select some best-fitting random variable in the interact
 Metrics As Scores is a supplement to existing analyses that enables the exploration of differences among groups in a novel, mostly interactive way.
 Raw features are seldomly useful as, e.g., indicators of quality.
 Only the transformation to scores allows for an apples-to-apples comparison of different quantities (features) across contexts (groups).
-This is particularly true for software metrics, which often cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematical sound way to do so [@ulan2018jointprobs].
+This is particularly true for software metrics, which often cannot be compared directly, because due to their different scales and distributions, there does not exist a mathematically sound way to do so [@ulan2018jointprobs].
 <!-- -->
 While some have attempted to associate blank software metrics with quality [e.g., @basili1996validation], most often applications have to resort to using software metrics as, e.g., fault indicators [@caulo2019metricsfault; @aziz2019metrics], or as indicators of reliability and complexity [@chidamber1994metrics].
 <!-- -->
@@ -110,7 +110,7 @@ These are all unified using the class `Density`, which provides access to the PD
 <!--
 -->
 Metrics As Scores carries out a number of statistical tests for fitted distributions.
-The results for each test are stored in a separate spreadsheet after the fitting process and may be used to further investigate how well certain distributions fit and what the alternatives may are.
+The results for each test are stored in a separate spreadsheet after the fitting process and may be used to further investigate how well certain distributions fit and what the alternatives are.
 The carried out tests are: Cramér--von Mises [@Cramr1928] and Kolmogorov--Smirnov one-sample [@Stephens1974] tests, Cramér--von Mises [@Anderson1962], Kolmogorov--Smirnov, and Epps--Singleton [@Epps1986] two-sample tests.
 The second sample required for the two-sample test is obtained by uniformly sampling from the fitted distribution's PPF.
 The best-fitting distribution is selected for pre-generating densities that are used by the web application, such that only the single best fit is used for visualization.
@@ -118,7 +118,7 @@ The Epps--Singleton two-sample test is compatible with discrete data and is used
 For continuous data, the one-sample Kolmogorov--Smirnov test is used.
 
 
-Metrics As Scores supports to transform samples into distances using ideal values that are computed non-parametrically.
+Metrics As Scores supports the transformation of samples into distances using ideal values that are computed non-parametrically.
 Given a sample $X$ from an arbitrary population and an ideal value $i_X$, the corresponding distance, $D$, is obtained as $D=\lvert X-i_X \rvert$.
 In order to obtain a discrete ideal value (e.g., when transforming a discrete sample in order to fit a discrete probability distribution), the expectation (mean), median, infimum, and supremum can be obtained in a straightforward way and then rounded.
 A discrete value for the mode (most common value) is determined using `scipy`.
