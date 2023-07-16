@@ -53,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.6.2`.
+The current version is `v2.7.0`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -136,7 +136,7 @@ Metrics As Scores’ main feature is perhaps the Web Application. It can
 be run directly and locally from the TUI using a selected dataset (you
 may download a known dataset or use your own). The Web Application
 allows to visually inspect each *feature* across all the defined
-*groups*. It feates the PDF/PMF, CDF and CCDF, as well as the PPF for
+*groups*. It features the PDF/PMF, CDF and CCDF, as well as the PPF for
 each feature in each group. It offers five different principal types of
 densities: Parametric, Parametric (discrete), Empirical, Empirical
 (discrete), and (approximate) Kernel Density Estimation. The Web
