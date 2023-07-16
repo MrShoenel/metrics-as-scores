@@ -90,6 +90,10 @@ previous menu afterwards.
     def path_test_ANOVA(self) -> Path:
         return self.tests_dir.joinpath('./anova.csv')
     
+    @property
+    def path_test_KruskalWallis(self) -> Path:
+        return self.tests_dir.joinpath('./kruskal.csv')
+    
 
     @property
     def path_test_TukeyHSD(self) -> Path:
@@ -288,10 +292,16 @@ is no best value for lines of code (size) of software.
         self.q.print('We will now perform some statistical tests and summarize the results.')
         
         self.print_info(text_normal='Performing tests: ', text_vital='Analysis of Variance (ANOVA) ...', arrow='\n')
-        anova = self.dataset.analyze_ANOVA(qtypes=self.dataset.quantity_types, contexts=list(self.dataset.contexts(include_all_contexts=True)), unique_vals=True)
+        anova = self.dataset.analyze_groups(use='anova', qtypes=self.dataset.quantity_types, contexts=list(self.dataset.contexts(include_all_contexts=True)), unique_vals=True)
         file_anova = str(self.path_test_ANOVA)
         anova.to_csv(file_anova, index=False)
         self.print_info(text_normal='Wrote result to: ', text_vital=file_anova)
+
+        self.print_info(text_normal='Performing tests: ', text_vital='Kruskal-Wallis H-test ...', arrow='\n')
+        kruskal = self.dataset.analyze_groups(use='kruskal', qtypes=self.dataset.quantity_types, contexts=list(self.dataset.contexts(include_all_contexts=True)), unique_vals=True)
+        file_kruskal = str(self.path_test_KruskalWallis)
+        kruskal.to_csv(file_kruskal, index=False)
+        self.print_info(text_normal='Wrote result to: ', text_vital=file_kruskal)
 
         self.print_info(text_normal='Performing tests: ', text_vital='Two-Sample Kolmogorov-Smirnov (KS2) ...', arrow='\n')
         ks2samp = self.dataset.analyze_distr(qtypes=self.dataset.quantity_types, use_ks_2samp=True)

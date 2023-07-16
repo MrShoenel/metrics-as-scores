@@ -132,7 +132,7 @@ def required_files_folders_local_dataset(local_ds_id: str) -> tuple[list[Path], 
     ]) + list([
         dir_fits.joinpath(f'./pregen_distns_{dt.name}.csv') for dt in list(DistTransform)
     ]) + list([
-        dir_stests.joinpath(f'./{file}.csv') for file in ['anova', 'ks2samp', 'tukeyhsd']
+        dir_stests.joinpath(f'./{file}.csv') for file in ['anova', 'ks2samp', 'tukeyhsd', 'kruskal']
     ]) + list([
         dir_web.joinpath(f'./{file}.html') for file in ['about', 'references']
     ]) + list([

@@ -25,6 +25,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from typing import Union
+from metrics_as_scores.__version__ import __version__
 from metrics_as_scores.webapp.exception import PlotException
 from metrics_as_scores.tools.funcs import nonlinspace, natsort
 from metrics_as_scores.distribution.distribution import Empirical, DistTransform, Empirical_discrete, KDE_approx, Parametric, Parametric_discrete, Dataset, LocalDataset
@@ -569,7 +570,7 @@ btn_toggle_table.on_click(btn_toggle_table_click)
 html_about = web_dir.joinpath('./about.html')
 html_refs = web_dir.joinpath('./references.html')
 header = Div(text=f'''
-    {read_text(this_dir.joinpath('header.html'))}
+    {read_text(this_dir.joinpath('header.html')).replace('__VERSION__', __version__)}
     <h2>Loaded Dataset: <b>{ds.ds["name"]}</b></h2>
     <div id="about">
         <p><b>Author(s)</b>: {', '.join(ds.ds["author"])}</p>

@@ -16,7 +16,7 @@ from metrics_as_scores.tools.funcs import cdf_to_ppf
 from metrics_as_scores.distribution.fitting import StatTest_Types
 from statsmodels.distributions import ECDF as SMEcdf
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from scipy.stats import gaussian_kde, f_oneway, mode
+from scipy.stats import gaussian_kde, f_oneway, mode, kruskal
 from scipy.integrate import quad
 from scipy.optimize import direct
 from scipy.stats import ks_2samp, ttest_ind
@@ -930,12 +930,16 @@ class Dataset:
             data = np.abs(data - transform_value)
 
         return (transform_value, data)
+    
 
-
-    def analyze_ANOVA(self, qtypes: Iterable[str], contexts: Iterable[str], unique_vals: bool=True) -> pd.DataFrame:
+    def analyze_groups(self, use: Literal['anova', 'kruskal'], qtypes: Iterable[str], contexts: Iterable[str], unique_vals: bool=True) -> pd.DataFrame:
         """
         For each given type of quantity, this method performs an ANOVA across all
         given contexts.
+
+        use: ``Literal['anova', 'kruskal']``
+            Indicates which method for comparing groups to use. We can either conduct
+            an ANOVA or a Kruskal-Wallis test.
 
         qtypes: ``Iterable[str]``
             An iterable of quantity types to conduct the analysis for. For each given
@@ -958,6 +962,14 @@ class Dataset:
             the latter is a semicolon-separated list of contexts the quantity type was
             compared across.
         """
+        use_method: Callable = None
+        if use == 'anova':
+            use_method = f_oneway
+        elif use == 'kruskal':
+            use_method = kruskal
+        else:
+            raise Exception(f'Method "{use}" is not supported.')
+        
 
         # We first have to build the data; f_oneway requires *args, where each
         # arg is a data series.
@@ -965,11 +977,11 @@ class Dataset:
             raise Exception('Requires one or quantity types and two or more contexts.')
 
         def anova_for_qtype(qtype: str) -> dict[str, Union[str, str, float]]:
-            data_tuple = ()
+            samples = ()
             for ctx in contexts:
-                data_tuple += (self.data(qtype=qtype, context=None if ctx == '__ALL__' else ctx, unique_vals=unique_vals),)
+                samples += (self.data(qtype=qtype, context=None if ctx == '__ALL__' else ctx, unique_vals=unique_vals),)
             
-            stat, pval = f_oneway(*data_tuple)
+            stat, pval = use_method(*samples)
             return { 'qtype': qtype, 'stat': stat, 'pval': pval, 'across_contexts': ';'.join(contexts) }
 
         res_dicts = Parallel(n_jobs=-1)(delayed(anova_for_qtype)(qtype) for qtype in tqdm(qtypes))
@@ -981,7 +993,7 @@ class Dataset:
         r"""
         Calculate all pairwise comparisons for the given quantity types with Tukey's
         Honest Significance Test (HSD) and return the confidence intervals. For each
-        type of quantity, this method performs all of its associated contexts pair-wise
+        type of quantity, this method performs all of its associated contexts pairwise
         comparisons.
         For example, given a quantity :math:`Q` and its contexts :math:`C_1,C_2,C_3`,
         this method will examine the pairs :math:`\left[\{C_1,C_2\},\{C_1,C_3\},\{C_2,C_3\}\right]`.

@@ -352,4 +352,3 @@ curdoc().title = "Metrics As Scores"
 
 # References {-}
 
-<div id="refs"></div>
