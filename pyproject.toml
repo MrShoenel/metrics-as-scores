@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metrics-as-scores"
-version = "2.6.1"
+version = "2.6.2"
 description = "Interactive web application, tool- and analysis suite for approximating, exploring, understanding, and sampling from conditional distributions."
 authors = ["Sebastian Hönel <development@hoenel.net>"]
 license = "Dual-licensed under GNU General Public License v3 (GPLv3) and closed-source"
@@ -37,7 +37,7 @@ jupyterlab = "^3.4.7"
 matplotlib = "^3.6.0"
 ptvsd = "^4.3.2"
 pymoo = "^0.6.0"
-scipy = "^1.9.1"
+scipy = "1.10.1"
 statsmodels = "^0.13.2"
 StrEnum = "^0.4.8"
 tqdm = "^4.64.1"

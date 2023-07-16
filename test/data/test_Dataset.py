@@ -132,6 +132,8 @@ def test_Dataset_stat_tests():
         ds.analyze_groups(use='anova', qtypes=[], contexts=contexts_all)
     with raises(Exception, match='Requires one or quantity types and two or more contexts.'):
         ds.analyze_groups(use='anova', qtypes=qtypes, contexts=contexts_all[0:1])
+    with raises(Exception, match=f'Method "BLAFOO" is not supported.'):
+        ds.analyze_groups(use='BLAFOO', qtypes=qtypes, contexts=contexts_all)
     
 
     test_kruskal = ds.analyze_groups(use='kruskal', qtypes=qtypes, contexts=contexts_all)
