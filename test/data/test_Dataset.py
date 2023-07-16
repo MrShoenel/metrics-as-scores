@@ -120,7 +120,7 @@ def test_Dataset_stat_tests():
     qtypes = ds.quantity_types
     contexts_all = list(ds.contexts(include_all_contexts=True))
     
-    test_anova = ds.analyze_ANOVA(qtypes=qtypes, contexts=contexts_all)
+    test_anova = ds.analyze_groups(use='anova', qtypes=qtypes, contexts=contexts_all)
     assert isinstance(test_anova, pd.DataFrame)
     # We get one line for each qtype:
     assert len(test_anova.index) == len(qtypes)
@@ -129,9 +129,17 @@ def test_Dataset_stat_tests():
     assert row.across_contexts == ';'.join(contexts_all)
 
     with raises(Exception, match='Requires one or quantity types and two or more contexts.'):
-        ds.analyze_ANOVA(qtypes=[], contexts=contexts_all)
+        ds.analyze_groups(use='anova', qtypes=[], contexts=contexts_all)
     with raises(Exception, match='Requires one or quantity types and two or more contexts.'):
-        ds.analyze_ANOVA(qtypes=qtypes, contexts=contexts_all[0:1])
+        ds.analyze_groups(use='anova', qtypes=qtypes, contexts=contexts_all[0:1])
+    
+
+    test_kruskal = ds.analyze_groups(use='kruskal', qtypes=qtypes, contexts=contexts_all)
+    assert isinstance(test_kruskal, pd.DataFrame)
+    assert len(test_kruskal.index) == len(qtypes)
+    assert ','.join(test_kruskal.columns) == 'qtype,stat,pval,across_contexts'
+    row = test_kruskal.iloc[0,:]
+    assert row.across_contexts == ';'.join(contexts_all)
 
     
     test_tukey = ds.analyze_TukeyHSD(qtypes=qtypes)
