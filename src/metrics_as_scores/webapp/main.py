@@ -124,13 +124,19 @@ source = ColumnDataSource(data=pd.DataFrame(columns=list([f'x_{ctx}' for ctx in 
 # Set up plot
 plot = figure(sizing_mode='stretch_width', height=640,
               x_axis_label='Quantity Value', y_axis_label='Corresponding Score',
-              tools="box_zoom,crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset", x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom')
+              tools="box_zoom,crosshair,hover,pan,wheel_zoom,xwheel_zoom,ywheel_zoom,reset",
+              x_range=[0, 1], y_range=[0 - .02, 1.02], active_scroll='wheel_zoom',
+              tooltips=[
+                  ("Group", "$name"),
+                  ("X, Y", "$x, $y")
+              ])
 #plot.toolbar.active_scroll = plot.select_one('wheel_zoom') #'wheel_zoom'
 
 
 
 for idx, ctx in enumerate(contexts):
-    plot.line(f'x_{ctx}', ctx, source=source, line_width=2, line_alpha=1., color=Category20_20[idx], legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
+    plot.line(name=ctx, x=f'x_{ctx}', y=ctx, source=source, line_width=2, line_alpha=1.,
+              color=Category20_20[idx], legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
 
 # Also add a vertical line for own quantity
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))
