@@ -168,7 +168,7 @@ Application</a></p></li>
 between versions
 <a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8"><strong><code class="docutils literal notranslate"><span class="pre">v1.0.8</span></code></strong></a>
 and <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong>.</p>
-<p>The current version is <code class="docutils literal notranslate"><span class="pre">v2.5.1</span></code>.</p>
+<p>The current version is <code class="docutils literal notranslate"><span class="pre">v2.7.0</span></code>.</p>
 <p>From version <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong> it has the following new features:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#text-based-user-interface-tui"><span class="xref myst">Textual User Interface (TUI)</span></a></p></li>
@@ -241,7 +241,7 @@ code, if you want to do one of the following:</p>
 be run directly and locally from the TUI using a selected dataset (you
 may download a known dataset or use your own). The Web Application
 allows to visually inspect each <em>feature</em> across all the defined
-<em>groups</em>. It feates the PDF/PMF, CDF and CCDF, as well as the PPF for
+<em>groups</em>. It features the PDF/PMF, CDF and CCDF, as well as the PPF for
 each feature in each group. It offers five different principal types of
 densities: Parametric, Parametric (discrete), Empirical, Empirical
 (discrete), and (approximate) Kernel Density Estimation. The Web
@@ -282,15 +282,18 @@ venv/Scripts/activate
 <p>The project is managed with <code class="docutils literal notranslate"><span class="pre">Poetry</span></code>. To install the required packages,
 simply run the following.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>venv/Scripts/activate
-<span class="c1"># First install Poetry using pip:</span>
-<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;pip<span class="w"> </span>install<span class="w"> </span>poetry
+<span class="c1"># First, update pip:</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+<span class="c1"># First install Poetry v1.3.2 using pip:</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;pip<span class="w"> </span>install<span class="w"> </span><span class="nv">poetry</span><span class="o">==</span><span class="m">1</span>.3.2
 <span class="c1"># Install the projects and its dependencies</span>
 <span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>C:<span class="se">\m</span>etrics-as-scores&gt;<span class="w"> </span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
 <p>The same in Linux:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w"> </span><span class="c1"># Linux</span>
-<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>poetry
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">poetry</span><span class="o">==</span><span class="m">1</span>.3.2
 <span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>ubuntu@vm:/tmp/metrics-as-scores$<span class="w"> </span>poetry<span class="w"> </span>install
 </pre></div>
 </div>

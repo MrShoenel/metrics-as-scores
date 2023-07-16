@@ -97,7 +97,7 @@
 <span class="kn">from</span> <span class="nn">metrics_as_scores.distribution.fitting</span> <span class="kn">import</span> <span class="n">StatTest_Types</span>
 <span class="kn">from</span> <span class="nn">statsmodels.distributions</span> <span class="kn">import</span> <span class="n">ECDF</span> <span class="k">as</span> <span class="n">SMEcdf</span>
 <span class="kn">from</span> <span class="nn">statsmodels.stats.multicomp</span> <span class="kn">import</span> <span class="n">pairwise_tukeyhsd</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">f_oneway</span><span class="p">,</span> <span class="n">mode</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">f_oneway</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">kruskal</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">direct</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ks_2samp</span><span class="p">,</span> <span class="n">ttest_ind</span>
@@ -1011,12 +1011,16 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">transform_value</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">transform_value</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+    
 
-
-<div class="viewcode-block" id="Dataset.analyze_ANOVA"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.analyze_ANOVA">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_ANOVA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtypes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">unique_vals</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="Dataset.analyze_groups"><a class="viewcode-back" href="../../../metrics_as_scores.distribution.html#metrics_as_scores.distribution.distribution.Dataset.analyze_groups">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;anova&#39;</span><span class="p">,</span> <span class="s1">&#39;kruskal&#39;</span><span class="p">],</span> <span class="n">qtypes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">unique_vals</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For each given type of quantity, this method performs an ANOVA across all</span>
 <span class="sd">        given contexts.</span>
+
+<span class="sd">        use: ``Literal[&#39;anova&#39;, &#39;kruskal&#39;]``</span>
+<span class="sd">            Indicates which method for comparing groups to use. We can either conduct</span>
+<span class="sd">            an ANOVA or a Kruskal-Wallis test.</span>
 
 <span class="sd">        qtypes: ``Iterable[str]``</span>
 <span class="sd">            An iterable of quantity types to conduct the analysis for. For each given</span>
@@ -1039,6 +1043,14 @@
 <span class="sd">            the latter is a semicolon-separated list of contexts the quantity type was</span>
 <span class="sd">            compared across.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">use_method</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">use</span> <span class="o">==</span> <span class="s1">&#39;anova&#39;</span><span class="p">:</span>
+            <span class="n">use_method</span> <span class="o">=</span> <span class="n">f_oneway</span>
+        <span class="k">elif</span> <span class="n">use</span> <span class="o">==</span> <span class="s1">&#39;kruskal&#39;</span><span class="p">:</span>
+            <span class="n">use_method</span> <span class="o">=</span> <span class="n">kruskal</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Method &quot;</span><span class="si">{</span><span class="n">use</span><span class="si">}</span><span class="s1">&quot; is not supported.&#39;</span><span class="p">)</span>
+        
 
         <span class="c1"># We first have to build the data; f_oneway requires *args, where each</span>
         <span class="c1"># arg is a data series.</span>
@@ -1046,11 +1058,11 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Requires one or quantity types and two or more contexts.&#39;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">anova_for_qtype</span><span class="p">(</span><span class="n">qtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-            <span class="n">data_tuple</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="p">()</span>
             <span class="k">for</span> <span class="n">ctx</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
-                <span class="n">data_tuple</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">ctx</span> <span class="o">==</span> <span class="s1">&#39;__ALL__&#39;</span> <span class="k">else</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">unique_vals</span><span class="o">=</span><span class="n">unique_vals</span><span class="p">),)</span>
+                <span class="n">samples</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">qtype</span><span class="o">=</span><span class="n">qtype</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">ctx</span> <span class="o">==</span> <span class="s1">&#39;__ALL__&#39;</span> <span class="k">else</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">unique_vals</span><span class="o">=</span><span class="n">unique_vals</span><span class="p">),)</span>
             
-            <span class="n">stat</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">f_oneway</span><span class="p">(</span><span class="o">*</span><span class="n">data_tuple</span><span class="p">)</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">use_method</span><span class="p">(</span><span class="o">*</span><span class="n">samples</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;qtype&#39;</span><span class="p">:</span> <span class="n">qtype</span><span class="p">,</span> <span class="s1">&#39;stat&#39;</span><span class="p">:</span> <span class="n">stat</span><span class="p">,</span> <span class="s1">&#39;pval&#39;</span><span class="p">:</span> <span class="n">pval</span><span class="p">,</span> <span class="s1">&#39;across_contexts&#39;</span><span class="p">:</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">contexts</span><span class="p">)</span> <span class="p">}</span>
 
         <span class="n">res_dicts</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">anova_for_qtype</span><span class="p">)(</span><span class="n">qtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">qtype</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">qtypes</span><span class="p">))</span>
@@ -1062,7 +1074,7 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate all pairwise comparisons for the given quantity types with Tukey&#39;s</span>
 <span class="sd">        Honest Significance Test (HSD) and return the confidence intervals. For each</span>
-<span class="sd">        type of quantity, this method performs all of its associated contexts pair-wise</span>
+<span class="sd">        type of quantity, this method performs all of its associated contexts pairwise</span>
 <span class="sd">        comparisons.</span>
 <span class="sd">        For example, given a quantity :math:`Q` and its contexts :math:`C_1,C_2,C_3`,</span>
 <span class="sd">        this method will examine the pairs :math:`\left[\{C_1,C_2\},\{C_1,C_3\},\{C_2,C_3\}\right]`.</span>
