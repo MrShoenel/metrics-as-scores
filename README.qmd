@@ -131,7 +131,7 @@ It offers five different principal types of densities: Parametric, Parametric (d
 The Web Application includes a detailed [Help section](https://metrics-as-scores.ml/#help) that should answer most of your questions.
 
 
-![Metrics As Scores Interactive Web .](./WebApp.png "Metrics As Scores Interactive Web Appliction.")
+![Metrics As Scores Interactive Web .](./WebApp.png "Metrics As Scores Interactive Web Application.")
 
 ## Development Setup
 
