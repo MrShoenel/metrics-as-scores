@@ -222,15 +222,16 @@ You can also generate coverage reports:
 # Example Usage
 
 *Metrics As Scores* can be thought of an *interactive*, *multiple-ANOVA*
-analysis and explorer. The analysis of variance (ANOVA; John M. Chambers
-(2017)) is usually used to analyze the differences among *hypothesized*
-group means for a single *feature*. An ANOVA might be used to estimate
-the goodness-of-fit of a statistical model. Beyond ANOVA, `MAS` seeks to
-answer the question of whether a sample of a certain quantity (feature)
-is more or less common across groups. For each group, we can determine
-what might constitute a common/ideal value, and how distant the sample
-is from that value. This is expressed in terms of a percentile (a
-standardized scale of `[0,1]`), which we call **score**.
+analysis and explorer. The analysis of variance (ANOVA; Chambers,
+Freeny, and Heiberger (2017)) is usually used to analyze the differences
+among *hypothesized* group means for a single *feature*. An ANOVA might
+be used to estimate the goodness-of-fit of a statistical model. Beyond
+ANOVA, `MAS` seeks to answer the question of whether a sample of a
+certain quantity (feature) is more or less common across groups. For
+each group, we can determine what might constitute a common/ideal value,
+and how distant the sample is from that value. This is expressed in
+terms of a percentile (a standardized scale of `[0,1]`), which we call
+**score**.
 
 ## Concrete Example Using the Qualitas.class Corpus Dataset
 
@@ -309,8 +310,8 @@ Note that Metrics As Scores supports you with all tools necessary to
 create a publishable dataset. For example, it carries out the common
 statistical tests:
 
-- ANOVA (John M. Chambers 2017): Analysis of variance of your data
-  across the available groups.
+- ANOVA (Chambers, Freeny, and Heiberger 2017): Analysis of variance of
+  your data across the available groups.
 - Tukey’s Honest Significance Test (TukeyHSD; Tukey (1949)): This test
   is used to gain insights into the results of an ANOVA test. While the
   former only allows obtaining the amount of corroboration for the null
@@ -419,6 +420,15 @@ Optimization in Python.” *IEEE Access* 8: 89497–509.
 
 </div>
 
+<div id="ref-chambers2017" class="csl-entry">
+
+Chambers, John M., Anne E. Freeny, and Richard M. Heiberger. 2017.
+“Analysis of Variance; Designed Experiments.” In *Statistical Models in
+S*, edited by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
+<https://doi.org/10.1201/9780203738535>.
+
+</div>
+
 <div id="ref-cramer1928" class="csl-entry">
 
 Cramér, Harald. 1928. “On the Composition of Elementary Errors.”
@@ -482,15 +492,6 @@ Hönel, Sebastian, Morgan Ericsson, Welf Löwe, and Anna Wingkvist. 2022.
 Good?” In *22nd IEEE International Conference on Software Quality,
 Reliability and Security, QRS 2022, Guangzhou, China, December 5-9,
 2022*, 333–43. IEEE. <https://doi.org/10.1109/QRS57517.2022.00042>.
-
-</div>
-
-<div id="ref-chambers2017" class="csl-entry">
-
-John M. Chambers, Richard M. Heiberger, Anne E. Freeny. 2017. “Analysis
-of Variance; Designed Experiments.” In *Statistical Models in S*, edited
-by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
-<https://doi.org/10.1201/9780203738535>.
 
 </div>
 
