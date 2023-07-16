@@ -145,7 +145,7 @@ section](https://metrics-as-scores.ml/#help) that should answer most of
 your questions.
 
 ![Metrics As Scores Interactive Web
-.](./WebApp.png "Metrics As Scores Interactive Web Appliction.")
+.](./WebApp.png "Metrics As Scores Interactive Web Application.")
 
 ## Development Setup
 
