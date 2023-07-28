@@ -68,7 +68,9 @@ Demo.](https://user-images.githubusercontent.com/5049151/219892077-58854478-b761
 ------------------------------------------------------------------------
 
 Contains the data and scripts needed for the application
-**`Metrics as Scores`**, check out <https://metrics-as-scores.ml/>.
+**`Metrics as Scores`**, ~~check out <https://metrics-as-scores.ml/>~~
+(we will set up a new domain name soon, [see
+here](https://forum.infinityfree.net/t/all-ml-domains-are-down-due-to-registry-transfer/79379)).
 
 This package accompanies the paper entitled “*Contextual
 Operationalization of Metrics As Scores: Is My Metric Value Good?*”
@@ -140,9 +142,8 @@ allows to visually inspect each *feature* across all the defined
 each feature in each group. It offers five different principal types of
 densities: Parametric, Parametric (discrete), Empirical, Empirical
 (discrete), and (approximate) Kernel Density Estimation. The Web
-Application includes a detailed [Help
-section](https://metrics-as-scores.ml/#help) that should answer most of
-your questions.
+Application includes a detailed [Help section](#) that should answer
+most of your questions.
 
 ![Metrics As Scores Interactive Web
 .](./WebApp.png "Metrics As Scores Interactive Web Application.")
@@ -370,8 +371,8 @@ downloaded using the text-based user interface.
 
 # Personalizing the Web Application
 
-The web application *“[Metrics As
-Scores](https://metrics-as-scores.ml/)”* is located in the directory
+The web application *“[Metrics As Scores](#)”* is located in the
+directory
 [`src/metrics_as_scores/webapp/`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/).
 The app itself has three vertical blocks: a header, the interactive
 part, and a footer. Header and footer can be easily edited by modifing
@@ -395,8 +396,8 @@ curdoc().title = "Metrics As Scores"
 ```
 
 **Important**: If you modify the web application, you must always
-maintain two links: one to <https://metrics-as-scores.ml/> and one to
-this repository, that is,
+maintain two links: one to ~~<https://metrics-as-scores.ml/>~~ (new
+domain name coming soon) and one to this repository, that is,
 <https://github.com/MrShoenel/metrics-as-scores>.
 
 # References
