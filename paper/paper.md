@@ -150,7 +150,7 @@ These interactions include, for example, showing installed datasets, downloading
 # MAS -- The Interactive Application
 <!-- Here, we will introduce the actual application. Also, the application hosted under https://metrics-as-scores.ml/ is *an* actual application of the QCC. -->
 
-![Main plot area of the application "Metrics As Scores". Using the Qualitas.class corpus, software metrics values of own applications can be scored against the corpus' groups (application domains). Shown are the CCDFs (scores) of the fitted parametric distributions for the metric TLOC transformed using the infimum (per domain). Available online: <https://metrics-as-scores.ml/>.](MAS.png){#fig:mas}
+![Main plot area of the application "Metrics As Scores". Using the Qualitas.class corpus, software metrics values of own applications can be scored against the corpus' groups (application domains). Shown are the CCDFs (scores) of the fitted parametric distributions for the metric TLOC transformed using the infimum (per domain).](MAS.png){#fig:mas}
 
 The interactive application is partially shown in Figure \ref{fig:mas}. Not shown are the header, UI controls, a tabular with numerical data for the current selection, and the footer which contains help.
 The application supports all transforms, continuous and discrete distributions, obtaining scores for own features/sampling from inverse CDFs (PPFs), and grouping of features into discrete/continuous.
