@@ -62,7 +62,7 @@ From version **`v2.x.x`** it has the following new features:
 
 -----------------
 
-Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://metrics-as-scores.ml/>.
+Contains the data and scripts needed for the application __`Metrics as Scores`__, ~~check out <https://metrics-as-scores.ml/>~~ (we will set up a new domain name soon, [see here](https://forum.infinityfree.net/t/all-ml-domains-are-down-due-to-registry-transfer/79379)).
 
 ```{python}
 #| echo: false
@@ -128,7 +128,7 @@ It can be run directly and locally from the TUI using a selected dataset (you ma
 The Web Application allows to visually inspect each *feature* across all the defined *groups*.
 It features the PDF/PMF, CDF and CCDF, as well as the PPF for each feature in each group.
 It offers five different principal types of densities: Parametric, Parametric (discrete), Empirical, Empirical (discrete), and (approximate) Kernel Density Estimation.
-The Web Application includes a detailed [Help section](https://metrics-as-scores.ml/#help) that should answer most of your questions.
+The Web Application includes a detailed [Help section](#) that should answer most of your questions.
 
 
 ![Metrics As Scores Interactive Web .](./WebApp.png "Metrics As Scores Interactive Web Application.")
@@ -330,7 +330,7 @@ dm('\n'.join([format_dataset(ds) for ds in get_known_datasets(use_local_file=Fal
 
 # Personalizing the Web Application
 
-The web application _"[Metrics As Scores](https://metrics-as-scores.ml/)"_ is located in the directory [`src/metrics_as_scores/webapp/`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/).
+The web application _"[Metrics As Scores](#)"_ is located in the directory [`src/metrics_as_scores/webapp/`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/).
 The app itself has three vertical blocks: a header, the interactive part, and a footer.
 Header and footer can be easily edited by modifing the files [`src/metrics_as_scores/webapp/header.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/header.html) and [`src/metrics_as_scores/webapp/footer.html`](https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/footer.html).
 
@@ -346,7 +346,7 @@ If you want to change the title of the application, you will have to modify the 
 curdoc().title = "Metrics As Scores"
 ```
 
-**Important**: If you modify the web application, you must always maintain two links: one to <https://metrics-as-scores.ml/> and one to this repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
+**Important**: If you modify the web application, you must always maintain two links: one to ~~<https://metrics-as-scores.ml/>~~ (new domain name coming soon) and one to this repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
 
 
 
