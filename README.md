@@ -53,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.7.0`.
+The current version is `v2.8.0`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -404,7 +404,7 @@ domain name coming soon) and one to this repository, that is,
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-anderson1962" class="csl-entry">
+<div id="ref-Anderson1962" class="csl-entry">
 
 Anderson, T. W. 1962. “<span class="nocase">On the Distribution of the
 Two-Sample Cramer-von Mises Criterion</span>.” *The Annals of
@@ -413,20 +413,21 @@ Mathematical Statistics* 33 (3): 1148–59.
 
 </div>
 
-<div id="ref-pymoo2020" class="csl-entry">
+<div id="ref-pymoo" class="csl-entry">
 
-Blank, Julian, and Kalyanmoy Deb. 2020. “Pymoo: Multi-Objective
-Optimization in Python.” *IEEE Access* 8: 89497–509.
-<https://doi.org/10.1109/ACCESS.2020.2990567>.
+Blank, Julian, and Kalyanmoy Deb. 2020. “<span class="nocase">pymoo:
+Multi-Objective Optimization in Python</span>.” *IEEE Access* 8:
+89497–509. <https://doi.org/10.1109/ACCESS.2020.2990567>.
 
 </div>
 
-<div id="ref-chambers2017" class="csl-entry">
+<div id="ref-chambers2017statistical" class="csl-entry">
 
 Chambers, John M., Anne E. Freeny, and Richard M. Heiberger. 2017.
-“Analysis of Variance; Designed Experiments.” In *Statistical Models in
-S*, edited by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
-<https://doi.org/10.1201/9780203738535>.
+“<span class="nocase">Analysis of Variance; Designed
+Experiments</span>.” In *<span class="nocase">Statistical Models in
+S</span>*, edited by John M. Chambers and Trevor J. Hastie, 1st ed.
+Routledge. <https://doi.org/10.1201/9780203738535>.
 
 </div>
 
@@ -438,11 +439,12 @@ Cramér, Harald. 1928. “On the Composition of Elementary Errors.”
 
 </div>
 
-<div id="ref-epps1986" class="csl-entry">
+<div id="ref-Epps1986" class="csl-entry">
 
-Epps, T. W., and Kenneth J. Singleton. 1986. “An Omnibus Test for the
-Two-Sample Problem Using the Empirical Characteristic Function.”
-*Journal of Statistical Computation and Simulation* 26 (3-4): 177–203.
+Epps, T. W., and Kenneth J. Singleton. 1986. “<span class="nocase">An
+Omnibus Test for the Two-Sample Problem Using the Empirical
+Characteristic Function</span>.” *Journal of Statistical Computation and
+Simulation* 26 (3-4): 177–203.
 <https://doi.org/10.1080/00949658608810963>.
 
 </div>
@@ -486,48 +488,53 @@ Zenodo. <https://doi.org/10.5281/zenodo.7669664>.
 
 </div>
 
-<div id="ref-honel2022qrs" class="csl-entry">
+<div id="ref-honel2022mas" class="csl-entry">
 
 Hönel, Sebastian, Morgan Ericsson, Welf Löwe, and Anna Wingkvist. 2022.
-“Contextual Operationalization of Metrics as Scores: Is My Metric Value
-Good?” In *22nd IEEE International Conference on Software Quality,
-Reliability and Security, QRS 2022, Guangzhou, China, December 5-9,
-2022*, 333–43. IEEE. <https://doi.org/10.1109/QRS57517.2022.00042>.
+“<span class="nocase">Contextual Operationalization of Metrics As
+Scores: Is My Metric Value Good?</span>” In *<span class="nocase">22nd
+IEEE International Conference on Software Quality, Reliability and
+Security, QRS 2022, Guangzhou, China, December 5–9, 2022</span>*,
+333–43. IEEE. <https://doi.org/10.1109/QRS57517.2022.00042>.
 
 </div>
 
-<div id="ref-stephens1974" class="csl-entry">
+<div id="ref-Stephens1974" class="csl-entry">
 
-Stephens, M. A. 1974. “EDF Statistics for Goodness of Fit and Some
-Comparisons.” *Journal of the American Statistical Association* 69
-(347): 730–37. <https://doi.org/10.1080/01621459.1974.10480196>.
+Stephens, M. A. 1974. “<span class="nocase">EDF Statistics for Goodness
+of Fit and Some Comparisons</span>.” *Journal of the American
+Statistical Association* 69 (347): 730–37.
+<https://doi.org/10.1080/01621459.1974.10480196>.
 
 </div>
 
 <div id="ref-tempero2010qualitas" class="csl-entry">
 
 Tempero, Ewan D., Craig Anslow, Jens Dietrich, Ted Han, Jing Li, Markus
-Lumpe, Hayden Melton, and James Noble. 2010. “The Qualitas Corpus: A
-Curated Collection of Java Code for Empirical Studies.” In *17th Asia
-Pacific Software Engineering Conference, APSEC 2010, Sydney, Australia,
-November 30 - December 3, 2010*, edited by Jun Han and Tran Dan Thu,
-336–45. IEEE Computer Society. <https://doi.org/10.1109/APSEC.2010.46>.
+Lumpe, Hayden Melton, and James Noble. 2010. “<span class="nocase">The
+Qualitas Corpus: A Curated Collection of Java Code for Empirical
+Studies</span>.” In *17th Asia Pacific Software Engineering Conference,
+APSEC 2010, Sydney, Australia, November 30 - December 3, 2010*, edited
+by Jun Han and Tran Dan Thu, 336–45. IEEE Computer Society.
+<https://doi.org/10.1109/APSEC.2010.46>.
 
 </div>
 
-<div id="ref-terra2013qcc" class="csl-entry">
+<div id="ref-terra2013qualitas" class="csl-entry">
 
-Terra, Ricardo, Luis Fernando Miranda, Marco Túlio Valente, and Roberto
-da Silva Bigonha. 2013. “Qualitas.class Corpus: A Compiled Version of
-the Qualitas Corpus.” *ACM SIGSOFT Softw. Eng. Notes* 38 (5): 1–4.
+Terra, Ricardo, Luis Fernando Miranda, Marco Tulio Valente, and Roberto
+da Silva Bigonha. 2013. “<span class="nocase"><span
+class="nocase">Qualitas.class</span> corpus: a compiled version of the
+<span class="nocase">qualitas</span> corpus</span>.” *ACM SIGSOFT
+Software Engineering Notes* 38 (5): 1–4.
 <https://doi.org/10.1145/2507288.2507314>.
 
 </div>
 
-<div id="ref-tukey1949anova" class="csl-entry">
+<div id="ref-Tukey1949" class="csl-entry">
 
-Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
-Variance.” *Biometrics* 5 (2): 99–114.
+Tukey, John W. 1949. “<span class="nocase">Comparing Individual Means in
+the Analysis of Variance</span>.” *Biometrics* 5 (2): 99–114.
 <https://doi.org/10.2307/3001913>.
 
 </div>
