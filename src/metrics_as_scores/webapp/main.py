@@ -135,8 +135,11 @@ plot = figure(sizing_mode='stretch_width', height=640,
 
 
 for idx, ctx in enumerate(contexts):
-    plot.line(name=ctx, x=f'x_{ctx}', y=ctx, source=source, line_width=2, line_alpha=1.,
-              color=Category20_20[idx], legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
+    plot.line(
+        name='[All groups combined]' if ctx == '__ALL__' else ctx,
+        x=f'x_{ctx}', y=ctx, source=source, line_width=2, line_alpha=1.,
+        color=Category20_20[idx],
+        legend_label='[All groups combined]' if ctx == '__ALL__' else ctx)
 
 # Also add a vertical line for own quantity
 line_own_source = ColumnDataSource(data=pd.DataFrame(columns=['x', 'y']))

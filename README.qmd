@@ -4,6 +4,7 @@ top-level-division: section
 jupyter: python3
 bibliography:
   - refs.bib
+  - paper/refs.bib
   - src/metrics_as_scores/datasets/known-datasets.bib
   
 format:
@@ -68,7 +69,7 @@ Contains the data and scripts needed for the application __`Metrics as Scores`__
 #| echo: false
 
 dm(f'''
-This package accompanies the paper entitled "_Contextual Operationalization of Metrics As Scores: Is My Metric Value Good?_" [@honel2022qrs].
+This package accompanies the paper entitled "_Contextual Operationalization of Metrics As Scores: Is My Metric Value Good?_" [@honel2022mas].
 It seeks to answer the question whether or not the domain a software metric was captured in, matters.
 It enables the user to compare domains and to understand their differences.
 In order to answer the question of whether a metric value is actually good, we need to transform it into a **score**.
@@ -208,7 +209,7 @@ You can also generate coverage reports:
 # Example Usage
 
 _Metrics As Scores_ can be thought of an *interactive*, *multiple-ANOVA* analysis and explorer.
-The analysis of variance (ANOVA; @chambers2017) is usually used to analyze the differences among *hypothesized* group means for a single *feature*.
+The analysis of variance (ANOVA; @chambers2017statistical) is usually used to analyze the differences among *hypothesized* group means for a single *feature*.
 An ANOVA might be used to estimate the goodness-of-fit of a statistical model.
 Beyond ANOVA, `MAS` seeks to answer the question of whether a sample of a certain quantity (feature) is more or less common across groups.
 For each group, we can determine what might constitute a common/ideal value, and how distant the sample is from that value.
@@ -225,7 +226,7 @@ Using a concrete metric, *Number of Packages*, we find out that our hypothetical
 
 This example illustrates the point that software metrics, when captured out of context, are meaningless [@gil2016software].
 For example, typical values for complexity metrics are vastly different, depending on the type of application.
-We find that, for example, applications of type SDK have a much lower *expected* complexity compared to Games (`1.9` vs. `3.1`) [@honel2022qrs].
+We find that, for example, applications of type SDK have a much lower *expected* complexity compared to Games (`1.9` vs. `3.1`) [@honel2022mas].
 Software metrics are often used in software quality models.
 However, without knowledge of the application's context (here: domain), the deduced quality of these models is at least misleading, if not completely off.
 This becomes apparent if we examine how an application's complexity scores across certain domains.
@@ -235,7 +236,7 @@ How many metrics are statistically significantly different from each other?
 Is there a set of domains that are not distinguishable from each other?
 Are there metrics that are always different across domains and must be used with care?
 In this example, we use a known and downloadable dataset [@dataset_qcc].
-It is based on software metrics and application domains of the "Qualitas.class corpus" [@terra2013qcc; @tempero2010qualitas].
+It is based on software metrics and application domains of the "Qualitas.class corpus" [@terra2013qualitas; @tempero2010qualitas].
 
 
 ## Concrete Example Using the Iris Dataset
@@ -281,8 +282,8 @@ If you do not have an own dataset, you can use the built-in wizard to download a
 Note that Metrics As Scores supports you with all tools necessary to create a publishable dataset.
 For example, it carries out the common statistical tests:
 
-- ANOVA [@chambers2017]: Analysis of variance of your data across the available groups.
-- Tukey's Honest Significance Test (TukeyHSD; @tukey1949anova): This test is used to gain insights into the results of an ANOVA test. While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons (for all possible combinations of any two groups).
+- ANOVA [@chambers2017statistical]: Analysis of variance of your data across the available groups.
+- Tukey's Honest Significance Test (TukeyHSD; @Tukey1949): This test is used to gain insights into the results of an ANOVA test. While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons (for all possible combinations of any two groups).
 - Two-sample T-test: Compares the means of two samples to give an indication whether or not they appear to come from the same distribution. Again, this is useful for comparing groups.
 Tukey's test is used to gain insights into the results of an ANOVA test.
 While the former only allows obtaining the amount of corroboration for the null hypothesis, TukeyHSD performs all pairwise comparisons (for all possible combinations of any two groups).
@@ -291,14 +292,14 @@ It also creates an **automatic report** based on these tests that you can simply
 
 
 A publishable dataset must contain parametric fits and pre-generated densities (please check the wizard for these two).
-Metrics As Scores can fit approximately **120** continuous and discrete random variables using `Pymoo` [@pymoo2020].
+Metrics As Scores can fit approximately **120** continuous and discrete random variables using `Pymoo` [@pymoo].
 Note that Metrics As Scores also automatically carries out a number of goodness-of-fit tests.
 The type of test also depends on the data (for example, not each test is valid for discrete data, such as the KS two-sample test).
 These tests are then used to select some best fitting random variable for display in the web application.
 
 
-* Cramér-von Mises- [@cramer1928] and Kolmogorov&ndash;Smirnov one-sample [@stephens1974] tests: After fitting a distribution, the sample is tested against the fitted parametric distribution. Since the fitted distribution cannot usually accommodate all of the sample's subtleties, the test will indicate whether the fit is acceptable or not.
-* Cramér-von Mises- [@anderson1962], Kolmogorov&ndash;Smirnov-, and Epps&ndash;Singleton [@epps1986] two-sample tests: After fitting, we create a second sample by uniformly sampling from the `PPF`. Then, both samples can be used in these tests. The Epps&ndash;Singleton test is also applicable for discrete distributions.
+* Cramér-von Mises- [@cramer1928] and Kolmogorov&ndash;Smirnov one-sample [@Stephens1974] tests: After fitting a distribution, the sample is tested against the fitted parametric distribution. Since the fitted distribution cannot usually accommodate all of the sample's subtleties, the test will indicate whether the fit is acceptable or not.
+* Cramér-von Mises- [@Anderson1962], Kolmogorov&ndash;Smirnov-, and Epps&ndash;Singleton [@Epps1986] two-sample tests: After fitting, we create a second sample by uniformly sampling from the `PPF`. Then, both samples can be used in these tests. The Epps&ndash;Singleton test is also applicable for discrete distributions.
 
 
 
