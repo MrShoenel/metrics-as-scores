@@ -1,0 +1,50 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Hönel
+  given-names: Sebastian
+  orcid: "https://orcid.org/0000-0001-7937-1645"
+- family-names: Ericsson
+  given-names: Morgan
+  orcid: "https://orcid.org/0000-0003-1173-5187"
+- family-names: Löwe
+  given-names: Welf
+  orcid: "https://orcid.org/0000-0002-7565-3714"
+- family-names: Wingkvist
+  given-names: Anna
+  orcid: "https://orcid.org/0000-0002-0835-823X"
+contact:
+- family-names: Hönel
+  given-names: Sebastian
+  orcid: "https://orcid.org/0000-0001-7937-1645"
+doi: 10.5281/zenodo.8202326
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Hönel
+    given-names: Sebastian
+    orcid: "https://orcid.org/0000-0001-7937-1645"
+  - family-names: Ericsson
+    given-names: Morgan
+    orcid: "https://orcid.org/0000-0003-1173-5187"
+  - family-names: Löwe
+    given-names: Welf
+    orcid: "https://orcid.org/0000-0002-7565-3714"
+  - family-names: Wingkvist
+    given-names: Anna
+    orcid: "https://orcid.org/0000-0002-0835-823X"
+  date-published: 2023-08-25
+  doi: 10.21105/joss.04913
+  issn: 2475-9066
+  issue: 88
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 4913
+  title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive
+    Application for Exploring Context-Dependent Distributions"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.04913"
+  volume: 8
+title: "Metrics As Scores: A Tool- and Analysis Suite and Interactive
+  Application for Exploring Context-Dependent Distributions"
