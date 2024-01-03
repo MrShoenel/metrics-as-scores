@@ -63,7 +63,7 @@ From version **`v2.x.x`** it has the following new features:
 
 -----------------
 
-Contains the data and scripts needed for the application __`Metrics as Scores`__, ~~check out <https://metrics-as-scores.ml/>~~ (we will set up a new domain name soon, [see here](https://forum.infinityfree.net/t/all-ml-domains-are-down-due-to-registry-transfer/79379)).
+Contains the data and scripts needed for the application __`Metrics as Scores`__, check out <https://mas.research.hönel.net/>.
 
 ```{python}
 #| echo: false
@@ -347,7 +347,7 @@ If you want to change the title of the application, you will have to modify the 
 curdoc().title = "Metrics As Scores"
 ```
 
-**Important**: If you modify the web application, you must always maintain two links: one to ~~<https://metrics-as-scores.ml/>~~ (new domain name coming soon) and one to this repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
+**Important**: If you modify the web application, you must always maintain two links: one to <https://mas.research.hönel.net/> and one to this repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
 
 
 

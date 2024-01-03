@@ -53,7 +53,7 @@ between versions
 [**`v1.0.8`**](https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8)
 and **`v2.x.x`**.
 
-The current version is `v2.8.0`.
+The current version is `v2.8.1`.
 
 From version **`v2.x.x`** it has the following new features:
 
@@ -68,9 +68,9 @@ Demo.](https://user-images.githubusercontent.com/5049151/219892077-58854478-b761
 ------------------------------------------------------------------------
 
 Contains the data and scripts needed for the application
-**`Metrics as Scores`**, ~~check out <https://metrics-as-scores.ml/>~~
-(we will set up a new domain name soon, [see
-here](https://forum.infinityfree.net/t/all-ml-domains-are-down-due-to-registry-transfer/79379)).
+**`Metrics as Scores`**, check out
+<a href="https://mas.research.hönel.net/"
+class="uri">https://mas.research.hönel.net/</a>.
 
 This package accompanies the paper entitled “*Contextual
 Operationalization of Metrics As Scores: Is My Metric Value Good?*”
@@ -396,9 +396,9 @@ curdoc().title = "Metrics As Scores"
 ```
 
 **Important**: If you modify the web application, you must always
-maintain two links: one to ~~<https://metrics-as-scores.ml/>~~ (new
-domain name coming soon) and one to this repository, that is,
-<https://github.com/MrShoenel/metrics-as-scores>.
+maintain two links: one to <a href="https://mas.research.hönel.net/"
+class="uri">https://mas.research.hönel.net/</a> and one to this
+repository, that is, <https://github.com/MrShoenel/metrics-as-scores>.
 
 # References
 
