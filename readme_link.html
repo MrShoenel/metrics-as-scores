@@ -168,7 +168,7 @@ Application</a></p></li>
 between versions
 <a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/tree/v1.0.8"><strong><code class="docutils literal notranslate"><span class="pre">v1.0.8</span></code></strong></a>
 and <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong>.</p>
-<p>The current version is <code class="docutils literal notranslate"><span class="pre">v2.7.0</span></code>.</p>
+<p>The current version is <code class="docutils literal notranslate"><span class="pre">v2.8.1</span></code>.</p>
 <p>From version <strong><code class="docutils literal notranslate"><span class="pre">v2.x.x</span></code></strong> it has the following new features:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#text-based-user-interface-tui"><span class="xref myst">Textual User Interface (TUI)</span></a></p></li>
@@ -180,7 +180,9 @@ interface by typing <strong><code class="docutils literal notranslate"><span cla
 Demo.</a></p>
 <hr class="docutils" />
 <p>Contains the data and scripts needed for the application
-<strong><code class="docutils literal notranslate"><span class="pre">Metrics</span> <span class="pre">as</span> <span class="pre">Scores</span></code></strong>, check out <a class="reference external" href="https://metrics-as-scores.ml/">https://metrics-as-scores.ml/</a>.</p>
+<strong><code class="docutils literal notranslate"><span class="pre">Metrics</span> <span class="pre">as</span> <span class="pre">Scores</span></code></strong>, check out
+<a href="https://mas.research.hönel.net/"
+class="uri">https://mas.research.hönel.net/</a>.</p>
 <p>This package accompanies the paper entitled “<em>Contextual
 Operationalization of Metrics As Scores: Is My Metric Value Good?</em>”
 (Hönel et al. 2022). It seeks to answer the question whether or not the
@@ -245,9 +247,8 @@ allows to visually inspect each <em>feature</em> across all the defined
 each feature in each group. It offers five different principal types of
 densities: Parametric, Parametric (discrete), Empirical, Empirical
 (discrete), and (approximate) Kernel Density Estimation. The Web
-Application includes a detailed <a class="reference external" href="https://metrics-as-scores.ml/#help">Help
-section</a> that should answer most of
-your questions.</p>
+Application includes a detailed <a class="reference internal" href="#"><span class="xref myst">Help section</span></a> that should answer
+most of your questions.</p>
 <p><img alt="Metrics As Scores Interactive Web." src="_images/WebApp.png" /></p>
 </section>
 <section id="development-setup">
@@ -317,15 +318,16 @@ simply run the following.</p>
 <section id="example-usage">
 <h1>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h1>
 <p><em>Metrics As Scores</em> can be thought of an <em>interactive</em>, <em>multiple-ANOVA</em>
-analysis and explorer. The analysis of variance (ANOVA; John M. Chambers
-(2017)) is usually used to analyze the differences among <em>hypothesized</em>
-group means for a single <em>feature</em>. An ANOVA might be used to estimate
-the goodness-of-fit of a statistical model. Beyond ANOVA, <code class="docutils literal notranslate"><span class="pre">MAS</span></code> seeks to
-answer the question of whether a sample of a certain quantity (feature)
-is more or less common across groups. For each group, we can determine
-what might constitute a common/ideal value, and how distant the sample
-is from that value. This is expressed in terms of a percentile (a
-standardized scale of <code class="docutils literal notranslate"><span class="pre">[0,1]</span></code>), which we call <strong>score</strong>.</p>
+analysis and explorer. The analysis of variance (ANOVA; Chambers,
+Freeny, and Heiberger (2017)) is usually used to analyze the differences
+among <em>hypothesized</em> group means for a single <em>feature</em>. An ANOVA might
+be used to estimate the goodness-of-fit of a statistical model. Beyond
+ANOVA, <code class="docutils literal notranslate"><span class="pre">MAS</span></code> seeks to answer the question of whether a sample of a
+certain quantity (feature) is more or less common across groups. For
+each group, we can determine what might constitute a common/ideal value,
+and how distant the sample is from that value. This is expressed in
+terms of a percentile (a standardized scale of <code class="docutils literal notranslate"><span class="pre">[0,1]</span></code>), which we call
+<strong>score</strong>.</p>
 <section id="concrete-example-using-the-qualitas-class-corpus-dataset">
 <h2>Concrete Example Using the Qualitas.class Corpus Dataset<a class="headerlink" href="#concrete-example-using-the-qualitas-class-corpus-dataset" title="Permalink to this heading"></a></h2>
 <p>The notebook
@@ -398,8 +400,8 @@ wizard to download any of the known datasets, too!</p>
 create a publishable dataset. For example, it carries out the common
 statistical tests:</p>
 <ul class="simple">
-<li><p>ANOVA (John M. Chambers 2017): Analysis of variance of your data
-across the available groups.</p></li>
+<li><p>ANOVA (Chambers, Freeny, and Heiberger 2017): Analysis of variance of
+your data across the available groups.</p></li>
 <li><p>Tukey’s Honest Significance Test (TukeyHSD; Tukey (1949)): This test
 is used to gain insights into the results of an ANOVA test. While the
 former only allows obtaining the amount of corroboration for the null
@@ -459,8 +461,8 @@ Best-Clarity Diamonds (Hönel 2023c). 508 MB.
 <hr class="docutils" />
 <section id="personalizing-the-web-application">
 <h1>Personalizing the Web Application<a class="headerlink" href="#personalizing-the-web-application" title="Permalink to this heading"></a></h1>
-<p>The web application <em>“<a class="reference external" href="https://metrics-as-scores.ml/">Metrics As
-Scores</a>”</em> is located in the directory
+<p>The web application <em>“<a class="reference internal" href="#"><span class="xref myst">Metrics As Scores</span></a>”</em> is located in the
+directory
 <a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores/blob/master/src/metrics_as_scores/webapp/"><code class="docutils literal notranslate"><span class="pre">src/metrics_as_scores/webapp/</span></code></a>.
 The app itself has three vertical blocks: a header, the interactive
 part, and a footer. Header and footer can be easily edited by modifing
@@ -480,33 +482,41 @@ at the very end:</p>
 </pre></div>
 </div>
 <p><strong>Important</strong>: If you modify the web application, you must always
-maintain two links: one to <a class="reference external" href="https://metrics-as-scores.ml/">https://metrics-as-scores.ml/</a> and one to
-this repository, that is,
-<a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores">https://github.com/MrShoenel/metrics-as-scores</a>.</p>
+maintain two links: one to <a href="https://mas.research.hönel.net/"
+class="uri">https://mas.research.hönel.net/</a> and one to this
+repository, that is, <a class="reference external" href="https://github.com/MrShoenel/metrics-as-scores">https://github.com/MrShoenel/metrics-as-scores</a>.</p>
 </section>
 <section id="references">
 <h1>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-anderson1962" class="csl-entry">
+<div id="ref-Anderson1962" class="csl-entry">
 <p>Anderson, T. W. 1962. “<span class="nocase">On the Distribution of the
 Two-Sample Cramer-von Mises Criterion</span>.” <em>The Annals of
 Mathematical Statistics</em> 33 (3): 1148–59.
 <a class="reference external" href="https://doi.org/10.1214/aoms/1177704477">https://doi.org/10.1214/aoms/1177704477</a>.</p>
 </div>
-<div id="ref-pymoo2020" class="csl-entry">
-<p>Blank, Julian, and Kalyanmoy Deb. 2020. “Pymoo: Multi-Objective
-Optimization in Python.” <em>IEEE Access</em> 8: 89497–509.
-<a class="reference external" href="https://doi.org/10.1109/ACCESS.2020.2990567">https://doi.org/10.1109/ACCESS.2020.2990567</a>.</p>
+<div id="ref-pymoo" class="csl-entry">
+<p>Blank, Julian, and Kalyanmoy Deb. 2020. “<span class="nocase">pymoo:
+Multi-Objective Optimization in Python</span>.” <em>IEEE Access</em> 8:
+89497–509. <a class="reference external" href="https://doi.org/10.1109/ACCESS.2020.2990567">https://doi.org/10.1109/ACCESS.2020.2990567</a>.</p>
+</div>
+<div id="ref-chambers2017statistical" class="csl-entry">
+<p>Chambers, John M., Anne E. Freeny, and Richard M. Heiberger. 2017.
+“<span class="nocase">Analysis of Variance; Designed
+Experiments</span>.” In <em><span class="nocase">Statistical Models in
+S</span></em>, edited by John M. Chambers and Trevor J. Hastie, 1st ed.
+Routledge. <a class="reference external" href="https://doi.org/10.1201/9780203738535">https://doi.org/10.1201/9780203738535</a>.</p>
 </div>
 <div id="ref-cramer1928" class="csl-entry">
 <p>Cramér, Harald. 1928. “On the Composition of Elementary Errors.”
 <em>Scandinavian Actuarial Journal</em> 1928 (1): 13–74.
 <a class="reference external" href="https://doi.org/10.1080/03461238.1928.10416862">https://doi.org/10.1080/03461238.1928.10416862</a>.</p>
 </div>
-<div id="ref-epps1986" class="csl-entry">
-<p>Epps, T. W., and Kenneth J. Singleton. 1986. “An Omnibus Test for the
-Two-Sample Problem Using the Empirical Characteristic Function.”
-<em>Journal of Statistical Computation and Simulation</em> 26 (3-4): 177–203.
+<div id="ref-Epps1986" class="csl-entry">
+<p>Epps, T. W., and Kenneth J. Singleton. 1986. “<span class="nocase">An
+Omnibus Test for the Two-Sample Problem Using the Empirical
+Characteristic Function</span>.” <em>Journal of Statistical Computation and
+Simulation</em> 26 (3-4): 177–203.
 <a class="reference external" href="https://doi.org/10.1080/00949658608810963">https://doi.org/10.1080/00949658608810963</a>.</p>
 </div>
 <div id="ref-gil2016software" class="csl-entry">
@@ -533,41 +543,40 @@ Diamonds</span>.” Zenodo. <a class="reference external" href="https://doi.org/
 <p>———. 2023d. “Metrics As Scores Dataset: The Iris Flower Data Set.”
 Zenodo. <a class="reference external" href="https://doi.org/10.5281/zenodo.7669664">https://doi.org/10.5281/zenodo.7669664</a>.</p>
 </div>
-<div id="ref-honel2022qrs" class="csl-entry">
+<div id="ref-honel2022mas" class="csl-entry">
 <p>Hönel, Sebastian, Morgan Ericsson, Welf Löwe, and Anna Wingkvist. 2022.
-“Contextual Operationalization of Metrics as Scores: Is My Metric Value
-Good?” In <em>22nd IEEE International Conference on Software Quality,
-Reliability and Security, QRS 2022, Guangzhou, China, December 5-9,
-2022</em>, 333–43. IEEE. <a class="reference external" href="https://doi.org/10.1109/QRS57517.2022.00042">https://doi.org/10.1109/QRS57517.2022.00042</a>.</p>
+“<span class="nocase">Contextual Operationalization of Metrics As
+Scores: Is My Metric Value Good?</span>” In <em><span class="nocase">22nd
+IEEE International Conference on Software Quality, Reliability and
+Security, QRS 2022, Guangzhou, China, December 5–9, 2022</span></em>,
+333–43. IEEE. <a class="reference external" href="https://doi.org/10.1109/QRS57517.2022.00042">https://doi.org/10.1109/QRS57517.2022.00042</a>.</p>
 </div>
-<div id="ref-chambers2017" class="csl-entry">
-<p>John M. Chambers, Richard M. Heiberger, Anne E. Freeny. 2017. “Analysis
-of Variance; Designed Experiments.” In <em>Statistical Models in S</em>, edited
-by John M. Chambers and Trevor J. Hastie, 1st ed. Routledge.
-<a class="reference external" href="https://doi.org/10.1201/9780203738535">https://doi.org/10.1201/9780203738535</a>.</p>
-</div>
-<div id="ref-stephens1974" class="csl-entry">
-<p>Stephens, M. A. 1974. “EDF Statistics for Goodness of Fit and Some
-Comparisons.” <em>Journal of the American Statistical Association</em> 69
-(347): 730–37. <a class="reference external" href="https://doi.org/10.1080/01621459.1974.10480196">https://doi.org/10.1080/01621459.1974.10480196</a>.</p>
+<div id="ref-Stephens1974" class="csl-entry">
+<p>Stephens, M. A. 1974. “<span class="nocase">EDF Statistics for Goodness
+of Fit and Some Comparisons</span>.” <em>Journal of the American
+Statistical Association</em> 69 (347): 730–37.
+<a class="reference external" href="https://doi.org/10.1080/01621459.1974.10480196">https://doi.org/10.1080/01621459.1974.10480196</a>.</p>
 </div>
 <div id="ref-tempero2010qualitas" class="csl-entry">
 <p>Tempero, Ewan D., Craig Anslow, Jens Dietrich, Ted Han, Jing Li, Markus
-Lumpe, Hayden Melton, and James Noble. 2010. “The Qualitas Corpus: A
-Curated Collection of Java Code for Empirical Studies.” In <em>17th Asia
-Pacific Software Engineering Conference, APSEC 2010, Sydney, Australia,
-November 30 - December 3, 2010</em>, edited by Jun Han and Tran Dan Thu,
-336–45. IEEE Computer Society. <a class="reference external" href="https://doi.org/10.1109/APSEC.2010.46">https://doi.org/10.1109/APSEC.2010.46</a>.</p>
+Lumpe, Hayden Melton, and James Noble. 2010. “<span class="nocase">The
+Qualitas Corpus: A Curated Collection of Java Code for Empirical
+Studies</span>.” In <em>17th Asia Pacific Software Engineering Conference,
+APSEC 2010, Sydney, Australia, November 30 - December 3, 2010</em>, edited
+by Jun Han and Tran Dan Thu, 336–45. IEEE Computer Society.
+<a class="reference external" href="https://doi.org/10.1109/APSEC.2010.46">https://doi.org/10.1109/APSEC.2010.46</a>.</p>
 </div>
-<div id="ref-terra2013qcc" class="csl-entry">
-<p>Terra, Ricardo, Luis Fernando Miranda, Marco Túlio Valente, and Roberto
-da Silva Bigonha. 2013. “Qualitas.class Corpus: A Compiled Version of
-the Qualitas Corpus.” <em>ACM SIGSOFT Softw. Eng. Notes</em> 38 (5): 1–4.
+<div id="ref-terra2013qualitas" class="csl-entry">
+<p>Terra, Ricardo, Luis Fernando Miranda, Marco Tulio Valente, and Roberto
+da Silva Bigonha. 2013. “<span class="nocase"><span
+class="nocase">Qualitas.class</span> corpus: a compiled version of the
+<span class="nocase">qualitas</span> corpus</span>.” <em>ACM SIGSOFT
+Software Engineering Notes</em> 38 (5): 1–4.
 <a class="reference external" href="https://doi.org/10.1145/2507288.2507314">https://doi.org/10.1145/2507288.2507314</a>.</p>
 </div>
-<div id="ref-tukey1949anova" class="csl-entry">
-<p>Tukey, John W. 1949. “Comparing Individual Means in the Analysis of
-Variance.” <em>Biometrics</em> 5 (2): 99–114.
+<div id="ref-Tukey1949" class="csl-entry">
+<p>Tukey, John W. 1949. “<span class="nocase">Comparing Individual Means in
+the Analysis of Variance</span>.” <em>Biometrics</em> 5 (2): 99–114.
 <a class="reference external" href="https://doi.org/10.2307/3001913">https://doi.org/10.2307/3001913</a>.</p>
 </div>
 <div id="ref-ggplot2" class="csl-entry">
