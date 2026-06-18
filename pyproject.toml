@@ -31,7 +31,7 @@ script = "build.py"
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
-bokeh = "^2.4.3"
+bokeh = ">=2.4.3,<4.0.0"
 joblib = "^1.2.0"
 jupyterlab = "^3.4.7"
 matplotlib = "^3.6.0"
